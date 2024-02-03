@@ -1,0 +1,3 @@
+Project Ideas:
+1 - Physics Simulation Sandbox 
+2 - Simple Game with Multi-Agent Reinforcement Learning
