@@ -1,17 +1,13 @@
 # Cool awesome team :)
 
-### IDE:
-- IntelliJ IDEA
+IDE - IntelliJ IDEA
 
-### JAVA: TBD
+JAVA - 21
 
-### Build System:
-- Maven or Gradle, (TBD)
+Build System: Gradle
 
-### Coding Style:
-- IntelliJ
+Coding Style - IntelliJ
 
-### Code Review:
-- Through Jetbrains Space
+Code Review - Through Jetbrains Space
 
 Notes are done in Jetbrains Space documents
