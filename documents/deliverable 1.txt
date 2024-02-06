@@ -2,3 +2,5 @@ Project Ideas:
 1 - Physics Simulation Sandbox 
 2 - Simple Game with Multi-Agent Reinforcement Learning
 3 - Genetic Evolution Simulation
+4 - Chaos theory simulator 
+5 - Gravity force simulator 
