@@ -3,7 +3,7 @@ package com.coolawesome.integrativeproject.physics;
 import javafx.scene.paint.Color;
 
 
-public class Planet3D {
+public class Planet {
 
     Vector3D position;
     Vector3D velocity;
@@ -12,7 +12,7 @@ public class Planet3D {
     double mass;
     Color color;
 
-    public Planet3D(Vector3D position, Vector3D velocity, double radius, double mass, Color color) {
+    public Planet(Vector3D position, Vector3D velocity, double radius, double mass, Color color) {
         this.position = position;
         this.velocity = velocity;
         this.acceleration = new Vector3D();

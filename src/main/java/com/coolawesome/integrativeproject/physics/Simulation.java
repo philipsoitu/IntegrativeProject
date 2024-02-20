@@ -7,11 +7,11 @@ import java.util.List;
 
 public class Simulation {
 
-    public ArrayList<Planet3D> planets = new ArrayList<Planet3D>();
+    public ArrayList<Planet> planets = new ArrayList<Planet>();
 
 
     public void initialize(int numOfBodies) {
-        planets.add(new Planet3D(new Vector3D(350, 350, 0), new Vector3D(), 20, 300000, Color.YELLOW));
+        planets.add(new Planet(new Vector3D(350, 350, 0), new Vector3D(), 20, 300000, Color.YELLOW));
 
         for (int i = 1; i < numOfBodies; i++) {
 //            Randomizing parameters
@@ -25,7 +25,7 @@ public class Simulation {
             Color randColor = Color.rgb(r, g, b);
 
 //            Adding newly randomized Planet to ArrayList
-            Planet3D randPlanet = new Planet3D(randPos, randVel, randRad, randMass, randColor);
+            Planet randPlanet = new Planet(randPos, randVel, randRad, randMass, randColor);
             planets.add(randPlanet);
         }
     }
@@ -34,9 +34,9 @@ public class Simulation {
 
         double G = 0.001;
 
-        for (Planet3D p1 : planets) {
+        for (Planet p1 : planets) {
             Vector3D ftotal = new Vector3D();
-            for (Planet3D p2 : planets) {
+            for (Planet p2 : planets) {
                 if (p1 != p2) {
                     Vector3D dist = Vector3D.sub(p2.position, p1.position);
                     Vector3D f = Vector3D.multiply((G * p1.mass * p2.mass) / (dist.magnitude() * dist.magnitude()), Vector3D.unitVector(dist));
@@ -60,9 +60,9 @@ public class Simulation {
     }
 
     private void handleCollisions() {
-        List<Planet3D> planetsToRemove = new ArrayList<>();
-        for (Planet3D p1 : planets) {
-            for (Planet3D p2 : planets) {
+        List<Planet> planetsToRemove = new ArrayList<>();
+        for (Planet p1 : planets) {
+            for (Planet p2 : planets) {
                 if (p1 != p2 && p1 != null && p2 != null) {
                     Vector3D n = Vector3D.unitVector(Vector3D.sub(p1.position, p2.position));
                     double dist = Math.min(Vector3D.add(Vector3D.sub(p2.position, Vector3D.multiply(p2.radius, n)), p1.position).magnitude(), Vector3D.sub(Vector3D.sub(p2.position, Vector3D.multiply(p2.radius, n)), p1.position).magnitude());
