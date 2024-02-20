@@ -1,0 +1,29 @@
+Project Ideas:
+1 - Physics Simulation Sandbox 
+2 - Simple Game with Multi-Agent Reinforcement Learning
+3 - Genetic Evolution Simulation
+4 - Chaos theory simulator 
+5 - Gravity force simulator 
+6 - combine particles gravity with neural net
+spaceship that has to navigate solar system
+(2d)
+7 - balancing pendulum (n amounts) 
+
+Deliverable 1:
+
+Project description and documentation of the
+algorithms and features to be implemented
+
+Description: 
+
+
+A 2d AI spaceship navigator. A spaceship controlled by AI with the goal of navigating through planets.
+
+Inputs:
+
+
+
+Outputs:
+
+right, left, and thrust
+
