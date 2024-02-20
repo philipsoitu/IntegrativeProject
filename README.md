@@ -4,7 +4,7 @@ IDE - IntelliJ IDEA
 
 JAVA - 21
 
-Build System: Gradle
+Build System: Maven
 
 Coding Style - IntelliJ
 
