@@ -4,11 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fba92d50-62dc-4990-8ff1-7a3c8ce63cbd" name="Changes" comment="Setup Project">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java" afterDir="false" />
+    <list default="true" id="fba92d50-62dc-4990-8ff1-7a3c8ce63cbd" name="Changes" comment="Setup">
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Planet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Planet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Simulation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Simulation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Vector3D.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Vector3D.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,6 +55,10 @@
   "keyToString": {
     "ASKED_ADD_EXTERNAL_FILES": "true",
     "Application.MainApplication.executor": "Run",
+    "Downloaded.Files.Path.Enabled": "false",
+    "Repository.Attach.Annotations": "false",
+    "Repository.Attach.JavaDocs": "false",
+    "Repository.Attach.Sources": "false",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
@@ -61,9 +70,9 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
+    "project.structure.last.edited": "Libraries",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.3586207",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -109,7 +118,8 @@
       <option name="presentableId" value="Default" />
       <updated>1708445009551</updated>
       <workItem from="1708445010876" duration="779000" />
-      <workItem from="1708446744257" duration="1486000" />
+      <workItem from="1708446744257" duration="1592000" />
+      <workItem from="1708455491268" duration="5415000" />
     </task>
     <task id="LOCAL-00001" summary="Setup Project">
       <option name="closed" value="true" />
@@ -127,7 +137,15 @@
       <option name="project" value="LOCAL" />
       <updated>1708445714666</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Setup">
+      <option name="closed" value="true" />
+      <created>1708448327820</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1708448327821</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -136,6 +154,7 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Setup Project" />
-    <option name="LAST_COMMIT_MESSAGE" value="Setup Project" />
+    <MESSAGE value="Setup" />
+    <option name="LAST_COMMIT_MESSAGE" value="Setup" />
   </component>
 </project>
