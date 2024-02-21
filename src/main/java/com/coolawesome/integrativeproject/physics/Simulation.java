@@ -20,7 +20,7 @@ public class Simulation {
         for (int i = 1; i < numOfBodies; i++) {
 
             // Randomizing parameters
-            Vector3D randPos = new Vector3D(Math.random() * 30, Math.random() * 30, Math.random() * 30);
+            Vector3D randPos = new Vector3D(Math.random() * 30 - 15, Math.random() * 30 - 15, Math.random() * 30 - 15);
 //            Vector3D randVel = new Vector3D(-1 + Math.random() * 2, -1 + Math.random() * 2, -1 + Math.random() * 2);
             Vector3D randVel = new Vector3D();
             double randRad = 1 + Math.random() * 2;
