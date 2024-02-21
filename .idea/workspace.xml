@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fba92d50-62dc-4990-8ff1-7a3c8ce63cbd" name="Changes" comment="Initial 3D Scene Creation + Lombok Install">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Vector2D.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Simulation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Simulation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Vector3D.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Vector3D.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,6 +55,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/HP USER/Documents/CP4/IP&quot;,
@@ -117,6 +115,7 @@
       <workItem from="1708446744257" duration="1592000" />
       <workItem from="1708455491268" duration="6292000" />
       <workItem from="1708476819818" duration="10118000" />
+      <workItem from="1708536311414" duration="2755000" />
     </task>
     <task id="LOCAL-00001" summary="Setup Project">
       <option name="closed" value="true" />
