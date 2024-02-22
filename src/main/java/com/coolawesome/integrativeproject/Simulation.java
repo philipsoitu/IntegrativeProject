@@ -1,6 +1,6 @@
-package com.coolawesome.integrativeproject.physics;
+package com.coolawesome.integrativeproject;
 
-import com.coolawesome.integrativeproject.SimulationView;
+import com.coolawesome.integrativeproject.utils.Vector3D;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 
@@ -13,7 +13,7 @@ public class Simulation {
 
     public Simulation(AnchorPane viewport) {
         simulationView = new SimulationView(viewport, planetMap);
-        initialize(3);
+        initialize(10);
     }
 
     public void initialize(int numOfBodies) {
@@ -25,18 +25,15 @@ public class Simulation {
             Vector3D randVel = new Vector3D();
             double randRad = 1 + Math.random() * 2;
             double randMass = 5000;
-            int r = (int) (Math.random() * 255);
-            int g = (int) (Math.random() * 255);
-            int b = (int) (Math.random() * 255);
-            Color randColor = Color.rgb(r, g, b);
+            boolean sun = Math.random() * 4 < 1;
 
             // Generate a unique ID for the planet
             String uniqueID = UUID.randomUUID().toString().replaceAll("-", "");
 
             // Create the Planet object
-            Planet randPlanet = new Planet(randPos, randVel, randRad, randMass, randColor);
+            Planet randPlanet = new Planet(randPos, randVel, randRad, randMass, sun);
 
-            // Add the Planet to the ArrayList and the Map
+            // Add the Planet to the Map
             planetMap.put(uniqueID, randPlanet);
         }
     }

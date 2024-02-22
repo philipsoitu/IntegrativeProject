@@ -1,5 +1,6 @@
 package com.coolawesome.integrativeproject;
 
+import javafx.geometry.Point3D;
 import javafx.scene.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
@@ -10,8 +11,7 @@ import javafx.scene.shape.Sphere;
 import org.fxyz3d.scene.Skybox;
 import org.fxyz3d.utils.CameraTransformer;
 
-import com.coolawesome.integrativeproject.physics.Planet;
-import com.coolawesome.integrativeproject.physics.Vector3D;
+import com.coolawesome.integrativeproject.utils.Vector3D;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -67,17 +67,13 @@ public class SimulationView extends Group {
         cameraTransform.rx.setPivotZ(0);
         cameraTransform.ry.setPivotZ(0);
         subScene.setCamera(camera);
+        cameraTransform.t.setZ(-100);
 
         AmbientLight al = new AmbientLight(Color.rgb(100, 100, 100));
 
-        PointLight pl = new PointLight(Color.WHITE); // Temporary light source
-        pl.setTranslateX(0);
-        pl.setTranslateY(0);
-        pl.setTranslateZ(0);
-
         skyBox = new Skybox(topImage, bottomImage, rightImage, leftImage, frontImage, backImage, 10000, camera);
 
-        this.getChildren().addAll(pl, al, skyBox);
+        this.getChildren().addAll(al, skyBox);
 
         // Set up the event handlers
         subScene.setOnMousePressed(event -> {
@@ -108,6 +104,9 @@ public class SimulationView extends Group {
                 this.getChildren().add(planet.planetNode);
                 planet.planetNode.setOnMouseClicked(event -> currentCamPlanetID = id);
             }
+            if (planet.isSun && !this.getChildren().contains(planet.sunLight)) {
+                this.getChildren().add(planet.sunLight);
+            }
         });
 
         // check if there are any planets in the scene that are not in the map
@@ -128,6 +127,18 @@ public class SimulationView extends Group {
                     }
                 }
             }
+            if (node instanceof PointLight) {
+                boolean found = false;
+                for (Planet planet : planetMap.values()) {
+                    if (planet.isSun && planet.sunLight.equals(node)) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    nodesToRemove.add(node);
+                }
+            }
         }
         this.getChildren().removeAll(nodesToRemove);
 
@@ -136,6 +147,11 @@ public class SimulationView extends Group {
             planet.planetNode.setTranslateX(planet.position.x);
             planet.planetNode.setTranslateY(planet.position.y);
             planet.planetNode.setTranslateZ(planet.position.z);
+            if (planet.isSun){
+                planet.sunLight.setTranslateX(planet.position.x);
+                planet.sunLight.setTranslateY(planet.position.y);
+                planet.sunLight.setTranslateZ(planet.position.z);
+            }
         }
 
         // Look at the planet if the camera is set to do so
@@ -159,6 +175,9 @@ public class SimulationView extends Group {
             }
         }
 
+        //TODO: fix looking straight up/down
+        //TODO: fix flying into planets
+
         // Move the camera
         double yaw = Math.toRadians(cameraTransform.ry.getAngle());
         double pitch = Math.toRadians(cameraTransform.rx.getAngle());
@@ -176,9 +195,9 @@ public class SimulationView extends Group {
         Vector3D up = Vector3D.crossProduct(right, facing);
         up.normalize();
 
-        facing.multiply(0.9); // reduce the speed of the camera
-        right.multiply(0.9);
-        up.multiply(0.9);
+        facing.multiply(0.6); // reduce the speed of the camera
+        right.multiply(0.6);
+        up.multiply(0.6);
 
         if (keysPressed.contains(KeyCode.W)) {
             cameraVelocity.x += facing.x;

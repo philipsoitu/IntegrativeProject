@@ -1,4 +1,4 @@
-package com.coolawesome.integrativeproject.physics;
+package com.coolawesome.integrativeproject.utils;
 
 
 public class Vector3D {

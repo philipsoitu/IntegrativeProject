@@ -1,18 +1,13 @@
 package com.coolawesome.integrativeproject;
 
-import com.coolawesome.integrativeproject.physics.Planet;
-import com.coolawesome.integrativeproject.physics.Simulation;
-import com.coolawesome.integrativeproject.physics.Vector3D;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class MainApplication extends Application {
     @Override
