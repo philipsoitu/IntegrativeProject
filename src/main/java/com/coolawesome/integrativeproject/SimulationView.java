@@ -1,96 +1,104 @@
 package com.coolawesome.integrativeproject;
 
+import javafx.scene.*;
+import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.paint.Color;
+import javafx.scene.layout.AnchorPane;
+
+import javafx.scene.shape.Sphere;
+import org.fxyz3d.scene.Skybox;
+import org.fxyz3d.utils.CameraTransformer;
+
 import com.coolawesome.integrativeproject.physics.Planet;
 import com.coolawesome.integrativeproject.physics.Vector3D;
-import javafx.scene.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
-import javafx.scene.transform.Rotate;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+
 public class SimulationView extends Group {
 
-    private SubScene subScene;
-    private Set<KeyCode> keysPressed = new HashSet<>();
-    private Map<String, Planet> planetMap;
-    private String currentCamPlanetID = "";
-    private double deltaMouseX, deltaMouseY = 0;
-    private PerspectiveCamera camera;
-    Vector3D camPos = new Vector3D(0, 0, -100);
-    Vector3D camVel = new Vector3D();
-    private Rotate rotateX = new Rotate(0, Rotate.X_AXIS);
-    private Rotate rotateY = new Rotate(0, Rotate.Y_AXIS);
-    private double orbitDistance = 100;
+    private final Set<KeyCode> keysPressed = new HashSet<>();
 
+    private final Map<String, Planet> planetMap;
+    private String currentCamPlanetID = "";
+
+    private final Image
+        backImage = new Image("file:src/main/resources/images/skybox/back.png"),
+        bottomImage = new Image("file:src/main/resources/images/skybox/bottom.png"),
+        frontImage = new Image("file:src/main/resources/images/skybox/front.png"),
+        leftImage = new Image("file:src/main/resources/images/skybox/left.png"),
+        rightImage = new Image("file:src/main/resources/images/skybox/right.png"),
+        topImage = new Image("file:src/main/resources/images/skybox/top.png"),
+        cubeMap = new Image("file:src/main/resources/images/skybox/cubemap.png");
+    private final Skybox skyBox;
+
+    private final PerspectiveCamera camera;
+    private final double FOV = 60;
+    private final CameraTransformer cameraTransform = new CameraTransformer();
+    private final Vector3D cameraVelocity = new Vector3D();
+
+    private double deltaMouseX, deltaMouseY = 0;
 
     public SimulationView(AnchorPane pane, Map<String, Planet> planetMap) {
-        initializeCamera();
         this.planetMap = planetMap;
 
         // Set up the subscene for 3D content
-        subScene = new SubScene(this, pane.getWidth(), pane.getHeight(), true, SceneAntialiasing.BALANCED);
+        SubScene subScene = new SubScene(this, pane.getWidth(), pane.getHeight(), true, SceneAntialiasing.BALANCED);
         subScene.widthProperty().bind(pane.widthProperty());
         subScene.heightProperty().bind(pane.heightProperty());
         subScene.setFill(Color.BLACK);
-        subScene.setCamera(camera);
         pane.getChildren().add(subScene);
 
-        PointLight pl = new PointLight(Color.WHITE);
+        // Set up the camera
+        camera = new PerspectiveCamera(true);
+        camera.setNearClip(0.1);
+        camera.setFarClip(10000.0);
+        camera.setTranslateX(0);
+        camera.setTranslateY(0);
+        camera.setTranslateZ(0);
+        camera.setFieldOfView(FOV);
+        cameraTransform.getChildren().add(camera);
+        cameraTransform.t.setX(0);
+        cameraTransform.t.setY(0);
+        cameraTransform.t.setZ(0);
+        cameraTransform.rx.setPivotZ(0);
+        cameraTransform.ry.setPivotZ(0);
+        subScene.setCamera(camera);
+
+        AmbientLight al = new AmbientLight(Color.rgb(100, 100, 100));
+
+        PointLight pl = new PointLight(Color.WHITE); // Temporary light source
         pl.setTranslateX(0);
         pl.setTranslateY(0);
         pl.setTranslateZ(0);
 
-        AmbientLight al = new AmbientLight(Color.rgb(100, 100, 100));
+        skyBox = new Skybox(topImage, bottomImage, rightImage, leftImage, frontImage, backImage, 10000, camera);
 
-        this.getChildren().addAll(pl, al);
+        this.getChildren().addAll(pl, al, skyBox);
 
+        // Set up the event handlers
         subScene.setOnMousePressed(event -> {
             deltaMouseX = event.getSceneX();
             deltaMouseY = event.getSceneY();
         });
-
         subScene.setOnMouseDragged(event -> {
             currentCamPlanetID = "";
             deltaMouseX = event.getSceneX() - deltaMouseX;
             deltaMouseY = event.getSceneY() - deltaMouseY;
 
-            rotateX.setAngle(rotateX.getAngle() - deltaMouseY / 4);
-            rotateY.setAngle(rotateY.getAngle() + deltaMouseX / 4);
+            cameraTransform.ry.setAngle(cameraTransform.ry.getAngle() + deltaMouseX * 0.2);
+            cameraTransform.rx.setAngle(cameraTransform.rx.getAngle() - deltaMouseY * 0.2);
 
             deltaMouseX = event.getSceneX();
             deltaMouseY = event.getSceneY();
         });
-
-        subScene.setOnScroll(event -> {
-            orbitDistance += event.getDeltaY() / 4;
-        });
-
-        subScene.setOnKeyPressed(event -> {
-            keysPressed.add(event.getCode());
-        });
-
-        subScene.setOnKeyReleased(event -> {
-            keysPressed.remove(event.getCode());
-        });
+        subScene.setOnKeyPressed(event -> keysPressed.add(event.getCode()));
+        subScene.setOnKeyReleased(event -> keysPressed.remove(event.getCode()));
 
         subScene.requestFocus();
-
-        update(0.0);
-    }
-
-    private void initializeCamera() {
-        camera = new PerspectiveCamera(true);
-        camera.setTranslateX(camPos.x);
-        camera.setTranslateY(camPos.y);
-        camera.setTranslateZ(camPos.z);
-        camera.setFarClip(5000.0);
-        camera.setNearClip(0.1);
-        camera.getTransforms().add(0, rotateY);
-        camera.getTransforms().add(1, rotateX);
     }
 
     public void update(double dt) {
@@ -98,11 +106,30 @@ public class SimulationView extends Group {
         planetMap.forEach((id, planet) -> {
             if (!this.getChildren().contains(planet.planetNode)) {
                 this.getChildren().add(planet.planetNode);
-                planet.planetNode.setOnMouseClicked(event -> {
-                    currentCamPlanetID = id;
-                });
+                planet.planetNode.setOnMouseClicked(event -> currentCamPlanetID = id);
             }
         });
+
+        // check if there are any planets in the scene that are not in the map
+        Set<Node> nodesToRemove = new HashSet<>();
+        for (Node node : this.getChildren()) {
+            if (node instanceof Sphere) {
+                boolean found = false;
+                for (Planet planet : planetMap.values()) {
+                    if (planet.planetNode.equals(node)) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    nodesToRemove.add(node);
+                    if (currentCamPlanetID.equals(node.getId())) {
+                        currentCamPlanetID = "";
+                    }
+                }
+            }
+        }
+        this.getChildren().removeAll(nodesToRemove);
 
         //update the position of the planets
         for (var planet : planetMap.values()) {
@@ -111,54 +138,95 @@ public class SimulationView extends Group {
             planet.planetNode.setTranslateZ(planet.position.z);
         }
 
+        // Look at the planet if the camera is set to do so
         if (!currentCamPlanetID.isEmpty()) {
-
-            Planet camPlanet = planetMap.get(currentCamPlanetID);
-            Vector3D camPlanetPos = camPlanet.position;
-
-            Vector3D camDir = Vector3D.difference(camPlanetPos, camPos);
-            camDir.normalize();
-
-            if (planetMap.get(currentCamPlanetID).position.distance(camPos) > orbitDistance + 1){
-                // move towards the planet
-                camVel.add(Vector3D.multiplication(0.1, camDir));
-            } else if (planetMap.get(currentCamPlanetID).position.distance(camPos) < orbitDistance - 1){
-                // move away from the planet
-                camVel.subtract(Vector3D.multiplication(0.1, camDir));
-            } else {
-                // orbit around the planet
-                Vector3D direction = Vector3D.difference(camPlanet.position, camPos);
+            Planet planet = planetMap.get(currentCamPlanetID);
+            if (planet != null) {
+                Vector3D camPos = new Vector3D(
+                        cameraTransform.t.getX(),
+                        cameraTransform.t.getY(),
+                        cameraTransform.t.getZ()
+                );
+                Vector3D planetPos = planet.position;
+                Vector3D direction = Vector3D.difference(planetPos, camPos);
                 direction.normalize();
 
-                // Calculate the cross product of the direction vector and the up vector (0, 1, 0) to get the perpendicular vector
-                Vector3D perpendicular = Vector3D.crossProduct(direction, new Vector3D(0, 1, 0));
-                perpendicular.normalize();
+                double directionPitch = -Math.toDegrees(Math.asin(direction.y));
+                double directionYaw = Math.toDegrees(Math.atan2(direction.x, direction.z));
 
-                // Set the camera's velocity to the perpendicular vector multiplied by a speed factor
-                camVel = Vector3D.multiplication(0.2, perpendicular);
+                cameraTransform.rx.setAngle(lerpAngle(cameraTransform.rx.getAngle(), directionPitch, 0.5));
+                cameraTransform.ry.setAngle(lerpAngle(cameraTransform.ry.getAngle(), directionYaw, 0.5));
             }
-
-            // Calculate the direction vector from the camera to the planet
-            Vector3D direction = Vector3D.difference(camPlanet.position, camPos);
-
-            // Normalize the direction vector
-            direction.normalize();
-
-            // Calculate the pitch (rotation around the X-axis) and yaw (rotation around the Y-axis) angles
-            double pitch = -Math.toDegrees(Math.asin(direction.y));
-            double yaw = Math.toDegrees(Math.atan2(direction.x, direction.z));
-
-            // Set the angles of rotateX and rotateY to the calculated pitch and yaw respectively
-            rotateX.setAngle(pitch);
-            rotateY.setAngle(yaw);
         }
 
-        camPos.add(camVel);
+        // Move the camera
+        double yaw = Math.toRadians(cameraTransform.ry.getAngle());
+        double pitch = Math.toRadians(cameraTransform.rx.getAngle());
 
-        camVel.multiply(0.9);
+        double x = Math.cos(pitch) * Math.sin(yaw);
+        double y = Math.sin(pitch);
+        double z = Math.cos(pitch) * Math.cos(yaw);
 
-        camera.setTranslateX(camPos.x);
-        camera.setTranslateY(camPos.y);
-        camera.setTranslateZ(camPos.z);
+        Vector3D facing = new Vector3D(x, y, z);
+        facing.normalize();
+
+        Vector3D right = Vector3D.crossProduct(facing, new Vector3D(0, 1, 0));
+        right.normalize();
+
+        Vector3D up = Vector3D.crossProduct(right, facing);
+        up.normalize();
+
+        facing.multiply(0.9); // reduce the speed of the camera
+        right.multiply(0.9);
+        up.multiply(0.9);
+
+        if (keysPressed.contains(KeyCode.W)) {
+            cameraVelocity.x += facing.x;
+            cameraVelocity.y -= facing.y;
+            cameraVelocity.z += facing.z;
+        }
+        if (keysPressed.contains(KeyCode.S)) {
+            cameraVelocity.x -= facing.x;
+            cameraVelocity.y += facing.y;
+            cameraVelocity.z -= facing.z;
+        }
+        if (keysPressed.contains(KeyCode.A)) {
+            cameraVelocity.x += right.x;
+            cameraVelocity.y -= right.y;
+            cameraVelocity.z += right.z;
+        }
+        if (keysPressed.contains(KeyCode.D)) {
+            cameraVelocity.x -= right.x;
+            cameraVelocity.y += right.y;
+            cameraVelocity.z -= right.z;
+        }
+        if (keysPressed.contains(KeyCode.SPACE)) {
+            cameraVelocity.x += up.x;
+            cameraVelocity.y -= up.y;
+            cameraVelocity.z += up.z;
+        }
+        if (keysPressed.contains(KeyCode.CONTROL)) {
+            cameraVelocity.x -= up.x;
+            cameraVelocity.y += up.y;
+            cameraVelocity.z -= up.z;
+        }
+        if (keysPressed.contains(KeyCode.SHIFT)) {
+            cameraVelocity.multiply(1.2);
+        }
+
+        cameraTransform.t.setX(cameraTransform.t.getX() + cameraVelocity.x);
+        cameraTransform.t.setY(cameraTransform.t.getY() + cameraVelocity.y);
+        cameraTransform.t.setZ(cameraTransform.t.getZ() + cameraVelocity.z);
+
+        cameraVelocity.multiply(0.8);
     }
+
+    private double lerpAngle(double start, double end, double t) {
+        double diff = end - start;
+        // Normalize the difference in the angle
+        while (diff < -180) diff += 360;
+        while (diff > 180) diff -= 360;
+        return start + diff * t;
+    }
+
 }

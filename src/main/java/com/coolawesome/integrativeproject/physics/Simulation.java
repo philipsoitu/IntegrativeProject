@@ -13,15 +13,15 @@ public class Simulation {
 
     public Simulation(AnchorPane viewport) {
         simulationView = new SimulationView(viewport, planetMap);
-        initialize(50);
+        initialize(3);
     }
 
     public void initialize(int numOfBodies) {
-        for (int i = 1; i < numOfBodies; i++) {
+        for (int i = 0; i < numOfBodies; i++) {
 
             // Randomizing parameters
             Vector3D randPos = new Vector3D(Math.random() * 30 - 15, Math.random() * 30 - 15, Math.random() * 30 - 15);
-//            Vector3D randVel = new Vector3D(-1 + Math.random() * 2, -1 + Math.random() * 2, -1 + Math.random() * 2);
+            // Vector3D randVel = new Vector3D(-1 + Math.random() * 2, -1 + Math.random() * 2, -1 + Math.random() * 2);
             Vector3D randVel = new Vector3D();
             double randRad = 1 + Math.random() * 2;
             double randMass = 5000;
@@ -52,7 +52,7 @@ public class Simulation {
 
     private void updatePosition(double dt) {
 
-        double G = 0.0001;
+        double G = 0.001;
 
         planetMap.forEach((id, p1) -> {
             Vector3D ftotal = new Vector3D();
@@ -92,9 +92,7 @@ public class Simulation {
                 }
             });
         });
-        idPlanetsToRemove.forEach((id) -> {
-            planetMap.remove(id);
-        });
+        idPlanetsToRemove.forEach((id) -> planetMap.remove(id));
 //        planetMap.remove(idPlanetsToRemove);
     }
 }
