@@ -23,7 +23,7 @@ public class Planet {
     public boolean isSun;
     public PointLight sunLight;
 
-    private static final Image sunTexture = new Image("file:src/main/resources/images/planets/sun.png");
+    private static final Image sunTexture = new Image("file:src/main/resources/images/planets/sun.jpg");
     private static final Image[] planetTextures = {
         new Image("file:src/main/resources/images/planets/Alpine.png"),
         new Image("file:src/main/resources/images/planets/Gaseous1.png"),
@@ -79,8 +79,8 @@ public class Planet {
 
     private void initSun(){
         material.setSelfIlluminationMap(sunTexture); //TODO: add more sun textures
-        material.setDiffuseColor(this.color);
-        material.setSpecularColor(this.color);
+        material.setDiffuseColor(Color.BLACK);
+        material.setSpecularPower(0);
         planetNode.setMaterial(material);
         planetNode.setRotationAxis(new Point3D(0, 1, 0));
         sunLight = new PointLight(this.color);
