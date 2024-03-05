@@ -19,15 +19,15 @@ public class Vector3D {
         this.z = 0;
     }
 
-    public static Vector3D sum(Vector3D... args) {
+    public static Vector3D sum(Vector3D... vectors) {
         double x = 0;
         double y = 0;
         double z = 0;
 
-        for (var i : args) {
-            x += i.x;
-            y += i.y;
-            z += i.z;
+        for (var vector : vectors) {
+            x += vector.x;
+            y += vector.y;
+            z += vector.z;
         }
         return new Vector3D(x, y, z);
     }
@@ -39,10 +39,10 @@ public class Vector3D {
         return new Vector3D(x, y, z);
     }
 
-    public static Vector3D multiplication(double a, Vector3D v1) {
-        double x = (double) a * (double) v1.x;
-        double y = (double) a * (double) v1.y;
-        double z = (double) a * (double) v1.z;
+    public static Vector3D multiplication(double multiplier, Vector3D v1) {
+        double x = multiplier * v1.x;
+        double y = multiplier * v1.y;
+        double z = multiplier * v1.z;
         return new Vector3D(x, y, z);
     }
 
@@ -51,8 +51,8 @@ public class Vector3D {
     }
 
     static public Vector3D unitVector(Vector3D v) {
-        double magn = v.magnitude();
-        return new Vector3D(v.x / magn, v.y / magn, v.z / magn);
+        double magnitude = v.magnitude();
+        return new Vector3D(v.x / magnitude, v.y / magnitude, v.z / magnitude);
     }
 
     public static Vector3D crossProduct(Vector3D v1, Vector3D v2) {
@@ -69,26 +69,26 @@ public class Vector3D {
         this.z /= magnitude;
     }
 
-    public void add(Vector3D... args) {
-        for (var i : args) {
-            this.x += i.x;
-            this.y += i.y;
-            this.z += i.z;
+    public void add(Vector3D... vectors) {
+        for (var vector : vectors) {
+            this.x += vector.x;
+            this.y += vector.y;
+            this.z += vector.z;
         }
     }
 
-    public void subtract(Vector3D... args) {
-        for (var i : args) {
-            this.x -= i.x;
-            this.y -= i.y;
-            this.z -= i.z;
+    public void subtract(Vector3D... vectors) {
+        for (var vector : vectors) {
+            this.x -= vector.x;
+            this.y -= vector.y;
+            this.z -= vector.z;
         }
     }
 
-    public void multiply(double a) {
-        this.x *= a;
-        this.y *= a;
-        this.z *= a;
+    public void multiply(double multiplier) {
+        this.x *= multiplier;
+        this.y *= multiplier;
+        this.z *= multiplier;
     }
 
     public double magnitude() {
