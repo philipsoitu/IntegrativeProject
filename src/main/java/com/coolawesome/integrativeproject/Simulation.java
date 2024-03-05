@@ -13,14 +13,14 @@ public class Simulation {
 
     public Simulation(AnchorPane viewport) {
         simulationView = new SimulationView(viewport, planetMap);
-        initialize(10);
+        initialize(100);
     }
 
     public void initialize(int numOfBodies) {
         for (int i = 0; i < numOfBodies; i++) {
 
             // Randomizing parameters
-            Vector3D randPos = new Vector3D(Math.random() * 30 - 15, Math.random() * 30 - 15, Math.random() * 30 - 15);
+            Vector3D randPos = new Vector3D(Math.random() * 300 - 150, Math.random() * 300 - 150, Math.random() * 300 - 150);
             // Vector3D randVel = new Vector3D(-1 + Math.random() * 2, -1 + Math.random() * 2, -1 + Math.random() * 2);
             Vector3D randVel = new Vector3D();
             double randRad = 1 + Math.random() * 2;
@@ -36,11 +36,13 @@ public class Simulation {
             // Add the Planet to the Map
             planetMap.put(uniqueID, randPlanet);
         }
+        planetMap.put("sun", new Planet(new Vector3D(5000, 0, 0), new Vector3D(), 1000, 100000, true));
     }
 
     public void update(double dt){
         // Do physics n shit here
         updatePosition(dt);
+
         handleCollisions();
         simulationView.update(dt);
 

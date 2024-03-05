@@ -55,7 +55,7 @@ public class SimulationView extends Group {
         // Set up the camera
         camera = new PerspectiveCamera(true);
         camera.setNearClip(0.1);
-        camera.setFarClip(10000.0);
+        camera.setFarClip(100000.0);
         camera.setTranslateX(0);
         camera.setTranslateY(0);
         camera.setTranslateZ(0);
@@ -71,7 +71,7 @@ public class SimulationView extends Group {
 
         AmbientLight al = new AmbientLight(Color.rgb(100, 100, 100));
 
-        skyBox = new Skybox(topImage, bottomImage, rightImage, leftImage, frontImage, backImage, 10000, camera);
+        skyBox = new Skybox(topImage, bottomImage, rightImage, leftImage, frontImage, backImage, 100000, camera);
 
         this.getChildren().addAll(al, skyBox);
 
