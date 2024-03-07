@@ -99,6 +99,12 @@ public class Vector3D {
         return Math.sqrt(Math.pow(this.x - v.x, 2) + Math.pow(this.y - v.y, 2) + Math.pow(this.z - v.z, 2));
     }
 
+    public void negate() {
+        this.x = -this.x;
+        this.y = -this.y;
+        this.z = -this.z;
+    }
+
     @Override
     public String toString() {
         return "x: " + x + " y: " + y + " z: " + z;

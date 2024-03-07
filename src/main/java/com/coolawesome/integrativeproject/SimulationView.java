@@ -1,6 +1,6 @@
 package com.coolawesome.integrativeproject;
 
-import javafx.geometry.Point3D;
+import com.coolawesome.integrativeproject.utils.PIDController;
 import javafx.scene.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
@@ -154,29 +154,7 @@ public class SimulationView extends Group {
             }
         }
 
-        // Look at the planet if the camera is set to do so
-        if (!currentCamPlanetID.isEmpty()) {
-            Planet planet = planetMap.get(currentCamPlanetID);
-            if (planet != null) {
-                Vector3D camPos = new Vector3D(
-                        cameraTransform.t.getX(),
-                        cameraTransform.t.getY(),
-                        cameraTransform.t.getZ()
-                );
-                Vector3D planetPos = planet.position;
-                Vector3D direction = Vector3D.difference(planetPos, camPos);
-                direction.normalize();
-
-                double directionPitch = -Math.toDegrees(Math.asin(direction.y));
-                double directionYaw = Math.toDegrees(Math.atan2(direction.x, direction.z));
-
-                cameraTransform.rx.setAngle(lerpAngle(cameraTransform.rx.getAngle(), directionPitch, 0.5));
-                cameraTransform.ry.setAngle(lerpAngle(cameraTransform.ry.getAngle(), directionYaw, 0.5));
-            }
-        }
-
         //TODO: fix looking straight up/down
-        //TODO: fix flying into planets
 
         // Move the camera
         double yaw = Math.toRadians(cameraTransform.ry.getAngle());
@@ -199,38 +177,71 @@ public class SimulationView extends Group {
         right.multiply(0.6);
         up.multiply(0.6);
 
-        if (keysPressed.contains(KeyCode.W)) {
-            cameraVelocity.x += facing.x;
-            cameraVelocity.y -= facing.y;
-            cameraVelocity.z += facing.z;
-        }
-        if (keysPressed.contains(KeyCode.S)) {
-            cameraVelocity.x -= facing.x;
-            cameraVelocity.y += facing.y;
-            cameraVelocity.z -= facing.z;
-        }
-        if (keysPressed.contains(KeyCode.A)) {
-            cameraVelocity.x += right.x;
-            cameraVelocity.y -= right.y;
-            cameraVelocity.z += right.z;
-        }
-        if (keysPressed.contains(KeyCode.D)) {
-            cameraVelocity.x -= right.x;
-            cameraVelocity.y += right.y;
-            cameraVelocity.z -= right.z;
-        }
-        if (keysPressed.contains(KeyCode.SPACE)) {
-            cameraVelocity.x += up.x;
-            cameraVelocity.y -= up.y;
-            cameraVelocity.z += up.z;
-        }
-        if (keysPressed.contains(KeyCode.CONTROL)) {
-            cameraVelocity.x -= up.x;
-            cameraVelocity.y += up.y;
-            cameraVelocity.z -= up.z;
-        }
-        if (keysPressed.contains(KeyCode.SHIFT)) {
-            cameraVelocity.multiply(1.2);
+        if (!currentCamPlanetID.isEmpty()) {
+            Planet planet = planetMap.get(currentCamPlanetID);
+            if (planet != null) {
+                Vector3D camPos = new Vector3D(
+                        cameraTransform.t.getX(),
+                        cameraTransform.t.getY(),
+                        cameraTransform.t.getZ()
+                );
+                Vector3D planetPos = planet.position;
+                Vector3D direction = Vector3D.difference(planetPos, camPos);
+                double distance = direction.magnitude();
+                direction.normalize();
+
+                double directionPitch = -Math.toDegrees(Math.asin(direction.y));
+                double directionYaw = Math.toDegrees(Math.atan2(direction.x, direction.z));
+
+                cameraTransform.rx.setAngle(lerpAngle(cameraTransform.rx.getAngle(), directionPitch, 0.2));
+                cameraTransform.ry.setAngle(lerpAngle(cameraTransform.ry.getAngle(), directionYaw, 0.2));
+
+                //Use PID controller to move towards planet
+                direction.negate();
+                PIDController pidController = new PIDController(1e-15, 1e-2, 1e-8);
+                double pidOutput = pidController.calculate(planet.radius * 3, distance);
+                direction.multiply(pidOutput);
+                cameraVelocity.add(direction);
+
+                //TODO: orbit camera around planet
+
+            }
+
+        } else {
+
+            if (keysPressed.contains(KeyCode.W)) {
+                cameraVelocity.x += facing.x;
+                cameraVelocity.y -= facing.y;
+                cameraVelocity.z += facing.z;
+            }
+            if (keysPressed.contains(KeyCode.S)) {
+                cameraVelocity.x -= facing.x;
+                cameraVelocity.y += facing.y;
+                cameraVelocity.z -= facing.z;
+            }
+            if (keysPressed.contains(KeyCode.A)) {
+                cameraVelocity.x += right.x;
+                cameraVelocity.y -= right.y;
+                cameraVelocity.z += right.z;
+            }
+            if (keysPressed.contains(KeyCode.D)) {
+                cameraVelocity.x -= right.x;
+                cameraVelocity.y += right.y;
+                cameraVelocity.z -= right.z;
+            }
+            if (keysPressed.contains(KeyCode.SPACE)) {
+                cameraVelocity.x += up.x;
+                cameraVelocity.y -= up.y;
+                cameraVelocity.z += up.z;
+            }
+            if (keysPressed.contains(KeyCode.CONTROL)) {
+                cameraVelocity.x -= up.x;
+                cameraVelocity.y += up.y;
+                cameraVelocity.z -= up.z;
+            }
+            if (keysPressed.contains(KeyCode.SHIFT)) {
+                cameraVelocity.multiply(1.2);
+            }
         }
 
         cameraTransform.t.setX(cameraTransform.t.getX() + cameraVelocity.x);
@@ -247,5 +258,4 @@ public class SimulationView extends Group {
         while (diff > 180) diff -= 360;
         return start + diff * t;
     }
-
 }
