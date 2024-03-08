@@ -109,4 +109,16 @@ public class Vector3D {
     public String toString() {
         return "x: " + x + " y: " + y + " z: " + z;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Vector3D vector3D = (Vector3D) obj;
+        return Double.compare(vector3D.x, x) == 0 && Double.compare(vector3D.y, y) == 0 && Double.compare(vector3D.z, z) == 0;
+    }
 }

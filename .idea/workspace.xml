@@ -4,19 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fba92d50-62dc-4990-8ff1-7a3c8ce63cbd" name="Changes" comment="Texture Changes">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/PIDController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/com/coolawesome/integrativeproject/utils/PIDControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_11_48_a_m__[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_11_48_a_m___Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_5_32_p_m__[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_5_32_p_m___Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_10_19_a_m__[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_10_19_a_m___Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_2_56_p_m__[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_2_56_p_m___Changes_.xml" beforeDir="false" />
+    <list default="true" id="fba92d50-62dc-4990-8ff1-7a3c8ce63cbd" name="Changes" comment="PID Controller">
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/coolawesome/integrativeproject/utils/Vector3DTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/Vector3D.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/Vector3D.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -62,6 +52,7 @@
     "Downloaded.Files.Path.Enabled": "false",
     "JUnit.PIDControllerTest (1).executor": "Run",
     "JUnit.PIDControllerTest.executor": "Run",
+    "JUnit.Vector3DTest.executor": "Run",
     "Repository.Attach.Annotations": "false",
     "Repository.Attach.JavaDocs": "false",
     "Repository.Attach.Sources": "false",
@@ -100,7 +91,7 @@
       <recent name="com.coolawesome.integrativeproject" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.MainApplication">
+  <component name="RunManager" selected="JUnit.Vector3DTest">
     <configuration name="MainApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.coolawesome.integrativeproject.MainApplication" />
       <module name="IntegrativeProject" />
@@ -138,8 +129,24 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="Vector3DTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="IntegrativeProject" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.coolawesome.integrativeproject.utils.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.coolawesome.integrativeproject.utils" />
+      <option name="MAIN_CLASS_NAME" value="com.coolawesome.integrativeproject.utils.Vector3DTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.Vector3DTest" />
         <item itemvalue="Application.MainApplication" />
         <item itemvalue="JUnit.PIDControllerTest (1)" />
         <item itemvalue="JUnit.PIDControllerTest" />
@@ -179,7 +186,8 @@
       <workItem from="1709050676418" duration="123000" />
       <workItem from="1709818226495" duration="229000" />
       <workItem from="1709818507396" duration="3125000" />
-      <workItem from="1709841147721" duration="2915000" />
+      <workItem from="1709841147721" duration="3208000" />
+      <workItem from="1709865313852" duration="1382000" />
     </task>
     <task id="LOCAL-00001" summary="Setup Project">
       <option name="closed" value="true" />
@@ -237,7 +245,15 @@
       <option name="project" value="LOCAL" />
       <updated>1709047547859</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="PID Controller">
+      <option name="closed" value="true" />
+      <created>1709844106736</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1709844106736</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -251,6 +267,7 @@
     <MESSAGE value="Camera overhaul + Skybox" />
     <MESSAGE value="Sunlight added" />
     <MESSAGE value="Texture Changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Texture Changes" />
+    <MESSAGE value="PID Controller" />
+    <option name="LAST_COMMIT_MESSAGE" value="PID Controller" />
   </component>
 </project>
