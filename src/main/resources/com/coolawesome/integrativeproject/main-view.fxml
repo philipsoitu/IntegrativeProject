@@ -1,32 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.paint.LinearGradient?>
 <?import javafx.scene.paint.Stop?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/20.0.1" fx:controller="com.coolawesome.integrativeproject.MainController">
+<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.coolawesome.integrativeproject.MainController">
   <left>
     <VBox spacing="10" style="-fx-padding: 10;">
          <Label text="Space Simulation">
             <textFill>
-               <LinearGradient endX="1.0" endY="1.0" startX="1.0" startY="0.6950354609929078">
+               <LinearGradient endX="0.6926713947990544" endY="0.7990543735224587" startY="0.6832151300236406">
                   <stops>
                      <Stop>
                         <color>
-                           <Color red="0.062296945601701736" green="0.025341130793094635" blue="0.34210526943206787" />
+                           <Color red="1.0" green="0.6499999761581421" />
                         </color>
                      </Stop>
                      <Stop offset="1.0">
                         <color>
-                           <Color red="0.12754426896572113" green="0.06444931775331497" blue="0.6052631735801697" opacity="0.9800000190734863" />
+                           <Color red="1.0" green="0.28240740299224854" blue="0.8923611044883728" />
                         </color>
                      </Stop>
                   </stops>
@@ -36,10 +42,74 @@
                <Font name="Marlett" size="24.0" />
             </font>
          </Label>
-      <Label text="Simulation Info" />
-      <ListView fx:id="simulationInfoList">
+      <Label text="Simulation Info:" />
+      <ListView fx:id="simulationInfoList" prefHeight="232.0" prefWidth="248.0">
         <!-- Add items here -->
       </ListView>
+         <AnchorPane prefHeight="200.0" prefWidth="200.0">
+            <children>
+               <Label text="Controls:">
+                  <font>
+                     <Font size="14.0" />
+                  </font>
+               </Label>
+               <VBox prefHeight="200.0" prefWidth="247.0">
+                  <children>
+                     <Label text="Algorithm:">
+                        <VBox.margin>
+                           <Insets top="20.0" />
+                        </VBox.margin>
+                        <padding>
+                           <Insets top="10.0" />
+                        </padding>
+                     </Label>
+                     <ChoiceBox fx:id="algoChoiceBox" prefHeight="25.0" prefWidth="95.0">
+                        <VBox.margin>
+                           <Insets top="5.0" />
+                        </VBox.margin>
+                     </ChoiceBox>
+                     <HBox prefHeight="42.0" prefWidth="247.0">
+                        <children>
+                           <Button fx:id="playBTN" mnemonicParsing="false" onAction="#playSim" text="Play" />
+                           <Button fx:id="pauseBTN" mnemonicParsing="false" onAction="#pauseSim" text="Pause" />
+                        </children>
+                        <VBox.margin>
+                           <Insets top="10.0" />
+                        </VBox.margin>
+                     </HBox>
+                     <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                        <children>
+                           <Label text="Time Step:">
+                              <HBox.margin>
+                                 <Insets right="5.0" />
+                              </HBox.margin>
+                           </Label>
+                           <Slider fx:id="timeStepSLD" max="1.0" min="0.001" minorTickCount="0" prefHeight="14.0" prefWidth="86.0" showTickMarks="true" />
+                           <TextField fx:id="timeStepTXTF" onAction="#updateTimeStepSLD" prefHeight="25.0" prefWidth="45.0" />
+                        </children>
+                        <VBox.margin>
+                           <Insets top="5.0" />
+                        </VBox.margin>
+                     </HBox>
+                     <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                        <children>
+                           <Label text="G Constant:">
+                              <HBox.margin>
+                                 <Insets right="5.0" />
+                              </HBox.margin>
+                           </Label>
+                           <Slider fx:id="GConstSLD" blockIncrement="0.005" max="0.01" min="1.0E-9" prefHeight="14.0" prefWidth="84.0" showTickMarks="true">
+                              <HBox.margin>
+                                 <Insets />
+                              </HBox.margin>
+                           </Slider>
+                           <TextField fx:id="GConstantTXTF" onAction="#updateGConstSLD" prefHeight="25.0" prefWidth="67.0" />
+                        </children>
+                     </HBox>
+                  </children>
+               </VBox>
+            </children>
+         </AnchorPane>
     </VBox>
   </left>
   <center>

@@ -42,27 +42,19 @@ public class Simulation {
     public void update(double dt){
         // Do physics n shit here
         updatePosition(dt);
-
         handleCollisions();
         simulationView.update(dt);
-
-        
     }
 
     private void updatePosition(double dt) {
-
-        double G = 0.001;
-
         planetMap.forEach((id, p1) -> {
             Vector3D ftotal = new Vector3D();
             planetMap.forEach((id2, p2) -> {
                 if (p1 != p2) {
                     Vector3D dist = Vector3D.difference(p2.position, p1.position);
-                    Vector3D f = Vector3D.multiplication((G * p1.mass * p2.mass) / (dist.magnitude() * dist.magnitude()), Vector3D.unitVector(dist));
+                    Vector3D f = Vector3D.multiplication((MainController.G * p1.mass * p2.mass) / (dist.magnitude() * dist.magnitude()), Vector3D.unitVector(dist));
                     ftotal.add(f);
-
                 }
-
                 p1.acceleration = Vector3D.multiplication((1 / p1.mass), ftotal);
                 p1.velocity.add(Vector3D.multiplication(dt, p1.acceleration));
                 p1.position.add(Vector3D.multiplication(dt, p1.velocity));

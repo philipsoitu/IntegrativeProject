@@ -9,7 +9,12 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import static com.coolawesome.integrativeproject.MainController.timeStep;
+
 public class MainApplication extends Application {
+
+    Timeline timeline;
+
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("main-view.fxml"));
@@ -20,8 +25,7 @@ public class MainApplication extends Application {
 
         MainController controller = fxmlLoader.getController();
 
-        controller.controllerSetup(simulation);
-
+        controller.controllerSetup(simulation, this);
 
         stage.setTitle("Space Sim");
         stage.setScene(scene);
@@ -29,10 +33,10 @@ public class MainApplication extends Application {
         stage.setResizable(false);
         stage.show();
 
-        Timeline timeline = new Timeline();
+        timeline = new Timeline();
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.getKeyFrames().add(new javafx.animation.KeyFrame(javafx.util.Duration.millis(16), e -> {
-            simulation.update(0.016);
+            simulation.update(timeStep);
             controller.updateSimInfo();
         }));
         timeline.play();

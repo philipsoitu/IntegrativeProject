@@ -5,11 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fba92d50-62dc-4990-8ff1-7a3c8ce63cbd" name="Changes" comment="PID Controller">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/Constants.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/Simulation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/Simulation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/Constants.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/coolawesome/integrativeproject/main-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/coolawesome/integrativeproject/main-view.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -263,6 +263,17 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />

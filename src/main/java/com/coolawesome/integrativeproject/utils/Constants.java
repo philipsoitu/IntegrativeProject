@@ -8,6 +8,7 @@ public final class Constants {
 
     public static final String planetCountPrefix = "Planet Count: ";
 
+    public static final String[] algorithms = {"Brute Force", "Barnes Hut"};
 
 
     //shouldn't be able to create an instance of this class
