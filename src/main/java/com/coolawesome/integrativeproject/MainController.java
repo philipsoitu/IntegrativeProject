@@ -12,6 +12,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 /*
     TODO
 
@@ -28,6 +32,10 @@ import javafx.util.Duration;
 public class MainController {
     public static double G = 0.001;
     public static double timeStep = 0.016;
+    @FXML
+    public ListView<String> selectedPlanetInfoList;
+    @FXML
+    public Button viewRandBtn;
     @FXML
     private ListView<String> simulationInfoList;
     @FXML
@@ -52,7 +60,7 @@ public class MainController {
     private MainApplication main;
     private AnimationTimer timer;
     Timeline timeline;
-    private ObservableList<String> listContent = FXCollections.observableArrayList(
+    private ObservableList<String> simulationListContent = FXCollections.observableArrayList(
             Constants.frameRatePrefix, Constants.timeElapsedPrefix, Constants.planetCountPrefix
     );
 
@@ -84,8 +92,8 @@ public class MainController {
             throw new NullPointerException();
         }
 
-        if(!listContent.isEmpty()) {
-            simulationInfoList.setItems(listContent);
+        if(!simulationListContent.isEmpty()) {
+            simulationInfoList.setItems(simulationListContent);
         } else {
             throw new IllegalStateException();
         }
@@ -155,7 +163,7 @@ public class MainController {
     }
 
     public void updateSimInfo() {
-        listContent.set(2, Constants.planetCountPrefix + getPlanetCount());
+        simulationListContent.set(2, Constants.planetCountPrefix + getPlanetCount());
     }
 
     private void setInitialValues() {
@@ -197,7 +205,7 @@ public class MainController {
         int minutes = (secondsElapsed % 3600) / 60;
         int seconds = secondsElapsed % 60;
 
-        listContent.set(1, Constants.timeElapsedPrefix + String.format("%02d:%02d:%02d", hours, minutes, seconds));
+        simulationListContent.set(1, Constants.timeElapsedPrefix + String.format("%02d:%02d:%02d", hours, minutes, seconds));
     }
 
     private int getPlanetCount() {
@@ -212,7 +220,7 @@ public class MainController {
 
                 if (now - lastTime >= 1_000_000_000) {
                     double frameRate = frameCount;
-                    listContent.set(0, Constants.frameRatePrefix + frameRate);
+                    simulationListContent.set(0, Constants.frameRatePrefix + frameRate);
                     frameCount = 0;
                     lastTime = now;
                 }
@@ -273,5 +281,31 @@ public class MainController {
         } catch (NumberFormatException e) {
             System.out.println("Input Corrected in Time Step Slider");
         }
+    }
+
+    public void updateSelectedPlanetInfo(Planet planet) {
+        ObservableList<String> planetInfo = FXCollections.observableArrayList(
+                "Position: " + String.format("%.3f, %.3f, %.3f", planet.position.x, planet.position.y, planet.position.z),
+                "Velocity: " + String.format("%.3f, %.3f, %.3f", planet.velocity.x, planet.velocity.y, planet.velocity.z),
+                "Accel: " + String.format("%.1e, %.1e, %.1e", planet.acceleration.x, planet.acceleration.y, planet.acceleration.z),
+                "Radius: " + String.format("%.3f", planet.radius),
+                "Mass: " + String.format("%.3f", planet.mass),
+                "Color: " + planet.color
+        );
+        selectedPlanetInfoList.setItems(planetInfo);
+    }
+
+    @FXML
+    public void viewRandPlanet(ActionEvent event) {
+        // Get a random planet from the planetMap
+        List<String> keys = new ArrayList<>(simulation.planetMap.keySet());
+        String randomKey = keys.get(new Random().nextInt(keys.size()));
+        Planet randomPlanet = simulation.planetMap.get(randomKey);
+
+        // Update the selected planet info
+        updateSelectedPlanetInfo(randomPlanet);
+
+        // Update the current camera planet in the SimulationView
+        simulation.simulationView.setCurrentCamPlanetID(randomKey);
     }
 }

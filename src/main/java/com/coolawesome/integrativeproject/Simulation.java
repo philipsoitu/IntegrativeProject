@@ -11,8 +11,8 @@ public class Simulation {
     Map<String, Planet> planetMap = new HashMap<>();
     SimulationView simulationView;
 
-    public Simulation(AnchorPane viewport) {
-        simulationView = new SimulationView(viewport, planetMap);
+    public Simulation(AnchorPane viewport, MainController controller) {
+        simulationView = new SimulationView(viewport, planetMap, controller);
         initialize(100);
     }
 

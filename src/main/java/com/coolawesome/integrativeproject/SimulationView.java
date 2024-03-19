@@ -23,6 +23,7 @@ public class SimulationView extends Group {
     private final Set<KeyCode> keysPressed = new HashSet<>();
 
     private final Map<String, Planet> planetMap;
+    private final MainController mainController;
     private String currentCamPlanetID = "";
 
     private final Image
@@ -42,8 +43,9 @@ public class SimulationView extends Group {
 
     private double deltaMouseX, deltaMouseY = 0;
 
-    public SimulationView(AnchorPane pane, Map<String, Planet> planetMap) {
+    public SimulationView(AnchorPane pane, Map<String, Planet> planetMap, MainController mainController) {
         this.planetMap = planetMap;
+        this.mainController = mainController;
 
         // Set up the subscene for 3D content
         SubScene subScene = new SubScene(this, pane.getWidth(), pane.getHeight(), true, SceneAntialiasing.BALANCED);
@@ -98,11 +100,18 @@ public class SimulationView extends Group {
     }
 
     public void update(double dt) {
+        // Update the selected planet info list
+        if (!currentCamPlanetID.isEmpty()) {
+            this.mainController.updateSelectedPlanetInfo(planetMap.get(currentCamPlanetID));
+        }
+
         // check if there are any planets not currently in the scene
         planetMap.forEach((id, planet) -> {
             if (!this.getChildren().contains(planet.planetNode)) {
                 this.getChildren().add(planet.planetNode);
-                planet.planetNode.setOnMouseClicked(event -> currentCamPlanetID = id);
+                planet.planetNode.setOnMouseClicked(event -> {
+                    currentCamPlanetID = id;
+                });
             }
             if (planet.isSun && !this.getChildren().contains(planet.sunLight)) {
                 this.getChildren().add(planet.sunLight);
@@ -193,8 +202,8 @@ public class SimulationView extends Group {
                 double directionPitch = -Math.toDegrees(Math.asin(direction.y));
                 double directionYaw = Math.toDegrees(Math.atan2(direction.x, direction.z));
 
-                cameraTransform.rx.setAngle(lerpAngle(cameraTransform.rx.getAngle(), directionPitch, 0.2));
-                cameraTransform.ry.setAngle(lerpAngle(cameraTransform.ry.getAngle(), directionYaw, 0.2));
+                cameraTransform.rx.setAngle(lerpAngle(cameraTransform.rx.getAngle(), directionPitch, 0.05));
+                cameraTransform.ry.setAngle(lerpAngle(cameraTransform.ry.getAngle(), directionYaw, 0.05));
 
                 //Use PID controller to move towards planet
                 direction.negate();
@@ -257,5 +266,9 @@ public class SimulationView extends Group {
         while (diff < -180) diff += 360;
         while (diff > 180) diff -= 360;
         return start + diff * t;
+    }
+
+    public void setCurrentCamPlanetID(String planetID) {
+        this.currentCamPlanetID = planetID;
     }
 }

@@ -1,24 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.Slider?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.TitledPane?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.paint.Color?>
-<?import javafx.scene.paint.LinearGradient?>
-<?import javafx.scene.paint.Stop?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.coolawesome.integrativeproject.MainController">
+<BorderPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.coolawesome.integrativeproject.MainController">
   <left>
     <VBox spacing="10" style="-fx-padding: 10;">
          <Label text="Space Simulation">
@@ -39,11 +27,11 @@
                </LinearGradient>
             </textFill>
             <font>
-               <Font name="Marlett" size="24.0" />
+               <Font name="Marlett" size="28.0" />
             </font>
          </Label>
       <Label text="Simulation Info:" />
-      <ListView fx:id="simulationInfoList" prefHeight="232.0" prefWidth="248.0">
+      <ListView fx:id="simulationInfoList" prefHeight="220.0" prefWidth="220.0">
         <!-- Add items here -->
       </ListView>
          <AnchorPane prefHeight="200.0" prefWidth="200.0">
@@ -68,7 +56,7 @@
                            <Insets top="5.0" />
                         </VBox.margin>
                      </ChoiceBox>
-                     <HBox prefHeight="42.0" prefWidth="247.0">
+                     <HBox prefHeight="42.0" prefWidth="220.0">
                         <children>
                            <Button fx:id="playBTN" mnemonicParsing="false" onAction="#playSim" text="Play" />
                            <Button fx:id="pauseBTN" mnemonicParsing="false" onAction="#pauseSim" text="Pause" />
@@ -124,16 +112,15 @@
           <!-- Contents for preview -->
         </VBox>
       </TitledPane>
-      <VBox>
-        <Label text="Planet Creation Form" />
-        <GridPane fx:id="planetCreationForm">
-          <!-- Form elements here -->
-        </GridPane>
-      </VBox>
       <TitledPane collapsible="false" text="Currently Selected Planet Info">
-        <VBox>
-          <!-- Contents for selected planet info -->
-        </VBox>
+        <VBox alignment="TOP_CENTER" spacing="10.0">
+               <children>
+                  <Button fx:id="viewRandBtn" alignment="CENTER" mnemonicParsing="false" onAction="#viewRandPlanet" text="View Random Planet" textAlignment="CENTER" />
+                  <Separator prefWidth="200.0" />
+                   <ListView fx:id="selectedPlanetInfoList" prefHeight="220.0" prefWidth="220.0">
+                       <!-- Add items here -->
+                   </ListView>
+               </children></VBox>
       </TitledPane>
     </VBox>
   </right>

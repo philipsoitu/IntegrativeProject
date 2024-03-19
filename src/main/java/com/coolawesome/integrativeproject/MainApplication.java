@@ -20,10 +20,10 @@ public class MainApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("main-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1280, 720);
 
-        AnchorPane viewport = (AnchorPane) scene.lookup("#viewport");
-        Simulation simulation = new Simulation(viewport);
-
         MainController controller = fxmlLoader.getController();
+
+        AnchorPane viewport = (AnchorPane) scene.lookup("#viewport");
+        Simulation simulation = new Simulation(viewport, controller);
 
         controller.controllerSetup(simulation, this);
 
@@ -40,7 +40,6 @@ public class MainApplication extends Application {
             controller.updateSimInfo();
         }));
         timeline.play();
-
     }
 
     public static void main(String[] args) {

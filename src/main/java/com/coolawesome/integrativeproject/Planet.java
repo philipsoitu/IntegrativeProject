@@ -86,4 +86,16 @@ public class Planet {
         sunLight.setTranslateY(this.position.y);
         sunLight.setTranslateZ(this.position.z);
     }
+
+    @Override
+    public String toString() {
+        return "Planet{" +
+                "position=" + String.format("%.3f, %.3f, %.3f", position.x, position.y, position.z) +
+                ", velocity=" + String.format("%.3f, %.3f, %.3f", velocity.x, velocity.y, velocity.z) +
+                ", acceleration=" + String.format("%.3f, %.3f, %.3f", acceleration.x, acceleration.y, acceleration.z) +
+                ", radius=" + String.format("%.3f", radius) +
+                ", mass=" + String.format("%.3f", mass) +
+                ", color=" + color +
+                '}';
+    }
 }
