@@ -46,7 +46,7 @@ public class Simulation {
         handleCollisions();
         simulationView.update(dt);
 
-
+        
     }
 
     private void updatePosition(double dt) {

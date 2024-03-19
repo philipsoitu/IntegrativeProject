@@ -18,6 +18,11 @@ public class MainApplication extends Application {
         AnchorPane viewport = (AnchorPane) scene.lookup("#viewport");
         Simulation simulation = new Simulation(viewport);
 
+        MainController controller = fxmlLoader.getController();
+
+        controller.controllerSetup(simulation);
+
+
         stage.setTitle("Space Sim");
         stage.setScene(scene);
 
@@ -28,6 +33,7 @@ public class MainApplication extends Application {
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.getKeyFrames().add(new javafx.animation.KeyFrame(javafx.util.Duration.millis(16), e -> {
             simulation.update(0.016);
+            controller.updateSimInfo();
         }));
         timeline.play();
 
