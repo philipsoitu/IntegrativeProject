@@ -1,0 +1,866 @@
+Index: src/main/java/com/coolawesome/integrativeproject/Simulation.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.coolawesome.integrativeproject;\r\n\r\nimport com.coolawesome.integrativeproject.utils.Vector3D;\r\nimport javafx.scene.layout.AnchorPane;\r\nimport javafx.scene.paint.Color;\r\n\r\nimport java.util.*;\r\n\r\npublic class Simulation {\r\n\r\n    Map<String, Planet> planetMap = new HashMap<>();\r\n    SimulationView simulationView;\r\n\r\n    public Simulation(AnchorPane viewport) {\r\n        simulationView = new SimulationView(viewport, planetMap);\r\n        initialize(100);\r\n    }\r\n\r\n    public void initialize(int numOfBodies) {\r\n        for (int i = 0; i < numOfBodies; i++) {\r\n\r\n            // Randomizing parameters\r\n            Vector3D randPos = new Vector3D(Math.random() * 300 - 150, Math.random() * 300 - 150, Math.random() * 300 - 150);\r\n            // Vector3D randVel = new Vector3D(-1 + Math.random() * 2, -1 + Math.random() * 2, -1 + Math.random() * 2);\r\n            Vector3D randVel = new Vector3D();\r\n            double randRad = 1 + Math.random() * 2;\r\n            double randMass = 5000;\r\n            boolean sun = Math.random() * 4 < 1;\r\n\r\n            // Generate a unique ID for the planet\r\n            String uniqueID = UUID.randomUUID().toString().replaceAll(\"-\", \"\");\r\n\r\n            // Create the Planet object\r\n            Planet randPlanet = new Planet(randPos, randVel, randRad, randMass, sun);\r\n\r\n            // Add the Planet to the Map\r\n            planetMap.put(uniqueID, randPlanet);\r\n        }\r\n        planetMap.put(\"sun\", new Planet(new Vector3D(5000, 0, 0), new Vector3D(), 1000, 100000, true));\r\n    }\r\n\r\n    public void update(double dt){\r\n        // Do physics n shit here\r\n        updatePosition(dt);\r\n\r\n        handleCollisions();\r\n        simulationView.update(dt);\r\n\r\n\r\n    }\r\n\r\n    private void updatePosition(double dt) {\r\n\r\n        double G = 0.001;\r\n\r\n        planetMap.forEach((id, p1) -> {\r\n            Vector3D ftotal = new Vector3D();\r\n            planetMap.forEach((id2, p2) -> {\r\n                if (p1 != p2) {\r\n                    Vector3D dist = Vector3D.difference(p2.position, p1.position);\r\n                    Vector3D f = Vector3D.multiplication((G * p1.mass * p2.mass) / (dist.magnitude() * dist.magnitude()), Vector3D.unitVector(dist));\r\n                    ftotal.add(f);\r\n\r\n                }\r\n\r\n                p1.acceleration = Vector3D.multiplication((1 / p1.mass), ftotal);\r\n                p1.velocity.add(Vector3D.multiplication(dt, p1.acceleration));\r\n                p1.position.add(Vector3D.multiplication(dt, p1.velocity));\r\n            });\r\n        });\r\n    }\r\n\r\n    private void handleCollisions() {\r\n        List<String> idPlanetsToRemove = new ArrayList<>();\r\n        planetMap.forEach((id, p1) -> {\r\n            planetMap.forEach((id2, p2) -> {\r\n                if (p1 != p2 && p1 != null && p2 != null) {\r\n                    Vector3D n = Vector3D.unitVector(Vector3D.difference(p1.position, p2.position));\r\n                    double dist = Math.min(Vector3D.sum(Vector3D.difference(p2.position, Vector3D.multiplication(p2.radius, n)), p1.position).magnitude(), Vector3D.difference(Vector3D.difference(p2.position, Vector3D.multiplication(p2.radius, n)), p1.position).magnitude());\r\n                    if (p1.radius > dist) {\r\n                        p1.mass += p2.mass;\r\n                        p1.radius = Math.sqrt(p1.radius * p1.radius + p2.radius * p2.radius);\r\n                        double totalMass = p1.mass + p2.mass;\r\n                        int red = (int)Math.min(((p1.mass/totalMass)*p1.color.getRed() + (p2.mass/totalMass)*p2.color.getRed())*255,255);\r\n                        int green = (int)Math.min(((p1.mass/totalMass)*p1.color.getGreen() + (p2.mass/totalMass)*p2.color.getGreen())*255,255);\r\n                        int blue = (int)Math.min(((p1.mass/totalMass)*p1.color.getBlue() + (p2.mass/totalMass)*p2.color.getBlue())*255,255);\r\n\r\n                        p1.color = Color.rgb(red, green, blue);\r\n                        idPlanetsToRemove.add(id2);\r\n                    }\r\n                }\r\n            });\r\n        });\r\n        idPlanetsToRemove.forEach((id) -> planetMap.remove(id));\r\n//        planetMap.remove(idPlanetsToRemove);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/coolawesome/integrativeproject/Simulation.java b/src/main/java/com/coolawesome/integrativeproject/Simulation.java
+--- a/src/main/java/com/coolawesome/integrativeproject/Simulation.java	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
++++ b/src/main/java/com/coolawesome/integrativeproject/Simulation.java	(date 1709652844870)
+@@ -13,7 +13,7 @@
+ 
+     public Simulation(AnchorPane viewport) {
+         simulationView = new SimulationView(viewport, planetMap);
+-        initialize(100);
++        initialize(400);
+     }
+ 
+     public void initialize(int numOfBodies) {
+@@ -36,14 +36,13 @@
+             // Add the Planet to the Map
+             planetMap.put(uniqueID, randPlanet);
+         }
+-        planetMap.put("sun", new Planet(new Vector3D(5000, 0, 0), new Vector3D(), 1000, 100000, true));
+     }
+ 
+     public void update(double dt){
+         // Do physics n shit here
+         updatePosition(dt);
+ 
+-        handleCollisions();
++//        handleCollisions();
+         simulationView.update(dt);
+ 
+ 
+@@ -51,7 +50,7 @@
+ 
+     private void updatePosition(double dt) {
+ 
+-        double G = 0.001;
++        double G = 0.00001;
+ 
+         planetMap.forEach((id, p1) -> {
+             Vector3D ftotal = new Vector3D();
+Index: src/main/java/com/coolawesome/integrativeproject/Planet.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.coolawesome.integrativeproject;\r\n\r\nimport com.coolawesome.integrativeproject.utils.Vector3D;\r\nimport javafx.geometry.Point3D;\r\nimport javafx.scene.PointLight;\r\nimport javafx.scene.image.Image;\r\nimport javafx.scene.paint.Color;\r\nimport javafx.scene.paint.PhongMaterial;\r\nimport javafx.scene.shape.Sphere;\r\n\r\n\r\npublic class Planet {\r\n\r\n    public Vector3D position;\r\n    public Vector3D velocity;\r\n    public Vector3D acceleration;\r\n    public double radius;\r\n    public double mass;\r\n    public double spinRate;\r\n    public Color color;\r\n    public PhongMaterial material;\r\n\r\n    public boolean isSun;\r\n    public PointLight sunLight;\r\n\r\n    private static final Image sunTexture = new Image(\"file:src/main/resources/images/planets/sun.jpg\");\r\n    private static final Image[] planetTextures = {\r\n        new Image(\"file:src/main/resources/images/planets/Alpine.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Gaseous1.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Gaseous2.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Gaseous3.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Gaseous4.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Icy.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Martian.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Savannah.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Swamp.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Terrestrial1.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Terrestrial2.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Terrestrial3.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Terrestrial4.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Tropical.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Venusian.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Volcanic.png\")\r\n};\r\n    public Sphere planetNode;\r\n\r\n    // TODO: planets rings using FXyz torus?\r\n    public Planet(Vector3D position, Vector3D velocity, double radius, double mass, boolean isSun) {\r\n        this.position = position;\r\n        this.velocity = velocity;\r\n        this.acceleration = new Vector3D();\r\n        this.mass = mass;\r\n        this.radius = radius;\r\n        int r = (int) (Math.random() * 155) + 100;\r\n        int g = (int) (Math.random() * 155) + 100;\r\n        int b = (int) (Math.random() * 155) + 100;\r\n        Color randColor = Color.rgb(r, g, b);\r\n        this.color = randColor;\r\n        this.spinRate = -1.5 + (Math.random() * 3);\r\n        this.isSun = isSun;\r\n\r\n        planetNode = new Sphere(radius);\r\n        planetNode.setTranslateX(position.x);\r\n        planetNode.setTranslateY(position.y);\r\n        planetNode.setTranslateZ(position.z);\r\n        material = new PhongMaterial(color);\r\n        if(isSun){\r\n            initSun();\r\n        } else {\r\n            initSphere();\r\n        }\r\n    }\r\n\r\n    private void initSphere() {\r\n        material.setDiffuseMap(planetTextures[(int) (Math.random() * planetTextures.length)]);\r\n        planetNode.setMaterial(material);\r\n        planetNode.setRotationAxis(new Point3D(0, 1, 0));\r\n    }\r\n\r\n    private void initSun(){\r\n        material.setSelfIlluminationMap(sunTexture); //TODO: add more sun textures\r\n        material.setDiffuseColor(Color.BLACK);\r\n        material.setSpecularPower(0);\r\n        planetNode.setMaterial(material);\r\n        planetNode.setRotationAxis(new Point3D(0, 1, 0));\r\n        sunLight = new PointLight(this.color);\r\n        sunLight.setTranslateX(this.position.x);\r\n        sunLight.setTranslateY(this.position.y);\r\n        sunLight.setTranslateZ(this.position.z);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/coolawesome/integrativeproject/Planet.java b/src/main/java/com/coolawesome/integrativeproject/Planet.java
+--- a/src/main/java/com/coolawesome/integrativeproject/Planet.java	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
++++ b/src/main/java/com/coolawesome/integrativeproject/Planet.java	(date 1709652645109)
+@@ -25,23 +25,23 @@
+ 
+     private static final Image sunTexture = new Image("file:src/main/resources/images/planets/sun.jpg");
+     private static final Image[] planetTextures = {
+-        new Image("file:src/main/resources/images/planets/Alpine.png"),
+-        new Image("file:src/main/resources/images/planets/Gaseous1.png"),
+-        new Image("file:src/main/resources/images/planets/Gaseous2.png"),
+-        new Image("file:src/main/resources/images/planets/Gaseous3.png"),
+-        new Image("file:src/main/resources/images/planets/Gaseous4.png"),
+-        new Image("file:src/main/resources/images/planets/Icy.png"),
+-        new Image("file:src/main/resources/images/planets/Martian.png"),
+-        new Image("file:src/main/resources/images/planets/Savannah.png"),
+-        new Image("file:src/main/resources/images/planets/Swamp.png"),
+-        new Image("file:src/main/resources/images/planets/Terrestrial1.png"),
+-        new Image("file:src/main/resources/images/planets/Terrestrial2.png"),
+-        new Image("file:src/main/resources/images/planets/Terrestrial3.png"),
+-        new Image("file:src/main/resources/images/planets/Terrestrial4.png"),
+-        new Image("file:src/main/resources/images/planets/Tropical.png"),
+-        new Image("file:src/main/resources/images/planets/Venusian.png"),
+-        new Image("file:src/main/resources/images/planets/Volcanic.png")
+-};
++            new Image("file:src/main/resources/images/planets/Alpine.png"),
++            new Image("file:src/main/resources/images/planets/Gaseous1.png"),
++            new Image("file:src/main/resources/images/planets/Gaseous2.png"),
++            new Image("file:src/main/resources/images/planets/Gaseous3.png"),
++            new Image("file:src/main/resources/images/planets/Gaseous4.png"),
++            new Image("file:src/main/resources/images/planets/Icy.png"),
++            new Image("file:src/main/resources/images/planets/Martian.png"),
++            new Image("file:src/main/resources/images/planets/Savannah.png"),
++            new Image("file:src/main/resources/images/planets/Swamp.png"),
++            new Image("file:src/main/resources/images/planets/Terrestrial1.png"),
++            new Image("file:src/main/resources/images/planets/Terrestrial2.png"),
++            new Image("file:src/main/resources/images/planets/Terrestrial3.png"),
++            new Image("file:src/main/resources/images/planets/Terrestrial4.png"),
++            new Image("file:src/main/resources/images/planets/Tropical.png"),
++            new Image("file:src/main/resources/images/planets/Venusian.png"),
++            new Image("file:src/main/resources/images/planets/Volcanic.png")
++    };
+     public Sphere planetNode;
+ 
+     // TODO: planets rings using FXyz torus?
+@@ -51,10 +51,8 @@
+         this.acceleration = new Vector3D();
+         this.mass = mass;
+         this.radius = radius;
+-        int r = (int) (Math.random() * 155) + 100;
+-        int g = (int) (Math.random() * 155) + 100;
+-        int b = (int) (Math.random() * 155) + 100;
+-        Color randColor = Color.rgb(r, g, b);
++        double hue = Math.random() * 360;
++        Color randColor = Color.hsb(hue, 1,1);
+         this.color = randColor;
+         this.spinRate = -1.5 + (Math.random() * 3);
+         this.isSun = isSun;
+@@ -64,7 +62,7 @@
+         planetNode.setTranslateY(position.y);
+         planetNode.setTranslateZ(position.z);
+         material = new PhongMaterial(color);
+-        if(isSun){
++        if (isSun) {
+             initSun();
+         } else {
+             initSphere();
+@@ -77,7 +75,7 @@
+         planetNode.setRotationAxis(new Point3D(0, 1, 0));
+     }
+ 
+-    private void initSun(){
++    private void initSun() {
+         material.setSelfIlluminationMap(sunTexture); //TODO: add more sun textures
+         material.setDiffuseColor(Color.BLACK);
+         material.setSpecularPower(0);
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_11_48_a_m___Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_11_48_a_m___Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_11_48_a_m___Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_11_48_a_m___Changes_.xml	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
++++ /dev/null	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_2024-02-20_11_48_a_m__[Changes]" date="1708447740909" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_11_48_a_m__[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 2024-02-20 11:48 a.m. [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_5_32_p_m__[Changes]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_5_32_p_m__[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_5_32_p_m__[Changes]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_5_32_p_m__[Changes]/shelved.patch	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
++++ /dev/null	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
+@@ -1,127 +0,0 @@
+-Index: .idea/workspace.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"fba92d50-62dc-4990-8ff1-7a3c8ce63cbd\" name=\"Changes\" comment=\"\">\r\n      <change afterPath=\"$PROJECT_DIR$/.gitignore\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/.idea/encodings.xml\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/.idea/uiDesigner.xml\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.jar\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/mvnw\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/mvnw.cmd\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/pom.xml\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainApplication.java\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/Vector2.java\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/Vector3.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/checksums/checksums.lock\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/checksums/md5-checksums.bin\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/checksums/sha1-checksums.bin\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/dependencies-accessors/dependencies-accessors.lock\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/dependencies-accessors/gc.properties\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/executionHistory/executionHistory.lock\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/fileChanges/last-build.bin\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/fileHashes/fileHashes.lock\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/gc.properties\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/vcs-1/gc.properties\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/.gitignore\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/compiler.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/compiler.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/gradle.xml\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/jarRepositories.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/jarRepositories.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/misc.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/misc.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/README.md\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/README.md\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/build.gradle\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/documents/deliverable 1.txt\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/gradlew\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/gradlew.bat\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/settings.gradle\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/HelloApplication.java\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/HelloController.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainController.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/resources/com/coolawesome/integrativeproject/hello-view.fxml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/resources/com/coolawesome/integrativeproject/main-view.fxml\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"MavenImportPreferences\">\r\n    <option name=\"generalSettings\">\r\n      <MavenGeneralSettings>\r\n        <option name=\"mavenHome\" value=\"Use Maven wrapper\" />\r\n      </MavenGeneralSettings>\r\n    </option>\r\n  </component>\r\n  <component name=\"ProjectColorInfo\"><![CDATA[{\r\n  \"associatedIndex\": 4\r\n}]]></component>\r\n  <component name=\"ProjectId\" id=\"2cdcgiNguDxJSrbrktXF9cZBqiO\" />\r\n  <component name=\"ProjectLevelVcsManager\">\r\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\r\n  </component>\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"ASKED_ADD_EXTERNAL_FILES\": \"true\",\r\n    \"Application.MainApplication.executor\": \"Run\",\r\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\r\n    \"ignore.virus.scanning.warn.message\": \"true\",\r\n    \"kotlin-language-version-configured\": \"true\",\r\n    \"last_opened_file_path\": \"C:/Users/HP USER/Documents/CP4/IP\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"jdk-21.0.2-openjdk-21.0.2-4caba194b151-4f524021\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"fba92d50-62dc-4990-8ff1-7a3c8ce63cbd\" name=\"Changes\" comment=\"\" />\r\n      <created>1708445009551</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1708445009551</updated>\r\n      <workItem from=\"1708445010876\" duration=\"474000\" />\r\n    </task>\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <option name=\"ADD_EXTERNAL_FILES_SILENTLY\" value=\"true\" />\r\n  </component>\r\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+---- a/.idea/workspace.xml	(revision 24b0ebd7d9df7efc9f64facbb58d287e029314c4)
+-+++ b/.idea/workspace.xml	(date 1708468354112)
+-@@ -5,45 +5,8 @@
+-   </component>
+-   <component name="ChangeListManager">
+-     <list default="true" id="fba92d50-62dc-4990-8ff1-7a3c8ce63cbd" name="Changes" comment="">
+--      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.jar" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/mvnw" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/mvnw.cmd" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainApplication.java" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/Vector2.java" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/Vector3.java" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/checksums/checksums.lock" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/checksums/md5-checksums.bin" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/checksums/sha1-checksums.bin" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/dependencies-accessors/dependencies-accessors.lock" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/dependencies-accessors/gc.properties" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/executionHistory/executionHistory.lock" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/fileChanges/last-build.bin" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/fileHashes/fileHashes.lock" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/gc.properties" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/vcs-1/gc.properties" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/documents/deliverable 1.txt" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/gradlew" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/gradlew.bat" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/settings.gradle" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/HelloApplication.java" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/HelloController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainController.java" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/src/main/resources/com/coolawesome/integrativeproject/hello-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/coolawesome/integrativeproject/main-view.fxml" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-     </list>
+-     <option name="SHOW_DIALOG" value="false" />
+-     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+-@@ -70,9 +33,9 @@
+-       </MavenGeneralSettings>
+-     </option>
+-   </component>
+--  <component name="ProjectColorInfo"><![CDATA[{
+--  "associatedIndex": 4
+--}]]></component>
+-+  <component name="ProjectColorInfo">{
+-+  &quot;associatedIndex&quot;: 4
+-+}</component>
+-   <component name="ProjectId" id="2cdcgiNguDxJSrbrktXF9cZBqiO" />
+-   <component name="ProjectLevelVcsManager">
+-     <ConfirmationsSetting value="2" id="Add" />
+-@@ -88,17 +51,27 @@
+-     "RunOnceActivity.OpenProjectViewOnStart": "true",
+-     "RunOnceActivity.ShowReadmeOnStart": "true",
+-     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+-+    "WebServerToolWindowFactoryState": "false",
+-     "ignore.virus.scanning.warn.message": "true",
+-     "kotlin-language-version-configured": "true",
+--    "last_opened_file_path": "C:/Users/HP USER/Documents/CP4/IP",
+-+    "last_opened_file_path": "C:/ProgrammingProjects/IntegrativeProject/src/main/java/com/coolawesome/integrativeproject/physics",
+-     "node.js.detected.package.eslint": "true",
+-     "node.js.detected.package.tslint": "true",
+-     "node.js.selected.package.eslint": "(autodetect)",
+-     "node.js.selected.package.tslint": "(autodetect)",
+-     "nodejs_package_manager_path": "npm",
+-+    "project.structure.last.edited": "Project",
+-+    "project.structure.proportion": "0.0",
+-+    "project.structure.side.proportion": "0.2",
+-+    "settings.editor.selected.configurable": "preferences.lookFeel",
+-     "vue.rearranger.settings.migration": "true"
+-   }
+- }]]></component>
+-+  <component name="RecentsManager">
+-+    <key name="CopyFile.RECENT_KEYS">
+-+      <recent name="C:\ProgrammingProjects\IntegrativeProject\src\main\java\com\coolawesome\integrativeproject\physics" />
+-+    </key>
+-+  </component>
+-   <component name="SharedIndexes">
+-     <attachedChunks>
+-       <set>
+-@@ -115,6 +88,7 @@
+-       <option name="presentableId" value="Default" />
+-       <updated>1708445009551</updated>
+-       <workItem from="1708445010876" duration="474000" />
+-+      <workItem from="1708447438625" duration="772000" />
+-     </task>
+-     <servers />
+-   </component>
+-Index: .idea/misc.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\r\n  <component name=\"MavenProjectsManager\">\r\n    <option name=\"originalFiles\">\r\n      <list>\r\n        <option value=\"$PROJECT_DIR$/pom.xml\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_20\" default=\"true\" project-jdk-name=\"openjdk-20\" project-jdk-type=\"JavaSDK\">\r\n    <output url=\"file://$PROJECT_DIR$/out\" />\r\n  </component>\r\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/misc.xml b/.idea/misc.xml
+---- a/.idea/misc.xml	(revision 24b0ebd7d9df7efc9f64facbb58d287e029314c4)
+-+++ b/.idea/misc.xml	(date 1708447825257)
+-@@ -8,7 +8,7 @@
+-       </list>
+-     </option>
+-   </component>
+--  <component name="ProjectRootManager" version="2" languageLevel="JDK_20" default="true" project-jdk-name="openjdk-20" project-jdk-type="JavaSDK">
+-+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="openjdk-21" project-jdk-type="JavaSDK">
+-     <output url="file://$PROJECT_DIR$/out" />
+-   </component>
+- </project>
+-\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_5_32_p_m___Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_5_32_p_m___Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_5_32_p_m___Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_5_32_p_m___Changes_.xml	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
++++ /dev/null	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_2024-02-20_5_32_p_m__[Changes]" date="1708468372393" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_5_32_p_m__[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 2024-02-20 5:32 p.m. [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_2_56_p_m__[Changes]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_2_56_p_m__[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_2_56_p_m__[Changes]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_2_56_p_m__[Changes]/shelved.patch	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
++++ /dev/null	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
+@@ -1,61 +0,0 @@
+-Index: .idea/workspace.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"fba92d50-62dc-4990-8ff1-7a3c8ce63cbd\" name=\"Changes\" comment=\"Initial 3D Scene Creation + Lombok Install\">\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Vector2D.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Simulation.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Simulation.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Vector3D.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Vector3D.java\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"MavenImportPreferences\">\r\n    <option name=\"generalSettings\">\r\n      <MavenGeneralSettings>\r\n        <option name=\"mavenHome\" value=\"Use Maven wrapper\" />\r\n      </MavenGeneralSettings>\r\n    </option>\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 4\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"2cdcgiNguDxJSrbrktXF9cZBqiO\" />\r\n  <component name=\"ProjectLevelVcsManager\">\r\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\r\n  </component>\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\r\n  &quot;keyToString&quot;: {\r\n    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,\r\n    &quot;Application.MainApplication.executor&quot;: &quot;Run&quot;,\r\n    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,\r\n    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,\r\n    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,\r\n    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,\r\n    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\r\n    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,\r\n    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,\r\n    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,\r\n    &quot;last_opened_file_path&quot;: &quot;C:/Users/HP USER/Documents/CP4/IP&quot;,\r\n    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,\r\n    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,\r\n    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,\r\n    &quot;project.structure.side.proportion&quot;: &quot;0.3586207&quot;,\r\n    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;\r\n  }\r\n}</component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CreateClassDialog.RecentsKey\">\r\n      <recent name=\"com.coolawesome.integrativeproject\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunManager\">\r\n    <configuration name=\"MainApplication\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"com.coolawesome.integrativeproject.MainApplication\" />\r\n      <module name=\"IntegrativeProject\" />\r\n      <extension name=\"coverage\">\r\n        <pattern>\r\n          <option name=\"PATTERN\" value=\"com.coolawesome.integrativeproject.*\" />\r\n          <option name=\"ENABLED\" value=\"true\" />\r\n        </pattern>\r\n      </extension>\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Application.MainApplication\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"jdk-18.0.2-corretto-18.0.2-4caba194b151-5720f15e\" />\r\n        <option value=\"jdk-21.0.2-openjdk-21.0.2-4caba194b151-4f524021\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"fba92d50-62dc-4990-8ff1-7a3c8ce63cbd\" name=\"Changes\" comment=\"\" />\r\n      <created>1708445009551</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1708445009551</updated>\r\n      <workItem from=\"1708445010876\" duration=\"779000\" />\r\n      <workItem from=\"1708446744257\" duration=\"1592000\" />\r\n      <workItem from=\"1708455491268\" duration=\"6292000\" />\r\n      <workItem from=\"1708476819818\" duration=\"10118000\" />\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"Setup Project\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708445544700</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708445544700</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"Setup Project\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708445714666</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708445714666</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"Setup\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708448327820</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708448327821</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"Initial 3D Scene Creation + Lombok Install\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708461096889</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708461096889</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"5\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <option name=\"ADD_EXTERNAL_FILES_SILENTLY\" value=\"true\" />\r\n    <MESSAGE value=\"Setup Project\" />\r\n    <MESSAGE value=\"Setup\" />\r\n    <MESSAGE value=\"Initial 3D Scene Creation + Lombok Install\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Initial 3D Scene Creation + Lombok Install\" />\r\n  </component>\r\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+---- a/.idea/workspace.xml	(revision de2ff6bc5e8eeafce5553bae06d040fb3118dbe6)
+-+++ b/.idea/workspace.xml	(date 1708488260673)
+-@@ -4,13 +4,7 @@
+-     <option name="autoReloadType" value="SELECTIVE" />
+-   </component>
+-   <component name="ChangeListManager">
+--    <list default="true" id="fba92d50-62dc-4990-8ff1-7a3c8ce63cbd" name="Changes" comment="Initial 3D Scene Creation + Lombok Install">
+--      <change afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Vector2D.java" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Simulation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Simulation.java" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Vector3D.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Vector3D.java" afterDir="false" />
+--    </list>
+-+    <list default="true" id="fba92d50-62dc-4990-8ff1-7a3c8ce63cbd" name="Changes" comment="Camera Setup and Basic Lights" />
+-     <option name="SHOW_DIALOG" value="false" />
+-     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+-     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+-@@ -116,7 +110,7 @@
+-       <workItem from="1708445010876" duration="779000" />
+-       <workItem from="1708446744257" duration="1592000" />
+-       <workItem from="1708455491268" duration="6292000" />
+--      <workItem from="1708476819818" duration="10118000" />
+-+      <workItem from="1708476819818" duration="10924000" />
+-     </task>
+-     <task id="LOCAL-00001" summary="Setup Project">
+-       <option name="closed" value="true" />
+-@@ -150,7 +144,15 @@
+-       <option name="project" value="LOCAL" />
+-       <updated>1708461096889</updated>
+-     </task>
+--    <option name="localTasksCounter" value="5" />
+-+    <task id="LOCAL-00005" summary="Camera Setup and Basic Lights">
+-+      <option name="closed" value="true" />
+-+      <created>1708487349976</created>
+-+      <option name="number" value="00005" />
+-+      <option name="presentableId" value="LOCAL-00005" />
+-+      <option name="project" value="LOCAL" />
+-+      <updated>1708487349976</updated>
+-+    </task>
+-+    <option name="localTasksCounter" value="6" />
+-     <servers />
+-   </component>
+-   <component name="TypeScriptGeneratedFilesManager">
+-@@ -161,6 +163,7 @@
+-     <MESSAGE value="Setup Project" />
+-     <MESSAGE value="Setup" />
+-     <MESSAGE value="Initial 3D Scene Creation + Lombok Install" />
+--    <option name="LAST_COMMIT_MESSAGE" value="Initial 3D Scene Creation + Lombok Install" />
+-+    <MESSAGE value="Camera Setup and Basic Lights" />
+-+    <option name="LAST_COMMIT_MESSAGE" value="Camera Setup and Basic Lights" />
+-   </component>
+- </project>
+-\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_11_48_a_m__[Changes]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_11_48_a_m__[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_11_48_a_m__[Changes]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_11_48_a_m__[Changes]/shelved.patch	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
++++ /dev/null	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
+@@ -1,255 +0,0 @@
+-Index: src/main/java/com/coolawesome/integrativeproject/MainApplication.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package com.coolawesome.integrativeproject;\r\n\r\nimport javafx.application.Application;\r\nimport javafx.fxml.FXMLLoader;\r\nimport javafx.scene.Scene;\r\nimport javafx.stage.Stage;\r\n\r\nimport java.io.IOException;\r\n\r\npublic class MainApplication extends Application {\r\n    @Override\r\n    public void start(Stage stage) throws IOException {\r\n        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource(\"main-view.fxml\"));\r\n        Scene scene = new Scene(fxmlLoader.load(), 320, 240);\r\n        stage.setTitle(\"Hello!\");\r\n        stage.setScene(scene);\r\n        stage.show();\r\n    }\r\n\r\n    public static void main(String[] args) {\r\n        launch();\r\n    }\r\n}
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/src/main/java/com/coolawesome/integrativeproject/MainApplication.java b/src/main/java/com/coolawesome/integrativeproject/MainApplication.java
+---- a/src/main/java/com/coolawesome/integrativeproject/MainApplication.java	(revision 20ded5a3481bdae7b84056c83a82430d84266cda)
+-+++ b/src/main/java/com/coolawesome/integrativeproject/MainApplication.java	(date 1708447430724)
+-@@ -11,9 +11,11 @@
+-     @Override
+-     public void start(Stage stage) throws IOException {
+-         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("main-view.fxml"));
+--        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
+--        stage.setTitle("Hello!");
+-+        Scene scene = new Scene(fxmlLoader.load(), 1280, 720);
+-+        stage.setTitle("Space Sim");
+-         stage.setScene(scene);
+-+
+-+        stage.setResizable(false);
+-         stage.show();
+-     }
+- 
+-Index: src/main/java/com/coolawesome/integrativeproject/Simulation.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/src/main/java/com/coolawesome/integrativeproject/Simulation.java b/src/main/java/com/coolawesome/integrativeproject/Simulation.java
+-new file mode 100644
+---- /dev/null	(date 1708447699399)
+-+++ b/src/main/java/com/coolawesome/integrativeproject/Simulation.java	(date 1708447699399)
+-@@ -0,0 +1,27 @@
+-+package com.coolawesome.integrativeproject;
+-+
+-+import javafx.scene.Node;
+-+import javafx.scene.PerspectiveCamera;
+-+import javafx.scene.transform.Rotate;
+-+import javafx.scene.transform.Translate;
+-+
+-+import java.util.ArrayList;
+-+
+-+public class Simulation extends Node {
+-+    private ArrayList<Planet> planets;
+-+    private PerspectiveCamera camera;
+-+
+-+
+-+
+-+    private void initializeCamera() {
+-+        camera = new PerspectiveCamera(true);
+-+        camera.getTransforms().addAll(
+-+                new Translate(0, 0, -1000),
+-+                new Rotate(-45, Rotate.Y_AXIS),
+-+                new Rotate(-45, Rotate.X_AXIS)
+-+        );
+-+        camera.setFarClip(5000.0);
+-+        camera.setNearClip(0.1);
+-+    }
+-+
+-+}
+-Index: .idea/workspace.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"fba92d50-62dc-4990-8ff1-7a3c8ce63cbd\" name=\"Changes\" comment=\"\">\r\n      <change afterPath=\"$PROJECT_DIR$/.gitignore\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/.idea/encodings.xml\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/.idea/uiDesigner.xml\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.jar\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/mvnw\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/mvnw.cmd\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/pom.xml\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainApplication.java\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/Vector2.java\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/Vector3.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/checksums/checksums.lock\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/checksums/md5-checksums.bin\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/checksums/sha1-checksums.bin\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/dependencies-accessors/dependencies-accessors.lock\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/dependencies-accessors/gc.properties\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/executionHistory/executionHistory.lock\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/fileChanges/last-build.bin\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/fileHashes/fileHashes.lock\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/8.2/gc.properties\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.gradle/vcs-1/gc.properties\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/.gitignore\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/compiler.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/compiler.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/gradle.xml\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/jarRepositories.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/jarRepositories.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/misc.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/misc.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/README.md\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/README.md\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/build.gradle\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/documents/deliverable 1.txt\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/gradlew\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/gradlew.bat\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/settings.gradle\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/HelloApplication.java\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/HelloController.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainController.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/resources/com/coolawesome/integrativeproject/hello-view.fxml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/resources/com/coolawesome/integrativeproject/main-view.fxml\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"MavenImportPreferences\">\r\n    <option name=\"generalSettings\">\r\n      <MavenGeneralSettings>\r\n        <option name=\"mavenHome\" value=\"Use Maven wrapper\" />\r\n      </MavenGeneralSettings>\r\n    </option>\r\n  </component>\r\n  <component name=\"ProjectColorInfo\"><![CDATA[{\r\n  \"associatedIndex\": 4\r\n}]]></component>\r\n  <component name=\"ProjectId\" id=\"2cdcgiNguDxJSrbrktXF9cZBqiO\" />\r\n  <component name=\"ProjectLevelVcsManager\">\r\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\r\n  </component>\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"ASKED_ADD_EXTERNAL_FILES\": \"true\",\r\n    \"Application.MainApplication.executor\": \"Run\",\r\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\r\n    \"ignore.virus.scanning.warn.message\": \"true\",\r\n    \"kotlin-language-version-configured\": \"true\",\r\n    \"last_opened_file_path\": \"C:/Users/HP USER/Documents/CP4/IP\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"jdk-21.0.2-openjdk-21.0.2-4caba194b151-4f524021\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"fba92d50-62dc-4990-8ff1-7a3c8ce63cbd\" name=\"Changes\" comment=\"\" />\r\n      <created>1708445009551</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1708445009551</updated>\r\n      <workItem from=\"1708445010876\" duration=\"474000\" />\r\n    </task>\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <option name=\"ADD_EXTERNAL_FILES_SILENTLY\" value=\"true\" />\r\n  </component>\r\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+---- a/.idea/workspace.xml	(revision 20ded5a3481bdae7b84056c83a82430d84266cda)
+-+++ b/.idea/workspace.xml	(date 1708447577152)
+-@@ -4,46 +4,11 @@
+-     <option name="autoReloadType" value="SELECTIVE" />
+-   </component>
+-   <component name="ChangeListManager">
+--    <list default="true" id="fba92d50-62dc-4990-8ff1-7a3c8ce63cbd" name="Changes" comment="">
+--      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.jar" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/mvnw" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/mvnw.cmd" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainApplication.java" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/Vector2.java" afterDir="false" />
+--      <change afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/Vector3.java" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/checksums/checksums.lock" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/checksums/md5-checksums.bin" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/checksums/sha1-checksums.bin" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/dependencies-accessors/dependencies-accessors.lock" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/dependencies-accessors/gc.properties" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/executionHistory/executionHistory.lock" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/fileChanges/last-build.bin" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/fileHashes/fileHashes.lock" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/8.2/gc.properties" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.gradle/vcs-1/gc.properties" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/documents/deliverable 1.txt" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/gradlew" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/gradlew.bat" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/settings.gradle" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/HelloApplication.java" beforeDir="false" />
+--      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/HelloController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainController.java" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/src/main/resources/com/coolawesome/integrativeproject/hello-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/coolawesome/integrativeproject/main-view.fxml" afterDir="false" />
+-+    <list default="true" id="fba92d50-62dc-4990-8ff1-7a3c8ce63cbd" name="Changes" comment="Setup Project">
+-+      <change afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/Planet.java" afterDir="false" />
+-+      <change afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/Simulation.java" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainApplication.java" afterDir="false" />
+-     </list>
+-     <option name="SHOW_DIALOG" value="false" />
+-     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+-@@ -70,9 +35,9 @@
+-       </MavenGeneralSettings>
+-     </option>
+-   </component>
+--  <component name="ProjectColorInfo"><![CDATA[{
+--  "associatedIndex": 4
+--}]]></component>
+-+  <component name="ProjectColorInfo">{
+-+  &quot;associatedIndex&quot;: 4
+-+}</component>
+-   <component name="ProjectId" id="2cdcgiNguDxJSrbrktXF9cZBqiO" />
+-   <component name="ProjectLevelVcsManager">
+-     <ConfirmationsSetting value="2" id="Add" />
+-@@ -81,24 +46,49 @@
+-     <option name="hideEmptyMiddlePackages" value="true" />
+-     <option name="showLibraryContents" value="true" />
+-   </component>
+--  <component name="PropertiesComponent"><![CDATA[{
+--  "keyToString": {
+--    "ASKED_ADD_EXTERNAL_FILES": "true",
+--    "Application.MainApplication.executor": "Run",
+--    "RunOnceActivity.OpenProjectViewOnStart": "true",
+--    "RunOnceActivity.ShowReadmeOnStart": "true",
+--    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+--    "ignore.virus.scanning.warn.message": "true",
+--    "kotlin-language-version-configured": "true",
+--    "last_opened_file_path": "C:/Users/HP USER/Documents/CP4/IP",
+--    "node.js.detected.package.eslint": "true",
+--    "node.js.detected.package.tslint": "true",
+--    "node.js.selected.package.eslint": "(autodetect)",
+--    "node.js.selected.package.tslint": "(autodetect)",
+--    "nodejs_package_manager_path": "npm",
+--    "vue.rearranger.settings.migration": "true"
+--  }
+--}]]></component>
+-+  <component name="PropertiesComponent">{
+-+  &quot;keyToString&quot;: {
+-+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+-+    &quot;Application.MainApplication.executor&quot;: &quot;Run&quot;,
+-+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+-+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+-+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+-+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+-+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+-+    &quot;last_opened_file_path&quot;: &quot;C:/Users/HP USER/Documents/CP4/IP&quot;,
+-+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+-+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+-+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+-+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+-+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+-+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+-+  }
+-+}</component>
+-+  <component name="RecentsManager">
+-+    <key name="CreateClassDialog.RecentsKey">
+-+      <recent name="com.coolawesome.integrativeproject" />
+-+    </key>
+-+  </component>
+-+  <component name="RunManager">
+-+    <configuration name="MainApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+-+      <option name="MAIN_CLASS_NAME" value="com.coolawesome.integrativeproject.MainApplication" />
+-+      <module name="IntegrativeProject" />
+-+      <extension name="coverage">
+-+        <pattern>
+-+          <option name="PATTERN" value="com.coolawesome.integrativeproject.*" />
+-+          <option name="ENABLED" value="true" />
+-+        </pattern>
+-+      </extension>
+-+      <method v="2">
+-+        <option name="Make" enabled="true" />
+-+      </method>
+-+    </configuration>
+-+    <recent_temporary>
+-+      <list>
+-+        <item itemvalue="Application.MainApplication" />
+-+      </list>
+-+    </recent_temporary>
+-+  </component>
+-   <component name="SharedIndexes">
+-     <attachedChunks>
+-       <set>
+-@@ -114,8 +104,26 @@
+-       <option name="number" value="Default" />
+-       <option name="presentableId" value="Default" />
+-       <updated>1708445009551</updated>
+--      <workItem from="1708445010876" duration="474000" />
+-+      <workItem from="1708445010876" duration="779000" />
+-+      <workItem from="1708446744257" duration="829000" />
+-     </task>
+-+    <task id="LOCAL-00001" summary="Setup Project">
+-+      <option name="closed" value="true" />
+-+      <created>1708445544700</created>
+-+      <option name="number" value="00001" />
+-+      <option name="presentableId" value="LOCAL-00001" />
+-+      <option name="project" value="LOCAL" />
+-+      <updated>1708445544700</updated>
+-+    </task>
+-+    <task id="LOCAL-00002" summary="Setup Project">
+-+      <option name="closed" value="true" />
+-+      <created>1708445714666</created>
+-+      <option name="number" value="00002" />
+-+      <option name="presentableId" value="LOCAL-00002" />
+-+      <option name="project" value="LOCAL" />
+-+      <updated>1708445714666</updated>
+-+    </task>
+-+    <option name="localTasksCounter" value="3" />
+-     <servers />
+-   </component>
+-   <component name="TypeScriptGeneratedFilesManager">
+-@@ -123,5 +131,7 @@
+-   </component>
+-   <component name="VcsManagerConfiguration">
+-     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+-+    <MESSAGE value="Setup Project" />
+-+    <option name="LAST_COMMIT_MESSAGE" value="Setup Project" />
+-   </component>
+- </project>
+-\ No newline at end of file
+-Index: src/main/java/com/coolawesome/integrativeproject/Planet.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/src/main/java/com/coolawesome/integrativeproject/Planet.java b/src/main/java/com/coolawesome/integrativeproject/Planet.java
+-new file mode 100644
+---- /dev/null	(date 1708447511568)
+-+++ b/src/main/java/com/coolawesome/integrativeproject/Planet.java	(date 1708447511568)
+-@@ -0,0 +1,4 @@
+-+package com.coolawesome.integrativeproject;
+-+
+-+public class Planet {
+-+}
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_2_56_p_m___Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_2_56_p_m___Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_2_56_p_m___Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_2_56_p_m___Changes_.xml	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
++++ /dev/null	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_2024-02-21_2_56_p_m__[Changes]" date="1708545438790" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_2_56_p_m__[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 2024-02-21 2:56 p.m. [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_10_19_a_m__[Changes]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_10_19_a_m__[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_10_19_a_m__[Changes]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_10_19_a_m__[Changes]/shelved.patch	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
++++ /dev/null	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
+@@ -1,85 +0,0 @@
+-Index: .idea/workspace.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"fba92d50-62dc-4990-8ff1-7a3c8ce63cbd\" name=\"Changes\" comment=\"Setup\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/misc.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/misc.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/pom.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/pom.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainApplication.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainApplication.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainController.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainController.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Planet.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Planet.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Simulation.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Simulation.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Vector3D.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Vector3D.java\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"MavenImportPreferences\">\r\n    <option name=\"generalSettings\">\r\n      <MavenGeneralSettings>\r\n        <option name=\"mavenHome\" value=\"Use Maven wrapper\" />\r\n      </MavenGeneralSettings>\r\n    </option>\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 4\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"2cdcgiNguDxJSrbrktXF9cZBqiO\" />\r\n  <component name=\"ProjectLevelVcsManager\">\r\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\r\n  </component>\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"ASKED_ADD_EXTERNAL_FILES\": \"true\",\r\n    \"Application.MainApplication.executor\": \"Run\",\r\n    \"Downloaded.Files.Path.Enabled\": \"false\",\r\n    \"Repository.Attach.Annotations\": \"false\",\r\n    \"Repository.Attach.JavaDocs\": \"false\",\r\n    \"Repository.Attach.Sources\": \"false\",\r\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\r\n    \"ignore.virus.scanning.warn.message\": \"true\",\r\n    \"kotlin-language-version-configured\": \"true\",\r\n    \"last_opened_file_path\": \"C:/Users/HP USER/Documents/CP4/IP\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"project.structure.last.edited\": \"Libraries\",\r\n    \"project.structure.proportion\": \"0.15\",\r\n    \"project.structure.side.proportion\": \"0.3586207\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CreateClassDialog.RecentsKey\">\r\n      <recent name=\"com.coolawesome.integrativeproject\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunManager\">\r\n    <configuration name=\"MainApplication\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"com.coolawesome.integrativeproject.MainApplication\" />\r\n      <module name=\"IntegrativeProject\" />\r\n      <extension name=\"coverage\">\r\n        <pattern>\r\n          <option name=\"PATTERN\" value=\"com.coolawesome.integrativeproject.*\" />\r\n          <option name=\"ENABLED\" value=\"true\" />\r\n        </pattern>\r\n      </extension>\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Application.MainApplication\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"jdk-18.0.2-corretto-18.0.2-4caba194b151-5720f15e\" />\r\n        <option value=\"jdk-21.0.2-openjdk-21.0.2-4caba194b151-4f524021\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"fba92d50-62dc-4990-8ff1-7a3c8ce63cbd\" name=\"Changes\" comment=\"\" />\r\n      <created>1708445009551</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1708445009551</updated>\r\n      <workItem from=\"1708445010876\" duration=\"779000\" />\r\n      <workItem from=\"1708446744257\" duration=\"1592000\" />\r\n      <workItem from=\"1708455491268\" duration=\"5415000\" />\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"Setup Project\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708445544700</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708445544700</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"Setup Project\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708445714666</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708445714666</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"Setup\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708448327820</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708448327821</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"4\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <option name=\"ADD_EXTERNAL_FILES_SILENTLY\" value=\"true\" />\r\n    <MESSAGE value=\"Setup Project\" />\r\n    <MESSAGE value=\"Setup\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Setup\" />\r\n  </component>\r\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+---- a/.idea/workspace.xml	(revision c1f8e2fab0f46e5ae7764fec5ddaab47dfc28af2)
+-+++ b/.idea/workspace.xml	(date 1708468540595)
+-@@ -4,17 +4,7 @@
+-     <option name="autoReloadType" value="SELECTIVE" />
+-   </component>
+-   <component name="ChangeListManager">
+--    <list default="true" id="fba92d50-62dc-4990-8ff1-7a3c8ce63cbd" name="Changes" comment="Setup">
+--      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainApplication.java" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/MainController.java" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Planet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Planet.java" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Simulation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Simulation.java" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Vector3D.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/physics/Vector3D.java" afterDir="false" />
+--    </list>
+-+    <list default="true" id="fba92d50-62dc-4990-8ff1-7a3c8ce63cbd" name="Changes" comment="Setup" />
+-     <option name="SHOW_DIALOG" value="false" />
+-     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+-     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+-@@ -51,31 +41,31 @@
+-     <option name="hideEmptyMiddlePackages" value="true" />
+-     <option name="showLibraryContents" value="true" />
+-   </component>
+--  <component name="PropertiesComponent"><![CDATA[{
+--  "keyToString": {
+--    "ASKED_ADD_EXTERNAL_FILES": "true",
+--    "Application.MainApplication.executor": "Run",
+--    "Downloaded.Files.Path.Enabled": "false",
+--    "Repository.Attach.Annotations": "false",
+--    "Repository.Attach.JavaDocs": "false",
+--    "Repository.Attach.Sources": "false",
+--    "RunOnceActivity.OpenProjectViewOnStart": "true",
+--    "RunOnceActivity.ShowReadmeOnStart": "true",
+--    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+--    "ignore.virus.scanning.warn.message": "true",
+--    "kotlin-language-version-configured": "true",
+--    "last_opened_file_path": "C:/Users/HP USER/Documents/CP4/IP",
+--    "node.js.detected.package.eslint": "true",
+--    "node.js.detected.package.tslint": "true",
+--    "node.js.selected.package.eslint": "(autodetect)",
+--    "node.js.selected.package.tslint": "(autodetect)",
+--    "nodejs_package_manager_path": "npm",
+--    "project.structure.last.edited": "Libraries",
+--    "project.structure.proportion": "0.15",
+--    "project.structure.side.proportion": "0.3586207",
+--    "vue.rearranger.settings.migration": "true"
+-+  <component name="PropertiesComponent">{
+-+  &quot;keyToString&quot;: {
+-+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+-+    &quot;Application.MainApplication.executor&quot;: &quot;Run&quot;,
+-+    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
+-+    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
+-+    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
+-+    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
+-+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+-+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+-+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+-+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+-+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+-+    &quot;last_opened_file_path&quot;: &quot;C:/Users/HP USER/Documents/CP4/IP&quot;,
+-+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+-+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+-+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+-+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+-+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+-+    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
+-+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+-+    &quot;project.structure.side.proportion&quot;: &quot;0.3586207&quot;,
+-+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+-   }
+--}]]></component>
+-+}</component>
+-   <component name="RecentsManager">
+-     <key name="CreateClassDialog.RecentsKey">
+-       <recent name="com.coolawesome.integrativeproject" />
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_10_19_a_m___Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_10_19_a_m___Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_10_19_a_m___Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_10_19_a_m___Changes_.xml	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
++++ /dev/null	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_2024-02-21_10_19_a_m__[Changes]" date="1708528776072" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_10_19_a_m__[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 2024-02-21 10:19 a.m. [Changes]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/compiler.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"CompilerConfiguration\">\r\n    <annotationProcessing>\r\n      <profile name=\"Maven default annotation processors profile\" enabled=\"true\">\r\n        <sourceOutputDir name=\"target/generated-sources/annotations\" />\r\n        <sourceTestOutputDir name=\"target/generated-test-sources/test-annotations\" />\r\n        <outputRelativeToContentRoot value=\"true\" />\r\n        <module name=\"IntegrativeProject\" />\r\n      </profile>\r\n    </annotationProcessing>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/compiler.xml b/.idea/compiler.xml
+--- a/.idea/compiler.xml	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
++++ b/.idea/compiler.xml	(date 1709650004119)
+@@ -2,6 +2,7 @@
+ <project version="4">
+   <component name="CompilerConfiguration">
+     <annotationProcessing>
++      <profile default="true" name="Default" enabled="true" />
+       <profile name="Maven default annotation processors profile" enabled="true">
+         <sourceOutputDir name="target/generated-sources/annotations" />
+         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"fba92d50-62dc-4990-8ff1-7a3c8ce63cbd\" name=\"Changes\" comment=\"Sunlight added\">\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/resources/images/planets/sun.jpg\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/resources/images/utils/Clouds1.png\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/resources/images/utils/Clouds2.png\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/resources/images/utils/Clouds3.png\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/resources/images/utils/Clouds4.png\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/Planet.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/Planet.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/Simulation.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/Simulation.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"MavenImportPreferences\">\r\n    <option name=\"generalSettings\">\r\n      <MavenGeneralSettings>\r\n        <option name=\"mavenHome\" value=\"Use Maven wrapper\" />\r\n      </MavenGeneralSettings>\r\n    </option>\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 4\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"2cdcgiNguDxJSrbrktXF9cZBqiO\" />\r\n  <component name=\"ProjectLevelVcsManager\">\r\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\r\n  </component>\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"ASKED_ADD_EXTERNAL_FILES\": \"true\",\r\n    \"Application.MainApplication.executor\": \"Run\",\r\n    \"Downloaded.Files.Path.Enabled\": \"false\",\r\n    \"Repository.Attach.Annotations\": \"false\",\r\n    \"Repository.Attach.JavaDocs\": \"false\",\r\n    \"Repository.Attach.Sources\": \"false\",\r\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\r\n    \"WebServerToolWindowFactoryState\": \"false\",\r\n    \"ignore.virus.scanning.warn.message\": \"true\",\r\n    \"kotlin-language-version-configured\": \"true\",\r\n    \"last_opened_file_path\": \"C:/Users/HP USER/Documents/CP4/IntegrativeProject/src/main/resources/images/utils\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"project.structure.last.edited\": \"Libraries\",\r\n    \"project.structure.proportion\": \"0.15\",\r\n    \"project.structure.side.proportion\": \"0.3586207\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CreateClassDialog.RecentsKey\">\r\n      <recent name=\"com.coolawesome.integrativeproject\" />\r\n    </key>\r\n    <key name=\"CopyFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\HP USER\\Documents\\CP4\\IntegrativeProject\\src\\main\\resources\\images\\utils\" />\r\n      <recent name=\"C:\\Users\\HP USER\\Documents\\CP4\\IntegrativeProject\\src\\main\\resources\\images\\planets\" />\r\n      <recent name=\"C:\\Users\\HP USER\\Documents\\CP4\\IntegrativeProject\\src\\main\\resources\\images\\util\" />\r\n      <recent name=\"C:\\Users\\HP USER\\Documents\\CP4\\IntegrativeProject\\src\\main\\resources\\images\" />\r\n    </key>\r\n    <key name=\"MoveFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\HP USER\\Documents\\CP4\\IntegrativeProject\" />\r\n    </key>\r\n    <key name=\"MoveClassesOrPackagesDialog.RECENTS_KEY\">\r\n      <recent name=\"com.coolawesome.integrativeproject\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunManager\">\r\n    <configuration name=\"MainApplication\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"com.coolawesome.integrativeproject.MainApplication\" />\r\n      <module name=\"IntegrativeProject\" />\r\n      <extension name=\"coverage\">\r\n        <pattern>\r\n          <option name=\"PATTERN\" value=\"com.coolawesome.integrativeproject.*\" />\r\n          <option name=\"ENABLED\" value=\"true\" />\r\n        </pattern>\r\n      </extension>\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Application.MainApplication\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"jdk-18.0.2-corretto-18.0.2-4caba194b151-5720f15e\" />\r\n        <option value=\"jdk-21.0.2-openjdk-21.0.2-4caba194b151-4f524021\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"fba92d50-62dc-4990-8ff1-7a3c8ce63cbd\" name=\"Changes\" comment=\"\" />\r\n      <created>1708445009551</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1708445009551</updated>\r\n      <workItem from=\"1708445010876\" duration=\"779000\" />\r\n      <workItem from=\"1708446744257\" duration=\"1592000\" />\r\n      <workItem from=\"1708455491268\" duration=\"6292000\" />\r\n      <workItem from=\"1708476819818\" duration=\"10118000\" />\r\n      <workItem from=\"1708536311414\" duration=\"2755000\" />\r\n      <workItem from=\"1708616275169\" duration=\"245000\" />\r\n      <workItem from=\"1708617997869\" duration=\"623000\" />\r\n      <workItem from=\"1708618960749\" duration=\"2139000\" />\r\n      <workItem from=\"1708628275102\" duration=\"6226000\" />\r\n      <workItem from=\"1708634687839\" duration=\"76000\" />\r\n      <workItem from=\"1708644025355\" duration=\"1397000\" />\r\n      <workItem from=\"1708807439090\" duration=\"2518000\" />\r\n      <workItem from=\"1708810059219\" duration=\"247000\" />\r\n      <workItem from=\"1709043765217\" duration=\"3018000\" />\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"Setup Project\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708445544700</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708445544700</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"Setup Project\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708445714666</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708445714666</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"Setup\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708448327820</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708448327821</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"Initial 3D Scene Creation + Lombok Install\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708461096889</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708461096889</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00005\" summary=\"Camera overhaul + Skybox\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708584875490</created>\r\n      <option name=\"number\" value=\"00005\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708584875491</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00006\" summary=\"Sunlight added\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708633997936</created>\r\n      <option name=\"number\" value=\"00006\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708633997936</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"7\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <option name=\"ADD_EXTERNAL_FILES_SILENTLY\" value=\"true\" />\r\n    <MESSAGE value=\"Setup Project\" />\r\n    <MESSAGE value=\"Setup\" />\r\n    <MESSAGE value=\"Initial 3D Scene Creation + Lombok Install\" />\r\n    <MESSAGE value=\"Camera overhaul + Skybox\" />\r\n    <MESSAGE value=\"Sunlight added\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Sunlight added\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
++++ b/.idea/workspace.xml	(date 1709846397561)
+@@ -5,15 +5,19 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="fba92d50-62dc-4990-8ff1-7a3c8ce63cbd" name="Changes" comment="Sunlight added">
+-      <change afterPath="$PROJECT_DIR$/src/main/resources/images/planets/sun.jpg" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/resources/images/utils/Clouds1.png" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/resources/images/utils/Clouds2.png" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/resources/images/utils/Clouds3.png" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/resources/images/utils/Clouds4.png" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_11_48_a_m__[Changes]/shelved.patch" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_11_48_a_m___Changes_.xml" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_5_32_p_m__[Changes]/shelved.patch" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-20_5_32_p_m___Changes_.xml" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_10_19_a_m__[Changes]/shelved.patch" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_10_19_a_m___Changes_.xml" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_2_56_p_m__[Changes]/shelved.patch" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024-02-21_2_56_p_m___Changes_.xml" beforeDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/Planet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/Planet.java" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/Simulation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/Simulation.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/SimulationView.java" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -51,32 +55,32 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "ASKED_ADD_EXTERNAL_FILES": "true",
+-    "Application.MainApplication.executor": "Run",
+-    "Downloaded.Files.Path.Enabled": "false",
+-    "Repository.Attach.Annotations": "false",
+-    "Repository.Attach.JavaDocs": "false",
+-    "Repository.Attach.Sources": "false",
+-    "RunOnceActivity.OpenProjectViewOnStart": "true",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+-    "WebServerToolWindowFactoryState": "false",
+-    "ignore.virus.scanning.warn.message": "true",
+-    "kotlin-language-version-configured": "true",
+-    "last_opened_file_path": "C:/Users/HP USER/Documents/CP4/IntegrativeProject/src/main/resources/images/utils",
+-    "node.js.detected.package.eslint": "true",
+-    "node.js.detected.package.tslint": "true",
+-    "node.js.selected.package.eslint": "(autodetect)",
+-    "node.js.selected.package.tslint": "(autodetect)",
+-    "nodejs_package_manager_path": "npm",
+-    "project.structure.last.edited": "Libraries",
+-    "project.structure.proportion": "0.15",
+-    "project.structure.side.proportion": "0.3586207",
+-    "vue.rearranger.settings.migration": "true"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
++    &quot;Application.MainApplication.executor&quot;: &quot;Run&quot;,
++    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
++    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
++    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
++    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
++    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
++    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
++    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
++    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
++    &quot;last_opened_file_path&quot;: &quot;C:/Users/HP USER/Documents/CP4/IntegrativeProject/src/main/resources/images/utils&quot;,
++    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
++    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
++    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
++    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
++    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
++    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
++    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
++    &quot;project.structure.side.proportion&quot;: &quot;0.3586207&quot;,
++    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+   }
+-}]]></component>
++}</component>
+   <component name="RecentsManager">
+     <key name="CreateClassDialog.RecentsKey">
+       <recent name="com.coolawesome.integrativeproject" />
+@@ -144,6 +148,8 @@
+       <workItem from="1708807439090" duration="2518000" />
+       <workItem from="1708810059219" duration="247000" />
+       <workItem from="1709043765217" duration="3018000" />
++      <workItem from="1709652434029" duration="906000" />
++      <workItem from="1709843184883" duration="1127000" />
+     </task>
+     <task id="LOCAL-00001" summary="Setup Project">
+       <option name="closed" value="true" />
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\r\n  <component name=\"MavenProjectsManager\">\r\n    <option name=\"originalFiles\">\r\n      <list>\r\n        <option value=\"$PROJECT_DIR$/pom.xml\" />\r\n      </list>\r\n    </option>\r\n    <option name=\"workspaceImportForciblyTurnedOn\" value=\"true\" />\r\n  </component>\r\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_21\" default=\"true\" project-jdk-name=\"openjdk-21\" project-jdk-type=\"JavaSDK\">\r\n    <output url=\"file://$PROJECT_DIR$/out\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision 9090f44c569e4161f51b0ce86bc673f4f817a9ad)
++++ b/.idea/misc.xml	(date 1709650006055)
+@@ -1,4 +1,3 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="ExternalStorageConfigurationManager" enabled="true" />
+   <component name="MavenProjectsManager">

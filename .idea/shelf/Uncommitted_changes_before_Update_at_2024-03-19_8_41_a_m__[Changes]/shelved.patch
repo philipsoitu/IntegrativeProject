@@ -1,0 +1,266 @@
+Index: src/main/java/com/coolawesome/integrativeproject/Simulation.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.coolawesome.integrativeproject;\r\n\r\nimport com.coolawesome.integrativeproject.utils.Vector3D;\r\nimport javafx.scene.layout.AnchorPane;\r\nimport javafx.scene.paint.Color;\r\n\r\nimport java.util.*;\r\n\r\npublic class Simulation {\r\n\r\n    Map<String, Planet> planetMap = new HashMap<>();\r\n    SimulationView simulationView;\r\n\r\n    public Simulation(AnchorPane viewport) {\r\n        simulationView = new SimulationView(viewport, planetMap);\r\n        initialize(100);\r\n    }\r\n\r\n    public void initialize(int numOfBodies) {\r\n        for (int i = 0; i < numOfBodies; i++) {\r\n\r\n            // Randomizing parameters\r\n            Vector3D randPos = new Vector3D(Math.random() * 300 - 150, Math.random() * 300 - 150, Math.random() * 300 - 150);\r\n            // Vector3D randVel = new Vector3D(-1 + Math.random() * 2, -1 + Math.random() * 2, -1 + Math.random() * 2);\r\n            Vector3D randVel = new Vector3D();\r\n            double randRad = 1 + Math.random() * 2;\r\n            double randMass = 5000;\r\n            boolean sun = Math.random() * 4 < 1;\r\n\r\n            // Generate a unique ID for the planet\r\n            String uniqueID = UUID.randomUUID().toString().replaceAll(\"-\", \"\");\r\n\r\n            // Create the Planet object\r\n            Planet randPlanet = new Planet(randPos, randVel, randRad, randMass, sun);\r\n\r\n            // Add the Planet to the Map\r\n            planetMap.put(uniqueID, randPlanet);\r\n        }\r\n        planetMap.put(\"sun\", new Planet(new Vector3D(5000, 0, 0), new Vector3D(), 1000, 100000, true));\r\n    }\r\n\r\n    public void update(double dt){\r\n        // Do physics n shit here\r\n        updatePosition(dt);\r\n\r\n        handleCollisions();\r\n        simulationView.update(dt);\r\n\r\n\r\n    }\r\n\r\n    private void updatePosition(double dt) {\r\n\r\n        double G = 0.001;\r\n\r\n        planetMap.forEach((id, p1) -> {\r\n            Vector3D ftotal = new Vector3D();\r\n            planetMap.forEach((id2, p2) -> {\r\n                if (p1 != p2) {\r\n                    Vector3D dist = Vector3D.difference(p2.position, p1.position);\r\n                    Vector3D f = Vector3D.multiplication((G * p1.mass * p2.mass) / (dist.magnitude() * dist.magnitude()), Vector3D.unitVector(dist));\r\n                    ftotal.add(f);\r\n\r\n                }\r\n\r\n                p1.acceleration = Vector3D.multiplication((1 / p1.mass), ftotal);\r\n                p1.velocity.add(Vector3D.multiplication(dt, p1.acceleration));\r\n                p1.position.add(Vector3D.multiplication(dt, p1.velocity));\r\n            });\r\n        });\r\n    }\r\n\r\n    private void handleCollisions() {\r\n        List<String> idPlanetsToRemove = new ArrayList<>();\r\n        planetMap.forEach((id, p1) -> {\r\n            planetMap.forEach((id2, p2) -> {\r\n                if (p1 != p2 && p1 != null && p2 != null) {\r\n                    Vector3D n = Vector3D.unitVector(Vector3D.difference(p1.position, p2.position));\r\n                    double dist = Math.min(Vector3D.sum(Vector3D.difference(p2.position, Vector3D.multiplication(p2.radius, n)), p1.position).magnitude(), Vector3D.difference(Vector3D.difference(p2.position, Vector3D.multiplication(p2.radius, n)), p1.position).magnitude());\r\n                    if (p1.radius > dist) {\r\n                        p1.mass += p2.mass;\r\n                        p1.radius = Math.sqrt(p1.radius * p1.radius + p2.radius * p2.radius);\r\n                        double totalMass = p1.mass + p2.mass;\r\n                        int red = (int)Math.min(((p1.mass/totalMass)*p1.color.getRed() + (p2.mass/totalMass)*p2.color.getRed())*255,255);\r\n                        int green = (int)Math.min(((p1.mass/totalMass)*p1.color.getGreen() + (p2.mass/totalMass)*p2.color.getGreen())*255,255);\r\n                        int blue = (int)Math.min(((p1.mass/totalMass)*p1.color.getBlue() + (p2.mass/totalMass)*p2.color.getBlue())*255,255);\r\n\r\n                        p1.color = Color.rgb(red, green, blue);\r\n                        idPlanetsToRemove.add(id2);\r\n                    }\r\n                }\r\n            });\r\n        });\r\n        idPlanetsToRemove.forEach((id) -> planetMap.remove(id));\r\n//        planetMap.remove(idPlanetsToRemove);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/coolawesome/integrativeproject/Simulation.java b/src/main/java/com/coolawesome/integrativeproject/Simulation.java
+--- a/src/main/java/com/coolawesome/integrativeproject/Simulation.java	(revision a4c793681ac83e05efb18d40ef611d154ee106d0)
++++ b/src/main/java/com/coolawesome/integrativeproject/Simulation.java	(date 1710766623620)
+@@ -13,7 +13,7 @@
+ 
+     public Simulation(AnchorPane viewport) {
+         simulationView = new SimulationView(viewport, planetMap);
+-        initialize(100);
++        initialize(400);
+     }
+ 
+     public void initialize(int numOfBodies) {
+@@ -36,14 +36,13 @@
+             // Add the Planet to the Map
+             planetMap.put(uniqueID, randPlanet);
+         }
+-        planetMap.put("sun", new Planet(new Vector3D(5000, 0, 0), new Vector3D(), 1000, 100000, true));
+     }
+ 
+     public void update(double dt){
+         // Do physics n shit here
+         updatePosition(dt);
+ 
+-        handleCollisions();
++//        handleCollisions();
+         simulationView.update(dt);
+ 
+ 
+@@ -51,7 +50,7 @@
+ 
+     private void updatePosition(double dt) {
+ 
+-        double G = 0.001;
++        double G = 0.00001;
+ 
+         planetMap.forEach((id, p1) -> {
+             Vector3D ftotal = new Vector3D();
+Index: src/main/java/com/coolawesome/integrativeproject/Planet.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.coolawesome.integrativeproject;\r\n\r\nimport com.coolawesome.integrativeproject.utils.Vector3D;\r\nimport javafx.geometry.Point3D;\r\nimport javafx.scene.PointLight;\r\nimport javafx.scene.image.Image;\r\nimport javafx.scene.paint.Color;\r\nimport javafx.scene.paint.PhongMaterial;\r\nimport javafx.scene.shape.Sphere;\r\n\r\n\r\npublic class Planet {\r\n\r\n    public Vector3D position;\r\n    public Vector3D velocity;\r\n    public Vector3D acceleration;\r\n    public double radius;\r\n    public double mass;\r\n    public double spinRate;\r\n    public Color color;\r\n    public PhongMaterial material;\r\n\r\n    public boolean isSun;\r\n    public PointLight sunLight;\r\n\r\n    private static final Image sunTexture = new Image(\"file:src/main/resources/images/planets/sun.jpg\");\r\n    private static final Image[] planetTextures = {\r\n        new Image(\"file:src/main/resources/images/planets/Alpine.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Gaseous1.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Gaseous2.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Gaseous3.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Gaseous4.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Icy.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Martian.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Savannah.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Swamp.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Terrestrial1.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Terrestrial2.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Terrestrial3.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Terrestrial4.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Tropical.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Venusian.png\"),\r\n        new Image(\"file:src/main/resources/images/planets/Volcanic.png\")\r\n};\r\n    public Sphere planetNode;\r\n\r\n    // TODO: planets rings using FXyz torus?\r\n    public Planet(Vector3D position, Vector3D velocity, double radius, double mass, boolean isSun) {\r\n        this.position = position;\r\n        this.velocity = velocity;\r\n        this.acceleration = new Vector3D();\r\n        this.mass = mass;\r\n        this.radius = radius;\r\n        int r = (int) (Math.random() * 155) + 100;\r\n        int g = (int) (Math.random() * 155) + 100;\r\n        int b = (int) (Math.random() * 155) + 100;\r\n        Color randColor = Color.rgb(r, g, b);\r\n        this.color = randColor;\r\n        this.spinRate = -1.5 + (Math.random() * 3);\r\n        this.isSun = isSun;\r\n\r\n        planetNode = new Sphere(radius);\r\n        planetNode.setTranslateX(position.x);\r\n        planetNode.setTranslateY(position.y);\r\n        planetNode.setTranslateZ(position.z);\r\n        material = new PhongMaterial(color);\r\n        if(isSun){\r\n            initSun();\r\n        } else {\r\n            initSphere();\r\n        }\r\n    }\r\n\r\n    private void initSphere() {\r\n        material.setDiffuseMap(planetTextures[(int) (Math.random() * planetTextures.length)]);\r\n        planetNode.setMaterial(material);\r\n        planetNode.setRotationAxis(new Point3D(0, 1, 0));\r\n    }\r\n\r\n    private void initSun(){\r\n        material.setSelfIlluminationMap(sunTexture); //TODO: add more sun textures\r\n        material.setDiffuseColor(Color.BLACK);\r\n        material.setSpecularPower(0);\r\n        planetNode.setMaterial(material);\r\n        planetNode.setRotationAxis(new Point3D(0, 1, 0));\r\n        sunLight = new PointLight(this.color);\r\n        sunLight.setTranslateX(this.position.x);\r\n        sunLight.setTranslateY(this.position.y);\r\n        sunLight.setTranslateZ(this.position.z);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/coolawesome/integrativeproject/Planet.java b/src/main/java/com/coolawesome/integrativeproject/Planet.java
+--- a/src/main/java/com/coolawesome/integrativeproject/Planet.java	(revision a4c793681ac83e05efb18d40ef611d154ee106d0)
++++ b/src/main/java/com/coolawesome/integrativeproject/Planet.java	(date 1710766623633)
+@@ -25,23 +25,23 @@
+ 
+     private static final Image sunTexture = new Image("file:src/main/resources/images/planets/sun.jpg");
+     private static final Image[] planetTextures = {
+-        new Image("file:src/main/resources/images/planets/Alpine.png"),
+-        new Image("file:src/main/resources/images/planets/Gaseous1.png"),
+-        new Image("file:src/main/resources/images/planets/Gaseous2.png"),
+-        new Image("file:src/main/resources/images/planets/Gaseous3.png"),
+-        new Image("file:src/main/resources/images/planets/Gaseous4.png"),
+-        new Image("file:src/main/resources/images/planets/Icy.png"),
+-        new Image("file:src/main/resources/images/planets/Martian.png"),
+-        new Image("file:src/main/resources/images/planets/Savannah.png"),
+-        new Image("file:src/main/resources/images/planets/Swamp.png"),
+-        new Image("file:src/main/resources/images/planets/Terrestrial1.png"),
+-        new Image("file:src/main/resources/images/planets/Terrestrial2.png"),
+-        new Image("file:src/main/resources/images/planets/Terrestrial3.png"),
+-        new Image("file:src/main/resources/images/planets/Terrestrial4.png"),
+-        new Image("file:src/main/resources/images/planets/Tropical.png"),
+-        new Image("file:src/main/resources/images/planets/Venusian.png"),
+-        new Image("file:src/main/resources/images/planets/Volcanic.png")
+-};
++            new Image("file:src/main/resources/images/planets/Alpine.png"),
++            new Image("file:src/main/resources/images/planets/Gaseous1.png"),
++            new Image("file:src/main/resources/images/planets/Gaseous2.png"),
++            new Image("file:src/main/resources/images/planets/Gaseous3.png"),
++            new Image("file:src/main/resources/images/planets/Gaseous4.png"),
++            new Image("file:src/main/resources/images/planets/Icy.png"),
++            new Image("file:src/main/resources/images/planets/Martian.png"),
++            new Image("file:src/main/resources/images/planets/Savannah.png"),
++            new Image("file:src/main/resources/images/planets/Swamp.png"),
++            new Image("file:src/main/resources/images/planets/Terrestrial1.png"),
++            new Image("file:src/main/resources/images/planets/Terrestrial2.png"),
++            new Image("file:src/main/resources/images/planets/Terrestrial3.png"),
++            new Image("file:src/main/resources/images/planets/Terrestrial4.png"),
++            new Image("file:src/main/resources/images/planets/Tropical.png"),
++            new Image("file:src/main/resources/images/planets/Venusian.png"),
++            new Image("file:src/main/resources/images/planets/Volcanic.png")
++    };
+     public Sphere planetNode;
+ 
+     // TODO: planets rings using FXyz torus?
+@@ -51,10 +51,8 @@
+         this.acceleration = new Vector3D();
+         this.mass = mass;
+         this.radius = radius;
+-        int r = (int) (Math.random() * 155) + 100;
+-        int g = (int) (Math.random() * 155) + 100;
+-        int b = (int) (Math.random() * 155) + 100;
+-        Color randColor = Color.rgb(r, g, b);
++        double hue = Math.random() * 360;
++        Color randColor = Color.hsb(hue, 1,1);
+         this.color = randColor;
+         this.spinRate = -1.5 + (Math.random() * 3);
+         this.isSun = isSun;
+@@ -64,7 +62,7 @@
+         planetNode.setTranslateY(position.y);
+         planetNode.setTranslateZ(position.z);
+         material = new PhongMaterial(color);
+-        if(isSun){
++        if (isSun) {
+             initSun();
+         } else {
+             initSphere();
+@@ -77,7 +75,7 @@
+         planetNode.setRotationAxis(new Point3D(0, 1, 0));
+     }
+ 
+-    private void initSun(){
++    private void initSun() {
+         material.setSelfIlluminationMap(sunTexture); //TODO: add more sun textures
+         material.setDiffuseColor(Color.BLACK);
+         material.setSpecularPower(0);
+Index: .idea/compiler.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"CompilerConfiguration\">\r\n    <annotationProcessing>\r\n      <profile name=\"Maven default annotation processors profile\" enabled=\"true\">\r\n        <sourceOutputDir name=\"target/generated-sources/annotations\" />\r\n        <sourceTestOutputDir name=\"target/generated-test-sources/test-annotations\" />\r\n        <outputRelativeToContentRoot value=\"true\" />\r\n        <module name=\"IntegrativeProject\" />\r\n      </profile>\r\n    </annotationProcessing>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/compiler.xml b/.idea/compiler.xml
+--- a/.idea/compiler.xml	(revision a4c793681ac83e05efb18d40ef611d154ee106d0)
++++ b/.idea/compiler.xml	(date 1710766623666)
+@@ -2,6 +2,7 @@
+ <project version="4">
+   <component name="CompilerConfiguration">
+     <annotationProcessing>
++      <profile default="true" name="Default" enabled="true" />
+       <profile name="Maven default annotation processors profile" enabled="true">
+         <sourceOutputDir name="target/generated-sources/annotations" />
+         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"fba92d50-62dc-4990-8ff1-7a3c8ce63cbd\" name=\"Changes\" comment=\"PID Controller\">\r\n      <change afterPath=\"$PROJECT_DIR$/src/test/java/com/coolawesome/integrativeproject/utils/Vector3DTest.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/Vector3D.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/Vector3D.java\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"MavenImportPreferences\">\r\n    <option name=\"generalSettings\">\r\n      <MavenGeneralSettings>\r\n        <option name=\"mavenHome\" value=\"Use Maven wrapper\" />\r\n      </MavenGeneralSettings>\r\n    </option>\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 4\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"2cdcgiNguDxJSrbrktXF9cZBqiO\" />\r\n  <component name=\"ProjectLevelVcsManager\">\r\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\r\n  </component>\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"ASKED_ADD_EXTERNAL_FILES\": \"true\",\r\n    \"Application.MainApplication.executor\": \"Run\",\r\n    \"Downloaded.Files.Path.Enabled\": \"false\",\r\n    \"JUnit.PIDControllerTest (1).executor\": \"Run\",\r\n    \"JUnit.PIDControllerTest.executor\": \"Run\",\r\n    \"JUnit.Vector3DTest.executor\": \"Run\",\r\n    \"Repository.Attach.Annotations\": \"false\",\r\n    \"Repository.Attach.JavaDocs\": \"false\",\r\n    \"Repository.Attach.Sources\": \"false\",\r\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\r\n    \"WebServerToolWindowFactoryState\": \"false\",\r\n    \"ignore.virus.scanning.warn.message\": \"true\",\r\n    \"kotlin-language-version-configured\": \"true\",\r\n    \"last_opened_file_path\": \"C:/Users/HP USER/Documents/CP4/IntegrativeProject/src/main/resources/images/utils\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"project.structure.last.edited\": \"Modules\",\r\n    \"project.structure.proportion\": \"0.15\",\r\n    \"project.structure.side.proportion\": \"0.3586207\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CreateClassDialog.RecentsKey\">\r\n      <recent name=\"com.coolawesome.integrativeproject\" />\r\n    </key>\r\n    <key name=\"CopyFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\HP USER\\Documents\\CP4\\IntegrativeProject\\src\\main\\resources\\images\\utils\" />\r\n      <recent name=\"C:\\Users\\HP USER\\Documents\\CP4\\IntegrativeProject\\src\\main\\resources\\images\\planets\" />\r\n      <recent name=\"C:\\Users\\HP USER\\Documents\\CP4\\IntegrativeProject\\src\\main\\resources\\images\\util\" />\r\n      <recent name=\"C:\\Users\\HP USER\\Documents\\CP4\\IntegrativeProject\\src\\main\\resources\\images\" />\r\n    </key>\r\n    <key name=\"MoveFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\HP USER\\Documents\\CP4\\IntegrativeProject\" />\r\n    </key>\r\n    <key name=\"MoveClassesOrPackagesDialog.RECENTS_KEY\">\r\n      <recent name=\"com.coolawesome.integrativeproject\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunManager\" selected=\"JUnit.Vector3DTest\">\r\n    <configuration name=\"MainApplication\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"com.coolawesome.integrativeproject.MainApplication\" />\r\n      <module name=\"IntegrativeProject\" />\r\n      <extension name=\"coverage\">\r\n        <pattern>\r\n          <option name=\"PATTERN\" value=\"com.coolawesome.integrativeproject.*\" />\r\n          <option name=\"ENABLED\" value=\"true\" />\r\n        </pattern>\r\n      </extension>\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration name=\"PIDControllerTest (1)\" type=\"JUnit\" factoryName=\"JUnit\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"IntegrativeProject\" />\r\n      <extension name=\"coverage\">\r\n        <pattern>\r\n          <option name=\"PATTERN\" value=\"com.coolawesome.integrativeproject.utils.*\" />\r\n          <option name=\"ENABLED\" value=\"true\" />\r\n        </pattern>\r\n      </extension>\r\n      <option name=\"PACKAGE_NAME\" value=\"com.coolawesome.integrativeproject.utils\" />\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"com.coolawesome.integrativeproject.utils.PIDControllerTest\" />\r\n      <option name=\"TEST_OBJECT\" value=\"class\" />\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration name=\"PIDControllerTest\" type=\"JUnit\" factoryName=\"JUnit\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"IntegrativeProject\" />\r\n      <option name=\"PACKAGE_NAME\" value=\"\" />\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"PIDControllerTest\" />\r\n      <option name=\"TEST_OBJECT\" value=\"class\" />\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration name=\"Vector3DTest\" type=\"JUnit\" factoryName=\"JUnit\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"IntegrativeProject\" />\r\n      <extension name=\"coverage\">\r\n        <pattern>\r\n          <option name=\"PATTERN\" value=\"com.coolawesome.integrativeproject.utils.*\" />\r\n          <option name=\"ENABLED\" value=\"true\" />\r\n        </pattern>\r\n      </extension>\r\n      <option name=\"PACKAGE_NAME\" value=\"com.coolawesome.integrativeproject.utils\" />\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"com.coolawesome.integrativeproject.utils.Vector3DTest\" />\r\n      <option name=\"TEST_OBJECT\" value=\"class\" />\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"JUnit.Vector3DTest\" />\r\n        <item itemvalue=\"Application.MainApplication\" />\r\n        <item itemvalue=\"JUnit.PIDControllerTest (1)\" />\r\n        <item itemvalue=\"JUnit.PIDControllerTest\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"jdk-18.0.2-corretto-18.0.2-4caba194b151-5720f15e\" />\r\n        <option value=\"jdk-21.0.2-openjdk-21.0.2-4caba194b151-4f524021\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"fba92d50-62dc-4990-8ff1-7a3c8ce63cbd\" name=\"Changes\" comment=\"\" />\r\n      <created>1708445009551</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1708445009551</updated>\r\n      <workItem from=\"1708445010876\" duration=\"779000\" />\r\n      <workItem from=\"1708446744257\" duration=\"1592000\" />\r\n      <workItem from=\"1708455491268\" duration=\"6292000\" />\r\n      <workItem from=\"1708476819818\" duration=\"10118000\" />\r\n      <workItem from=\"1708536311414\" duration=\"2755000\" />\r\n      <workItem from=\"1708616275169\" duration=\"245000\" />\r\n      <workItem from=\"1708617997869\" duration=\"623000\" />\r\n      <workItem from=\"1708618960749\" duration=\"2139000\" />\r\n      <workItem from=\"1708628275102\" duration=\"6226000\" />\r\n      <workItem from=\"1708634687839\" duration=\"76000\" />\r\n      <workItem from=\"1708644025355\" duration=\"1397000\" />\r\n      <workItem from=\"1708807439090\" duration=\"2518000\" />\r\n      <workItem from=\"1708810059219\" duration=\"247000\" />\r\n      <workItem from=\"1709043765217\" duration=\"3107000\" />\r\n      <workItem from=\"1709050676418\" duration=\"123000\" />\r\n      <workItem from=\"1709818226495\" duration=\"229000\" />\r\n      <workItem from=\"1709818507396\" duration=\"3125000\" />\r\n      <workItem from=\"1709841147721\" duration=\"3208000\" />\r\n      <workItem from=\"1709865313852\" duration=\"1382000\" />\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"Setup Project\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708445544700</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708445544700</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"Setup Project\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708445714666</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708445714666</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"Setup\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708448327820</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708448327821</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"Initial 3D Scene Creation + Lombok Install\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708461096889</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708461096889</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00005\" summary=\"Camera overhaul + Skybox\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708584875490</created>\r\n      <option name=\"number\" value=\"00005\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708584875491</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00006\" summary=\"Sunlight added\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1708633997936</created>\r\n      <option name=\"number\" value=\"00006\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1708633997936</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00007\" summary=\"Texture Changes\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1709047547859</created>\r\n      <option name=\"number\" value=\"00007\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00007\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1709047547859</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00008\" summary=\"PID Controller\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1709844106736</created>\r\n      <option name=\"number\" value=\"00008\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00008\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1709844106736</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"9\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <option name=\"ADD_EXTERNAL_FILES_SILENTLY\" value=\"true\" />\r\n    <MESSAGE value=\"Setup Project\" />\r\n    <MESSAGE value=\"Setup\" />\r\n    <MESSAGE value=\"Initial 3D Scene Creation + Lombok Install\" />\r\n    <MESSAGE value=\"Camera overhaul + Skybox\" />\r\n    <MESSAGE value=\"Sunlight added\" />\r\n    <MESSAGE value=\"Texture Changes\" />\r\n    <MESSAGE value=\"PID Controller\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"PID Controller\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision a4c793681ac83e05efb18d40ef611d154ee106d0)
++++ b/.idea/workspace.xml	(date 1710766718312)
+@@ -5,9 +5,11 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="fba92d50-62dc-4990-8ff1-7a3c8ce63cbd" name="Changes" comment="PID Controller">
+-      <change afterPath="$PROJECT_DIR$/src/test/java/com/coolawesome/integrativeproject/utils/Vector3DTest.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/Vector3D.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/utils/Vector3D.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/Planet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/Planet.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/Simulation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/coolawesome/integrativeproject/Simulation.java" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -45,35 +47,35 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "ASKED_ADD_EXTERNAL_FILES": "true",
+-    "Application.MainApplication.executor": "Run",
+-    "Downloaded.Files.Path.Enabled": "false",
+-    "JUnit.PIDControllerTest (1).executor": "Run",
+-    "JUnit.PIDControllerTest.executor": "Run",
+-    "JUnit.Vector3DTest.executor": "Run",
+-    "Repository.Attach.Annotations": "false",
+-    "Repository.Attach.JavaDocs": "false",
+-    "Repository.Attach.Sources": "false",
+-    "RunOnceActivity.OpenProjectViewOnStart": "true",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+-    "WebServerToolWindowFactoryState": "false",
+-    "ignore.virus.scanning.warn.message": "true",
+-    "kotlin-language-version-configured": "true",
+-    "last_opened_file_path": "C:/Users/HP USER/Documents/CP4/IntegrativeProject/src/main/resources/images/utils",
+-    "node.js.detected.package.eslint": "true",
+-    "node.js.detected.package.tslint": "true",
+-    "node.js.selected.package.eslint": "(autodetect)",
+-    "node.js.selected.package.tslint": "(autodetect)",
+-    "nodejs_package_manager_path": "npm",
+-    "project.structure.last.edited": "Modules",
+-    "project.structure.proportion": "0.15",
+-    "project.structure.side.proportion": "0.3586207",
+-    "vue.rearranger.settings.migration": "true"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
++    &quot;Application.MainApplication.executor&quot;: &quot;Run&quot;,
++    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
++    &quot;JUnit.PIDControllerTest (1).executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.PIDControllerTest.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.Vector3DTest.executor&quot;: &quot;Run&quot;,
++    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
++    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
++    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
++    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
++    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
++    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
++    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
++    &quot;last_opened_file_path&quot;: &quot;C:/Users/HP USER/Documents/CP4/IntegrativeProject/src/main/resources/images/utils&quot;,
++    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
++    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
++    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
++    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
++    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
++    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
++    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
++    &quot;project.structure.side.proportion&quot;: &quot;0.3586207&quot;,
++    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+   }
+-}]]></component>
++}</component>
+   <component name="RecentsManager">
+     <key name="CreateClassDialog.RecentsKey">
+       <recent name="com.coolawesome.integrativeproject" />
+@@ -91,7 +93,7 @@
+       <recent name="com.coolawesome.integrativeproject" />
+     </key>
+   </component>
+-  <component name="RunManager" selected="JUnit.Vector3DTest">
++  <component name="RunManager" selected="Application.MainApplication">
+     <configuration name="MainApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+       <option name="MAIN_CLASS_NAME" value="com.coolawesome.integrativeproject.MainApplication" />
+       <module name="IntegrativeProject" />
+@@ -146,8 +148,8 @@
+     </configuration>
+     <recent_temporary>
+       <list>
++        <item itemvalue="Application.MainApplication" />
+         <item itemvalue="JUnit.Vector3DTest" />
+-        <item itemvalue="Application.MainApplication" />
+         <item itemvalue="JUnit.PIDControllerTest (1)" />
+         <item itemvalue="JUnit.PIDControllerTest" />
+       </list>
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\r\n  <component name=\"MavenProjectsManager\">\r\n    <option name=\"originalFiles\">\r\n      <list>\r\n        <option value=\"$PROJECT_DIR$/pom.xml\" />\r\n      </list>\r\n    </option>\r\n    <option name=\"workspaceImportForciblyTurnedOn\" value=\"true\" />\r\n  </component>\r\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_21\" default=\"true\" project-jdk-name=\"openjdk-21\" project-jdk-type=\"JavaSDK\">\r\n    <output url=\"file://$PROJECT_DIR$/out\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision a4c793681ac83e05efb18d40ef611d154ee106d0)
++++ b/.idea/misc.xml	(date 1710766631170)
+@@ -1,4 +1,3 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="ExternalStorageConfigurationManager" enabled="true" />
+   <component name="MavenProjectsManager">
