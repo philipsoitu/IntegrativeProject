@@ -98,12 +98,12 @@
                                  <Insets right="5.0" />
                               </HBox.margin>
                            </Label>
-                           <Slider fx:id="GConstSLD" blockIncrement="0.005" max="0.01" min="1.0E-9" prefHeight="14.0" prefWidth="84.0" showTickMarks="true">
+                           <Slider fx:id="GConstSLD" blockIncrement="0.005" max="0.01" min="1.0E-8" prefHeight="14.0" prefWidth="84.0" showTickMarks="true">
                               <HBox.margin>
                                  <Insets />
                               </HBox.margin>
                            </Slider>
-                           <TextField fx:id="GConstantTXTF" onAction="#updateGConstSLD" prefHeight="25.0" prefWidth="67.0" />
+                           <TextField fx:id="GConstantTXTF" onAction="#updateGConstSLD" prefHeight="25.0" prefWidth="80.0" />
                         </children>
                      </HBox>
                   </children>
