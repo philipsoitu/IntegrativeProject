@@ -91,8 +91,8 @@ public class SimulationView extends Group {
             deltaMouseX = event.getSceneX();
             deltaMouseY = event.getSceneY();
         });
-        subScene.setOnKeyPressed(event -> keysPressed.add(event.getCode()));
-        subScene.setOnKeyReleased(event -> keysPressed.remove(event.getCode()));
+        pane.setOnKeyPressed(event -> keysPressed.add(event.getCode()));
+        pane.setOnKeyReleased(event -> keysPressed.remove(event.getCode()));
 
         subScene.requestFocus();
     }

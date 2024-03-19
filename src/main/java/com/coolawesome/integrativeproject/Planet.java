@@ -25,23 +25,23 @@ public class Planet {
 
     private static final Image sunTexture = new Image("file:src/main/resources/images/planets/sun.jpg");
     private static final Image[] planetTextures = {
-        new Image("file:src/main/resources/images/planets/Alpine.png"),
-        new Image("file:src/main/resources/images/planets/Gaseous1.png"),
-        new Image("file:src/main/resources/images/planets/Gaseous2.png"),
-        new Image("file:src/main/resources/images/planets/Gaseous3.png"),
-        new Image("file:src/main/resources/images/planets/Gaseous4.png"),
-        new Image("file:src/main/resources/images/planets/Icy.png"),
-        new Image("file:src/main/resources/images/planets/Martian.png"),
-        new Image("file:src/main/resources/images/planets/Savannah.png"),
-        new Image("file:src/main/resources/images/planets/Swamp.png"),
-        new Image("file:src/main/resources/images/planets/Terrestrial1.png"),
-        new Image("file:src/main/resources/images/planets/Terrestrial2.png"),
-        new Image("file:src/main/resources/images/planets/Terrestrial3.png"),
-        new Image("file:src/main/resources/images/planets/Terrestrial4.png"),
-        new Image("file:src/main/resources/images/planets/Tropical.png"),
-        new Image("file:src/main/resources/images/planets/Venusian.png"),
-        new Image("file:src/main/resources/images/planets/Volcanic.png")
-};
+            new Image("file:src/main/resources/images/planets/Alpine.png"),
+            new Image("file:src/main/resources/images/planets/Gaseous1.png"),
+            new Image("file:src/main/resources/images/planets/Gaseous2.png"),
+            new Image("file:src/main/resources/images/planets/Gaseous3.png"),
+            new Image("file:src/main/resources/images/planets/Gaseous4.png"),
+            new Image("file:src/main/resources/images/planets/Icy.png"),
+            new Image("file:src/main/resources/images/planets/Martian.png"),
+            new Image("file:src/main/resources/images/planets/Savannah.png"),
+            new Image("file:src/main/resources/images/planets/Swamp.png"),
+            new Image("file:src/main/resources/images/planets/Terrestrial1.png"),
+            new Image("file:src/main/resources/images/planets/Terrestrial2.png"),
+            new Image("file:src/main/resources/images/planets/Terrestrial3.png"),
+            new Image("file:src/main/resources/images/planets/Terrestrial4.png"),
+            new Image("file:src/main/resources/images/planets/Tropical.png"),
+            new Image("file:src/main/resources/images/planets/Venusian.png"),
+            new Image("file:src/main/resources/images/planets/Volcanic.png")
+    };
     public Sphere planetNode;
 
     // TODO: planets rings using FXyz torus?
@@ -51,10 +51,8 @@ public class Planet {
         this.acceleration = new Vector3D();
         this.mass = mass;
         this.radius = radius;
-        int r = (int) (Math.random() * 155) + 100;
-        int g = (int) (Math.random() * 155) + 100;
-        int b = (int) (Math.random() * 155) + 100;
-        Color randColor = Color.rgb(r, g, b);
+        double hue = Math.random() * 360;
+        Color randColor = Color.hsb(hue, 1,1);
         this.color = randColor;
         this.spinRate = -1.5 + (Math.random() * 3);
         this.isSun = isSun;
@@ -64,7 +62,7 @@ public class Planet {
         planetNode.setTranslateY(position.y);
         planetNode.setTranslateZ(position.z);
         material = new PhongMaterial(color);
-        if(isSun){
+        if (isSun) {
             initSun();
         } else {
             initSphere();
@@ -77,7 +75,7 @@ public class Planet {
         planetNode.setRotationAxis(new Point3D(0, 1, 0));
     }
 
-    private void initSun(){
+    private void initSun() {
         material.setSelfIlluminationMap(sunTexture); //TODO: add more sun textures
         material.setDiffuseColor(Color.BLACK);
         material.setSpecularPower(0);

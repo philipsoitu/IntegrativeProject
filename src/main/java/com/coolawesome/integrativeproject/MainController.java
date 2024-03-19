@@ -56,6 +56,19 @@ public class MainController {
             Constants.frameRatePrefix, Constants.timeElapsedPrefix, Constants.planetCountPrefix
     );
 
+    @FXML
+    public void initialize() {
+        viewport.sceneProperty().addListener((observableScene, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.focusOwnerProperty().addListener((observable, oldFocusOwner, newFocusOwner) -> {
+                    if (newFocusOwner != viewport) {
+                        viewport.requestFocus();
+                    }
+                });
+            }
+        });
+    }
+
     void controllerSetup(Simulation simulation, MainApplication main) {
 
         if(!isNull(simulation)) {
