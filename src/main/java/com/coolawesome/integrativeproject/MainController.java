@@ -292,6 +292,7 @@ public class MainController {
 
     public void updateSelectedPlanetInfo(Planet planet) {
         ObservableList<String> planetInfo = FXCollections.observableArrayList(
+                "ID: " + planet.id,
                 "Position: " + String.format("%.3f, %.3f, %.3f", planet.position.x, planet.position.y, planet.position.z),
                 "Velocity: " + String.format("%.3f, %.3f, %.3f", planet.velocity.x, planet.velocity.y, planet.velocity.z),
                 "Accel: " + String.format("%.1e, %.1e, %.1e", planet.acceleration.x, planet.acceleration.y, planet.acceleration.z),

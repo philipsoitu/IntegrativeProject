@@ -163,8 +163,6 @@ public class SimulationView extends Group {
             }
         }
 
-        //TODO: fix looking straight up/down
-
         // Move the camera
         double yaw = Math.toRadians(cameraTransform.ry.getAngle());
         double pitch = Math.toRadians(cameraTransform.rx.getAngle());
@@ -211,9 +209,6 @@ public class SimulationView extends Group {
                 double pidOutput = pidController.calculate(planet.radius * 3, distance);
                 direction.multiply(pidOutput);
                 cameraVelocity.add(direction);
-
-                //TODO: orbit camera around planet
-
             }
 
         } else {

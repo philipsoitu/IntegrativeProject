@@ -28,18 +28,19 @@ public class Simulation {
             Vector3D randVel = new Vector3D();
             double randRad = 1 + Math.random() * 2;
             double randMass = 5000;
-            boolean sun = Math.random() * 4 < 1;
+//            boolean sun = Math.random() * 4 < 1;
+            boolean sun = false;
 
             // Generate a unique ID for the planet
             String uniqueID = UUID.randomUUID().toString().replaceAll("-", "");
 
             // Create the Planet object
-            Planet randPlanet = new Planet(randPos, randVel, randRad, randMass, sun);
+            Planet randPlanet = new Planet(uniqueID, randPos, randVel, randRad, randMass, sun);
 
             // Add the Planet to the Map
             planetMap.put(uniqueID, randPlanet);
         }
-        planetMap.put("sun", new Planet(new Vector3D(5000, 0, 0), new Vector3D(), 1000, 100000, true));
+        planetMap.put("sun", new Planet("sun", new Vector3D(5000, 0, 0), new Vector3D(), 1000, 100000, true));
     }
 
     public void update(double dt){

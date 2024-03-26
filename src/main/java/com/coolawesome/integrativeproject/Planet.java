@@ -11,6 +11,7 @@ import javafx.scene.shape.Sphere;
 
 public class Planet {
 
+    String id;
     public Vector3D position;
     public Vector3D velocity;
     public Vector3D acceleration;
@@ -45,7 +46,8 @@ public class Planet {
     public Sphere planetNode;
 
     // TODO: planets rings using FXyz torus?
-    public Planet(Vector3D position, Vector3D velocity, double radius, double mass, boolean isSun) {
+    public Planet(String id, Vector3D position, Vector3D velocity, double radius, double mass, boolean isSun) {
+        this.id = id;
         this.position = position;
         this.velocity = velocity;
         this.acceleration = new Vector3D();
