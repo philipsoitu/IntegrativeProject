@@ -1,12 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.coolawesome.integrativeproject.MainController">
+<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.coolawesome.integrativeproject.MainController">
   <left>
     <VBox spacing="10" style="-fx-padding: 10;">
          <Label text="Space Simulation">
@@ -58,23 +70,13 @@
                      </ChoiceBox>
                      <HBox prefHeight="42.0" prefWidth="220.0">
                         <children>
-                           <Button fx:id="playBTN" mnemonicParsing="false" onAction="#playSim" text="Play" />
-                           <Button fx:id="pauseBTN" mnemonicParsing="false" onAction="#pauseSim" text="Pause" />
+                           <Button fx:id="playPauseBTN" mnemonicParsing="false" onAction="#playPauseSim" text="Pause" />
                         </children>
                         <VBox.margin>
                            <Insets top="10.0" />
                         </VBox.margin>
                      </HBox>
                      <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
-                        <children>
-                           <Label text="Time Step:">
-                              <HBox.margin>
-                                 <Insets right="5.0" />
-                              </HBox.margin>
-                           </Label>
-                           <Slider fx:id="timeStepSLD" max="1.0" min="0.001" minorTickCount="0" prefHeight="14.0" prefWidth="86.0" showTickMarks="true" />
-                           <TextField fx:id="timeStepTXTF" onAction="#updateTimeStepSLD" prefHeight="25.0" prefWidth="45.0" />
-                        </children>
                         <VBox.margin>
                            <Insets top="5.0" />
                         </VBox.margin>

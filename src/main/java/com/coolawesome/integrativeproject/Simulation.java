@@ -11,6 +11,8 @@ public class Simulation {
     Map<String, Planet> planetMap = new HashMap<>();
     SimulationView simulationView;
 
+    boolean isPaused = false;
+
     public Simulation(AnchorPane viewport, MainController controller) {
         simulationView = new SimulationView(viewport, planetMap, controller);
         initialize(100);
@@ -44,8 +46,11 @@ public class Simulation {
 
     public void update(double dt){
         // handle physics and collisions
-        updatePosition(dt);
-        handleCollisions();
+        if(!isPaused) {
+            updatePosition(dt);
+            handleCollisions();
+        }
+
         simulationView.update(dt);
     }
 
