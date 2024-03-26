@@ -20,8 +20,11 @@ public class Simulation {
         for (int i = 0; i < numOfBodies; i++) {
 
             // Randomizing parameters
-            Vector3D randPos = new Vector3D(Math.random() * 300 - 150, Math.random() * 300 - 150, Math.random() * 300 - 150);
-            // Vector3D randVel = new Vector3D(-1 + Math.random() * 2, -1 + Math.random() * 2, -1 + Math.random() * 2);
+            double x = Math.random() * 300 - 150;
+            double y = Math.random() * 300 - 150;
+            double z = Math.random() * 300 - 150;
+            Vector3D randPos = new Vector3D(x,y,z);
+
             Vector3D randVel = new Vector3D();
             double randRad = 1 + Math.random() * 2;
             double randMass = 5000;
@@ -40,7 +43,7 @@ public class Simulation {
     }
 
     public void update(double dt){
-        // Do physics n shit here
+        // handle physics and collisions
         updatePosition(dt);
         handleCollisions();
         simulationView.update(dt);
@@ -52,7 +55,7 @@ public class Simulation {
             planetMap.forEach((id2, p2) -> {
                 if (p1 != p2) {
                     Vector3D dist = Vector3D.difference(p2.position, p1.position);
-                    Vector3D f = Vector3D.multiplication((MainController.G * p1.mass * p2.mass) / (dist.magnitude() * dist.magnitude()), Vector3D.unitVector(dist));
+                    Vector3D f = Vector3D.multiplication((MainController.g * p1.mass * p2.mass) / (dist.magnitude() * dist.magnitude()), Vector3D.unitVector(dist));
                     ftotal.add(f);
                 }
                 p1.acceleration = Vector3D.multiplication((1 / p1.mass), ftotal);
@@ -84,6 +87,5 @@ public class Simulation {
             });
         });
         idPlanetsToRemove.forEach((id) -> planetMap.remove(id));
-//        planetMap.remove(idPlanetsToRemove);
     }
 }

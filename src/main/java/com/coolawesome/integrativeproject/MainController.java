@@ -30,7 +30,7 @@ import java.util.Random;
  */
 
 public class MainController {
-    public static double G = 0.001;
+    public static double g = 0.001;
     public static double timeStep = 0.016;
     @FXML
     public ListView<String> selectedPlanetInfoList;
@@ -39,9 +39,9 @@ public class MainController {
     @FXML
     private ListView<String> simulationInfoList;
     @FXML
-    private Slider GConstSLD;
+    private Slider gConstSLD;
     @FXML
-    private TextField GConstantTXTF;
+    private TextField gConstantTXTF;
     @FXML
     private Slider timeStepSLD;
     @FXML
@@ -79,20 +79,20 @@ public class MainController {
 
     void controllerSetup(Simulation simulation, MainApplication main) {
 
-        if(!isNull(simulation)) {
+        if (!isNull(simulation)) {
             this.simulation = simulation;
             updateSimInfo();
         } else {
             throw new NullPointerException();
         }
 
-        if(!isNull(main)) {
+        if (!isNull(main)) {
             this.main = main;
         } else {
             throw new NullPointerException();
         }
 
-        if(!simulationListContent.isEmpty()) {
+        if (!simulationListContent.isEmpty()) {
             simulationInfoList.setItems(simulationListContent);
         } else {
             throw new IllegalStateException();
@@ -105,7 +105,7 @@ public class MainController {
 
     public void sliderSetup() {
 
-        if(!isNull(timeStepSLD) && !isNull(timeStepTXTF)) {
+        if (!isNull(timeStepSLD) && !isNull(timeStepTXTF)) {
             timeStepSLD.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
                 String valueString = String.valueOf(newValue);
                 int endIndex = Math.min(valueString.length(), 5);
@@ -114,52 +114,52 @@ public class MainController {
             }));
 
             //does not allow invalid inputs to be typed
-            timeStepTXTF.textProperty().addListener((observableValue, oldValue, newValue) ->{
-            if(!timeStepTXTF.getText().isEmpty() && !checkValidDouble(newValue)) {
+            timeStepTXTF.textProperty().addListener((observableValue, oldValue, newValue) -> {
+                if (!timeStepTXTF.getText().isEmpty() && !isValidDouble(newValue)) {
 
-                try {
-                    timeStepTXTF.setText(oldValue);
-                    if(Double.parseDouble(newValue) < Double.parseDouble(String.valueOf(timeStepSLD.getMax()))) {
-                        timeStepTXTF.setText(String.valueOf(timeStepSLD.getMax()));
-                    } else if(Double.parseDouble(newValue) > Double.parseDouble(String.valueOf(timeStepSLD.getMin()))) {
-                        timeStepTXTF.setText(String.valueOf(timeStepSLD.getMin()));
+                    try {
+                        timeStepTXTF.setText(oldValue);
+                        if (Double.parseDouble(newValue) < Double.parseDouble(String.valueOf(timeStepSLD.getMax()))) {
+                            timeStepTXTF.setText(String.valueOf(timeStepSLD.getMax()));
+                        } else if (Double.parseDouble(newValue) > Double.parseDouble(String.valueOf(timeStepSLD.getMin()))) {
+                            timeStepTXTF.setText(String.valueOf(timeStepSLD.getMin()));
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Input Corrected");
                     }
-                } catch (NumberFormatException e) {
-                    System.out.println("Input Corrected");
-                }
                 }
             });
         }
 
-        if(!isNull(GConstSLD) && !isNull(GConstantTXTF)) {
-            GConstSLD.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
+        if (!isNull(gConstSLD) && !isNull(gConstantTXTF)) {
+            gConstSLD.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
                 String valueString = String.valueOf(newValue);
                 int endIndex = Math.min(valueString.length(), 4);
-                GConstantTXTF.setText(valueString.substring(0, endIndex));
+                gConstantTXTF.setText(valueString.substring(0, endIndex));
                 updateGConst();
             }));
 
-            GConstantTXTF.textProperty().addListener((observableValue, oldValue, newValue) -> {
-                if (!newValue.isEmpty() && !checkValidDouble(newValue)) {
-                    GConstantTXTF.setText(oldValue);
+            gConstantTXTF.textProperty().addListener((observableValue, oldValue, newValue) -> {
+                if (!newValue.isEmpty() && !isValidDouble(newValue)) {
+                    gConstantTXTF.setText(oldValue);
                 }
             });
         }
         setInitialValues();
     }
 
-    private boolean checkValidDouble(String str) {
-
-        if(!isNull(str)) {
-            try {
-                Double.parseDouble(str);
-                return true;
-            } catch (NumberFormatException e) {
-                System.out.println("Input Corrected");
-                return false;
-            }
+    private boolean isValidDouble(String str) {
+        if (isNull(str)) {
+            return false;
         }
-        return false;
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            System.out.println("Input Corrected");
+            return false;
+        }
+
     }
 
     public void updateSimInfo() {
@@ -167,13 +167,13 @@ public class MainController {
     }
 
     private void setInitialValues() {
-        if (GConstSLD != null) {
-            GConstSLD.setValue(G);
+        if (gConstSLD != null) {
+            gConstSLD.setValue(g);
         } else {
             throw new NullPointerException();
         }
 
-        if(playBTN != null){
+        if (playBTN != null) {
             playBTN.setDisable(true);
         }
 
@@ -181,15 +181,16 @@ public class MainController {
 
         algoChoiceBox.setValue(Constants.algorithms[0]);
 
-        GConstantTXTF.setText(G+"");
+        gConstantTXTF.setText(g + "");
 
         timeStepSLD.setValue(timeStep);
 
-        timeStepTXTF.setText(timeStep+"");
+        timeStepTXTF.setText(timeStep + "");
     }
+
     private void initializeTime() {
 
-         timeline = new Timeline(new KeyFrame(
+        timeline = new Timeline(new KeyFrame(
                 Duration.seconds(1),
                 event -> {
                     secondsElapsed++;
@@ -214,7 +215,7 @@ public class MainController {
 
     //needs to be redone
     private void displayFrameRate() {
-         timer = new AnimationTimer() {
+        timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
 
@@ -229,18 +230,22 @@ public class MainController {
         };
         timer.start();
     }
+
     private void updateGConst() {
-        G = GConstSLD.getValue();
+        g = gConstSLD.getValue();
     }
+
     private void updateTimeStep() {
-            timeStep = timeStepSLD.getValue();
+        timeStep = timeStepSLD.getValue();
     }
-    private boolean isNull(Object obj){
+
+    private boolean isNull(Object obj) {
         return obj == null;
     }
+
     @FXML
     void pauseSim(ActionEvent event) {
-        if(!isNull(main.timeline)) {
+        if (!isNull(main.timeline)) {
             main.timeline.pause();
             timer.stop();
             timeline.pause();
@@ -253,7 +258,7 @@ public class MainController {
 
     @FXML
     void playSim(ActionEvent event) {
-        if(isNull(main.timeline)) {
+        if (isNull(main.timeline)) {
             main.timeline.play();
             timer.start();
             timeline.play();
@@ -263,15 +268,17 @@ public class MainController {
             throw new NullPointerException();
         }
     }
+
     @FXML
     void updateGConstSLD(ActionEvent event) {
         try {
-            GConstSLD.setValue(Double.parseDouble(GConstantTXTF.getText()));
+            gConstSLD.setValue(Double.parseDouble(gConstantTXTF.getText()));
             updateGConst();
         } catch (NumberFormatException e) {
             System.out.println("Input Corrected in G Constant Slider");
         }
     }
+
     @FXML
     void updateTimeStepSLD(ActionEvent event) {
         try {
