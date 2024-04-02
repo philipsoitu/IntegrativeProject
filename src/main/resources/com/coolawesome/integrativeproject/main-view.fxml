@@ -126,21 +126,23 @@
                   </AnchorPane>
                   <VBox prefHeight="200.0" prefWidth="100.0" spacing="30.0">
                      <children>
-                        <HBox prefHeight="100.0" prefWidth="200.0">
+                        <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
                            <children>
-                              <Slider fx:id="massSLD" />
-                              <TextField fx:id="massTXTF" onAction="#onTXTFUpdate" />
+                              <Label text="Radius:" />
+                              <Slider fx:id="massSLD" max="10.0" min="1.0" prefWidth="110.0" />
+                              <TextField fx:id="massTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="65.0" />
                            </children>
                         </HBox>
-                        <HBox prefHeight="100.0" prefWidth="200.0">
+                        <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
                            <children>
-                              <Slider fx:id="radiusSLD" />
-                              <TextField fx:id="radiusTXTF" onAction="#onTXTFUpdate" />
+                              <Label text="Mass:" />
+                              <Slider fx:id="radiusSLD" max="999999.0" min="1000.0" prefHeight="14.0" prefWidth="109.0" />
+                              <TextField fx:id="radiusTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="60.0" />
                            </children>
                         </HBox>
                         <CheckBox fx:id="sunCheckB" mnemonicParsing="false" text="Sun" />
                         <Button fx:id="TextureBTN" mnemonicParsing="false" text="Texture" />
-                        <Button fx:id="createBTN" mnemonicParsing="false" text="Create" />
+                        <Button fx:id="createBTN" mnemonicParsing="false" onAction="#createCustomPlanet" text="Create" />
                      </children>
                   </VBox>
                </children></VBox>

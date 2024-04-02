@@ -1,6 +1,7 @@
 package com.coolawesome.integrativeproject;
 
 import com.coolawesome.integrativeproject.utils.Constants;
+import com.coolawesome.integrativeproject.utils.Vector3D;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
@@ -17,6 +18,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 public class MainController {
     public static double g = 0.001;
@@ -152,8 +154,6 @@ public class MainController {
                 }
             });
         }
-
-
         setInitialValues();
     }
 
@@ -265,7 +265,26 @@ public class MainController {
             }
 
         }
+    }
+    @FXML
+    void createCustomPlanet(ActionEvent event) {
 
+        double Vx = Math.random() * 2;
+        double Vy = Math.random() * 2;
+        double Vz = Math.random() * 2;
+
+        Vector3D position = simulation.simulationView.getFacinVector();
+        Vector3D velocity = new Vector3D(Vx,Vy,Vz);
+
+        double radius = Double.parseDouble(radiusTXTF.getText());
+        double mass = Double.parseDouble(massTXTF.getText());
+        boolean isSun = sunCheckB.isSelected();
+
+        String uniqueID = UUID.randomUUID().toString().replaceAll("-", "");
+
+        Planet planet = new Planet(uniqueID, position, velocity, radius, mass, isSun);
+
+        simulation.planetMap.put(uniqueID, planet);
 
     }
 

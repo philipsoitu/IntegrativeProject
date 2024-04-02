@@ -53,7 +53,6 @@ public class SimulationView extends Group {
         subScene.heightProperty().bind(pane.heightProperty());
         subScene.setFill(Color.BLACK);
         pane.getChildren().add(subScene);
-
         // Set up the camera
         camera = new PerspectiveCamera(true);
         camera.setNearClip(0.1);
