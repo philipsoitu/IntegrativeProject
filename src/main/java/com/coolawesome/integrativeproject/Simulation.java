@@ -1,5 +1,6 @@
 package com.coolawesome.integrativeproject;
 
+import com.coolawesome.integrativeproject.utils.JsonPlanetManager;
 import com.coolawesome.integrativeproject.utils.Vector3D;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
@@ -10,6 +11,7 @@ public class Simulation {
 
     Map<String, Planet> planetMap = new HashMap<>();
     SimulationView simulationView;
+    JsonPlanetManager planetManager = new JsonPlanetManager();
 
     boolean isPaused = false;
 
@@ -92,5 +94,13 @@ public class Simulation {
             });
         });
         idPlanetsToRemove.forEach((id) -> planetMap.remove(id));
+    }
+
+    public void saveToJson(String filePath) {
+        planetManager.saveToJson(planetMap, filePath);
+    }
+
+    public void loadFromJson(String filePath) {
+        planetMap = planetManager.loadFromJson(filePath);
     }
 }

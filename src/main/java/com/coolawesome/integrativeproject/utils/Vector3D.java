@@ -19,6 +19,12 @@ public class Vector3D {
         this.z = 0;
     }
 
+    public Vector3D(Vector3D otherVector) {
+        this.x = otherVector.x;
+        this.y = otherVector.y;
+        this.z = otherVector.z;
+    }
+
     public static Vector3D sum(Vector3D... vectors) {
         double x = 0;
         double y = 0;

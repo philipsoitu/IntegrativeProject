@@ -45,8 +45,8 @@
          </Label>
          <HBox prefHeight="5.0" prefWidth="241.0" spacing="5.0">
             <children>
-               <Button mnemonicParsing="false" text="Save" />
-               <Button mnemonicParsing="false" text="Load" />
+               <Button fx:id="saveBTN" mnemonicParsing="false" text="Save" onAction="#saveJson"/>
+               <Button fx:id="loadBTN" mnemonicParsing="false" text="Load" onAction="#loadJson"/>
             </children>
          </HBox>
       <Label text="Simulation Info:" />

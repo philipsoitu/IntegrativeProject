@@ -167,12 +167,7 @@ public class SimulationView extends Group {
         double yaw = Math.toRadians(cameraTransform.ry.getAngle());
         double pitch = Math.toRadians(cameraTransform.rx.getAngle());
 
-        double x = Math.cos(pitch) * Math.sin(yaw);
-        double y = Math.sin(pitch);
-        double z = Math.cos(pitch) * Math.cos(yaw);
-
-        Vector3D facing = new Vector3D(x, y, z);
-        facing.normalize();
+        Vector3D facing = getFacingVector(pitch, yaw);
 
         Vector3D right = Vector3D.crossProduct(facing, new Vector3D(0, 1, 0));
         right.normalize();
@@ -261,6 +256,20 @@ public class SimulationView extends Group {
         while (diff < -180) diff += 360;
         while (diff > 180) diff -= 360;
         return start + diff * t;
+    }
+
+    private Vector3D getFacingVector(double pitch, double yaw) {
+        double x = Math.cos(pitch) * Math.sin(yaw);
+        double y = Math.sin(pitch);
+        double z = Math.cos(pitch) * Math.cos(yaw);
+
+        Vector3D facing = new Vector3D(x, y, z);
+        facing.normalize();
+        return facing;
+    }
+
+    public Vector3D getFacinVector() {
+        return getFacingVector(Math.toRadians(cameraTransform.ry.getAngle()), Math.toRadians(cameraTransform.rx.getAngle()));
     }
 
     public void setCurrentCamPlanetID(String planetID) {

@@ -4,7 +4,9 @@ module com.coolawesome.integrativeproject {
 
     requires org.controlsfx.controls;
     requires org.fxyz3d.core;
+    requires com.google.gson;
 
     opens com.coolawesome.integrativeproject to javafx.fxml;
+    exports com.coolawesome.integrativeproject.utils to com.google.gson;
     exports com.coolawesome.integrativeproject;
 }

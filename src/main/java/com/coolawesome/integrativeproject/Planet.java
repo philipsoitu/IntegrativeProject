@@ -11,7 +11,7 @@ import javafx.scene.shape.Sphere;
 
 public class Planet {
 
-    String id;
+    public String id;
     public Vector3D position;
     public Vector3D velocity;
     public Vector3D acceleration;
@@ -69,6 +69,11 @@ public class Planet {
         } else {
             initSphere();
         }
+    }
+
+    public Planet(String id, Vector3D position, Vector3D velocity, double radius, double mass, boolean isSun, Color color) {
+        this(id, position, velocity, radius, mass, isSun);
+        this.color = color;
     }
 
     private void initSphere() {
