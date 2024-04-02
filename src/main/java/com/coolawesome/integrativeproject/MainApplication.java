@@ -9,8 +9,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-import static com.coolawesome.integrativeproject.MainController.timeStep;
-
 public class MainApplication extends Application {
 
     Timeline timeline;
@@ -25,7 +23,7 @@ public class MainApplication extends Application {
         AnchorPane viewport = (AnchorPane) scene.lookup("#viewport");
         Simulation simulation = new Simulation(viewport, controller);
 
-        controller.controllerSetup(simulation, this);
+        controller.controllerSetup(simulation);
 
         stage.setTitle("Space Sim");
         stage.setScene(scene);
@@ -36,7 +34,7 @@ public class MainApplication extends Application {
         timeline = new Timeline();
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.getKeyFrames().add(new javafx.animation.KeyFrame(javafx.util.Duration.millis(16), e -> {
-            simulation.update(timeStep);
+            simulation.update(0.016);
             controller.updateSimInfo();
         }));
         timeline.play();

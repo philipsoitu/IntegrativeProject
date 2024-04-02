@@ -1,7 +1,6 @@
 package com.coolawesome.integrativeproject;
 
 import com.coolawesome.integrativeproject.utils.Constants;
-import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
@@ -16,22 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/*
-    TODO
-
-    redo frame rate
-
-    ideas:
-
-    time until next collision
-    number of collisions
-    average force done by planets
-
- */
-
 public class MainController {
     public static double g = 0.001;
-    public static double timeStep = 0.016;
     @FXML
     public ListView<String> selectedPlanetInfoList;
     @FXML
@@ -43,26 +28,49 @@ public class MainController {
     @FXML
     private TextField gConstantTXTF;
     @FXML
-    private Slider timeStepSLD;
-    @FXML
-    private TextField timeStepTXTF;
-    @FXML
-    private Button pauseBTN;
-    @FXML
-    private Button playBTN;
+    private Button playPauseBTN;
     @FXML
     private ChoiceBox<String> algoChoiceBox;
+
+    @FXML
+    private Button TextureBTN;
+
+    @FXML
+    private Button createBTN;
+
+    @FXML
+    private Slider massSLD;
+
+    @FXML
+    private TextField massTXTF;
+
+    @FXML
+    private Slider radiusSLD;
+
+    @FXML
+    private TextField radiusTXTF;
+
+    @FXML
+    private CheckBox sunCheckB;
+
     public AnchorPane viewport;
     private Simulation simulation;
-    private long lastTime = 0;
-    private int frameCount = 0;
     private int secondsElapsed = 0;
-    private MainApplication main;
-    private AnimationTimer timer;
     Timeline timeline;
     private ObservableList<String> simulationListContent = FXCollections.observableArrayList(
-            Constants.frameRatePrefix, Constants.timeElapsedPrefix, Constants.planetCountPrefix
+            Constants.TIME_ELAPSED_PREFIX,
+            Constants.PLANET_COUNT_PREFIX,
+            Constants.AVERAGE_FORCE_PREFIX,
+            Constants.NUMBER_OF_COLLISIONS_PREFIX
     );
+
+
+    /*
+    mass
+    radius
+    isSun
+    import texture
+     */
 
     @FXML
     public void initialize() {
@@ -77,60 +85,26 @@ public class MainController {
         });
     }
 
-    void controllerSetup(Simulation simulation, MainApplication main) {
-
+    void controllerSetup(Simulation simulation) {
         if (!isNull(simulation)) {
             this.simulation = simulation;
             updateSimInfo();
         } else {
-            throw new NullPointerException();
-        }
-
-        if (!isNull(main)) {
-            this.main = main;
-        } else {
-            throw new NullPointerException();
+            System.out.println("Simulation is null");
         }
 
         if (!simulationListContent.isEmpty()) {
             simulationInfoList.setItems(simulationListContent);
         } else {
-            throw new IllegalStateException();
+            System.out.println("simulation list is empty");
         }
 
         initializeTime();
-        displayFrameRate();
         sliderSetup();
     }
 
     public void sliderSetup() {
-
-        if (!isNull(timeStepSLD) && !isNull(timeStepTXTF)) {
-            timeStepSLD.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
-                String valueString = String.valueOf(newValue);
-                int endIndex = Math.min(valueString.length(), 5);
-                timeStepTXTF.setText(valueString.substring(0, endIndex));
-                updateTimeStep();
-            }));
-
-            //does not allow invalid inputs to be typed
-            timeStepTXTF.textProperty().addListener((observableValue, oldValue, newValue) -> {
-                if (!timeStepTXTF.getText().isEmpty() && !isValidDouble(newValue)) {
-
-                    try {
-                        timeStepTXTF.setText(oldValue);
-                        if (Double.parseDouble(newValue) < Double.parseDouble(String.valueOf(timeStepSLD.getMax()))) {
-                            timeStepTXTF.setText(String.valueOf(timeStepSLD.getMax()));
-                        } else if (Double.parseDouble(newValue) > Double.parseDouble(String.valueOf(timeStepSLD.getMin()))) {
-                            timeStepTXTF.setText(String.valueOf(timeStepSLD.getMin()));
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("Input Corrected");
-                    }
-                }
-            });
-        }
-
+        //g constant
         if (!isNull(gConstSLD) && !isNull(gConstantTXTF)) {
             gConstSLD.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
                 String valueString = String.valueOf(newValue);
@@ -145,6 +119,38 @@ public class MainController {
                 }
             });
         }
+
+        //mass
+        if (!isNull(massSLD) && !isNull(massTXTF)) {
+            massSLD.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
+                String valueString = String.valueOf(newValue);
+                int endIndex = Math.min(valueString.length(), 4);
+                massTXTF.setText(valueString.substring(0, endIndex));
+            }));
+
+            massTXTF.textProperty().addListener((observableValue, oldValue, newValue) -> {
+                if (!newValue.isEmpty() && !isValidDouble(newValue)) {
+                    massTXTF.setText(oldValue);
+                }
+            });
+        }
+
+        //radius
+        if (!isNull(radiusSLD) && !isNull(radiusTXTF)) {
+            radiusSLD.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
+                String valueString = String.valueOf(newValue);
+                int endIndex = Math.min(valueString.length(), 4);
+                radiusTXTF.setText(valueString.substring(0, endIndex));
+            }));
+
+            radiusTXTF.textProperty().addListener((observableValue, oldValue, newValue) -> {
+                if (!newValue.isEmpty() && !isValidDouble(newValue)) {
+                    radiusTXTF.setText(oldValue);
+                }
+            });
+        }
+
+
         setInitialValues();
     }
 
@@ -159,37 +165,32 @@ public class MainController {
             System.out.println("Input Corrected");
             return false;
         }
-
     }
 
     public void updateSimInfo() {
-        simulationListContent.set(2, Constants.planetCountPrefix + getPlanetCount());
+        simulationListContent.set(1, Constants.PLANET_COUNT_PREFIX + getPlanetCount());
     }
 
     private void setInitialValues() {
-        if (gConstSLD != null) {
+        if (!isNull(gConstSLD)) {
             gConstSLD.setValue(g);
         } else {
-            throw new NullPointerException();
+            System.out.println("Gravity Constant Slider is null");
         }
 
-        if (playBTN != null) {
-            playBTN.setDisable(true);
-        }
+        massSLD.setValue(0);
+        massTXTF.setText("0");
+        radiusSLD.setValue(0);
+        radiusTXTF.setText("0");
 
-        algoChoiceBox.getItems().addAll(Constants.algorithms);
+        algoChoiceBox.getItems().addAll(Constants.ALGORITHM_CHOICES);
 
-        algoChoiceBox.setValue(Constants.algorithms[0]);
+        algoChoiceBox.setValue(Constants.ALGORITHM_CHOICES[0]);
 
         gConstantTXTF.setText(g + "");
-
-        timeStepSLD.setValue(timeStep);
-
-        timeStepTXTF.setText(timeStep + "");
     }
 
     private void initializeTime() {
-
         timeline = new Timeline(new KeyFrame(
                 Duration.seconds(1),
                 event -> {
@@ -206,37 +207,15 @@ public class MainController {
         int minutes = (secondsElapsed % 3600) / 60;
         int seconds = secondsElapsed % 60;
 
-        simulationListContent.set(1, Constants.timeElapsedPrefix + String.format("%02d:%02d:%02d", hours, minutes, seconds));
+        simulationListContent.set(0, Constants.TIME_ELAPSED_PREFIX + String.format("%02d:%02d:%02d", hours, minutes, seconds));
     }
 
     private int getPlanetCount() {
         return simulation.planetMap.size();
     }
 
-    //needs to be redone
-    private void displayFrameRate() {
-        timer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-
-                if (now - lastTime >= 1_000_000_000) {
-                    double frameRate = frameCount;
-                    simulationListContent.set(0, Constants.frameRatePrefix + frameRate);
-                    frameCount = 0;
-                    lastTime = now;
-                }
-                frameCount++;
-            }
-        };
-        timer.start();
-    }
-
     private void updateGConst() {
         g = gConstSLD.getValue();
-    }
-
-    private void updateTimeStep() {
-        timeStep = timeStepSLD.getValue();
     }
 
     private boolean isNull(Object obj) {
@@ -244,50 +223,47 @@ public class MainController {
     }
 
     @FXML
-    void pauseSim(ActionEvent event) {
-        if (!isNull(main.timeline)) {
-            main.timeline.pause();
-            timer.stop();
-            timeline.pause();
-            pauseBTN.setDisable(true);
-            playBTN.setDisable(false);
+    void playPauseSim(ActionEvent event) {
+        simulation.isPaused = !simulation.isPaused;
+
+        if (simulation.isPaused) {
+            System.out.println("Simulation is paused");
+            playPauseBTN.setText("Play");
         } else {
-            throw new NullPointerException();
+            System.out.println("Simulation is playing");
+            playPauseBTN.setText("Pause");
         }
     }
 
     @FXML
-    void playSim(ActionEvent event) {
-        if (isNull(main.timeline)) {
-            main.timeline.play();
-            timer.start();
-            timeline.play();
-            playBTN.setDisable(true);
-            pauseBTN.setDisable(false);
-        } else {
-            throw new NullPointerException();
-        }
-    }
+    void onTXTFUpdate(ActionEvent event) {
+        Slider source = (Slider) event.getSource();
 
-    @FXML
-    void updateGConstSLD(ActionEvent event) {
-        try {
-            gConstSLD.setValue(Double.parseDouble(gConstantTXTF.getText()));
-            updateGConst();
-        } catch (NumberFormatException e) {
-            System.out.println("Input Corrected in G Constant Slider");
-        }
-    }
+        if (source.equals(gConstSLD)) {
+            try {
+                gConstSLD.setValue(Double.parseDouble(gConstantTXTF.getText()));
+                updateGConst();
+            } catch (NumberFormatException e) {
+                System.out.println("Input Corrected in G Constant Slider");
+            }
 
-    @FXML
-    void updateTimeStepSLD(ActionEvent event) {
-        try {
-            timeStepSLD.setValue(Double.parseDouble(timeStepTXTF.getText()));
-            updateTimeStep();
+        } else if (source.equals(massSLD)) {
+            try {
+                massSLD.setValue(Double.parseDouble(massTXTF.getText()));
+            } catch (NumberFormatException e) {
+                System.out.println("Input corrected in mass slider");
+            }
+        } else if (source.equals(radiusSLD)) {
+            try {
+                massSLD.setValue(Double.parseDouble(massTXTF.getText()));
+                updateGConst();
+            } catch (NumberFormatException e) {
+                System.out.println("Input Corrected in mass Slider");
+            }
 
-        } catch (NumberFormatException e) {
-            System.out.println("Input Corrected in Time Step Slider");
         }
+
+
     }
 
     public void updateSelectedPlanetInfo(Planet planet) {

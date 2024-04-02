@@ -200,8 +200,8 @@ public class SimulationView extends Group {
                 double directionPitch = -Math.toDegrees(Math.asin(direction.y));
                 double directionYaw = Math.toDegrees(Math.atan2(direction.x, direction.z));
 
-                cameraTransform.rx.setAngle(lerpAngle(cameraTransform.rx.getAngle(), directionPitch, 0.05));
-                cameraTransform.ry.setAngle(lerpAngle(cameraTransform.ry.getAngle(), directionYaw, 0.05));
+                cameraTransform.rx.setAngle(lerpAngle(cameraTransform.rx.getAngle(), directionPitch, 0.5));
+                cameraTransform.ry.setAngle(lerpAngle(cameraTransform.ry.getAngle(), directionYaw, 0.5));
 
                 //Use PID controller to move towards planet
                 direction.negate();

@@ -11,6 +11,8 @@ public class Simulation {
     Map<String, Planet> planetMap = new HashMap<>();
     SimulationView simulationView;
 
+    boolean isPaused = false;
+
     public Simulation(AnchorPane viewport, MainController controller) {
         simulationView = new SimulationView(viewport, planetMap, controller);
         initialize(100);
@@ -24,7 +26,6 @@ public class Simulation {
             double y = Math.random() * 300 - 150;
             double z = Math.random() * 300 - 150;
             Vector3D randPos = new Vector3D(x,y,z);
-
             Vector3D randVel = new Vector3D();
             double randRad = 1 + Math.random() * 2;
             double randMass = 5000;
@@ -45,8 +46,11 @@ public class Simulation {
 
     public void update(double dt){
         // handle physics and collisions
-        updatePosition(dt);
-        handleCollisions();
+        if(!isPaused) {
+            updatePosition(dt);
+            handleCollisions();
+        }
+
         simulationView.update(dt);
     }
 
