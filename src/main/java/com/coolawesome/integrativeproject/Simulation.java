@@ -43,7 +43,8 @@ public class Simulation {
             // Add the Planet to the Map
             planetMap.put(uniqueID, randPlanet);
         }
-        planetMap.put("sun", new Planet("sun", new Vector3D(5000, 0, 0), new Vector3D(), 1000, 100000, true));
+        String uniqueID = UUID.randomUUID().toString().replaceAll("-", "");
+        planetMap.put(uniqueID, new Planet("sun", new Vector3D(5000, 0, 0), new Vector3D(), 1000, 100000, true));
     }
 
     public void update(double dt){

@@ -11,7 +11,7 @@ public class PlanetTypeAdapter implements JsonSerializer<Planet>, JsonDeserializ
     @Override
     public JsonElement serialize(Planet src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("id", src.id);
+        jsonObject.addProperty("id", src.name);
         jsonObject.add("position", context.serialize(src.position));
         jsonObject.add("velocity", context.serialize(src.velocity));
         jsonObject.addProperty("radius", src.radius);
