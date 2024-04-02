@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -30,6 +31,28 @@ public class MainController {
     private Button playPauseBTN;
     @FXML
     private ChoiceBox<String> algoChoiceBox;
+
+    @FXML
+    private Button TextureBTN;
+
+    @FXML
+    private Button createBTN;
+
+    @FXML
+    private Slider massSLD;
+
+    @FXML
+    private TextField massTXTF;
+
+    @FXML
+    private Slider radiusSLD;
+
+    @FXML
+    private TextField radiusTXTF;
+
+    @FXML
+    private CheckBox sunCheckB;
+
     public AnchorPane viewport;
     private Simulation simulation;
     private int secondsElapsed = 0;
@@ -40,6 +63,14 @@ public class MainController {
             Constants.AVERAGE_FORCE_PREFIX,
             Constants.NUMBER_OF_COLLISIONS_PREFIX
     );
+
+
+    /*
+    mass
+    radius
+    isSun
+    import texture
+     */
 
     @FXML
     public void initialize() {
@@ -73,6 +104,7 @@ public class MainController {
     }
 
     public void sliderSetup() {
+        //g constant
         if (!isNull(gConstSLD) && !isNull(gConstantTXTF)) {
             gConstSLD.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
                 String valueString = String.valueOf(newValue);
@@ -87,6 +119,38 @@ public class MainController {
                 }
             });
         }
+
+        //mass
+        if (!isNull(massSLD) && !isNull(massTXTF)) {
+            massSLD.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
+                String valueString = String.valueOf(newValue);
+                int endIndex = Math.min(valueString.length(), 4);
+                massTXTF.setText(valueString.substring(0, endIndex));
+            }));
+
+            massTXTF.textProperty().addListener((observableValue, oldValue, newValue) -> {
+                if (!newValue.isEmpty() && !isValidDouble(newValue)) {
+                    massTXTF.setText(oldValue);
+                }
+            });
+        }
+
+        //radius
+        if (!isNull(radiusSLD) && !isNull(radiusTXTF)) {
+            radiusSLD.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
+                String valueString = String.valueOf(newValue);
+                int endIndex = Math.min(valueString.length(), 4);
+                radiusTXTF.setText(valueString.substring(0, endIndex));
+            }));
+
+            radiusTXTF.textProperty().addListener((observableValue, oldValue, newValue) -> {
+                if (!newValue.isEmpty() && !isValidDouble(newValue)) {
+                    radiusTXTF.setText(oldValue);
+                }
+            });
+        }
+
+
         setInitialValues();
     }
 
@@ -106,12 +170,18 @@ public class MainController {
     public void updateSimInfo() {
         simulationListContent.set(1, Constants.PLANET_COUNT_PREFIX + getPlanetCount());
     }
+
     private void setInitialValues() {
-        if (gConstSLD != null) {
+        if (!isNull(gConstSLD)) {
             gConstSLD.setValue(g);
         } else {
             System.out.println("Gravity Constant Slider is null");
         }
+
+        massSLD.setValue(0);
+        massTXTF.setText("0");
+        radiusSLD.setValue(0);
+        radiusTXTF.setText("0");
 
         algoChoiceBox.getItems().addAll(Constants.ALGORITHM_CHOICES);
 
@@ -156,25 +226,44 @@ public class MainController {
     void playPauseSim(ActionEvent event) {
         simulation.isPaused = !simulation.isPaused;
 
-        if(simulation.isPaused) {
+        if (simulation.isPaused) {
             System.out.println("Simulation is paused");
             playPauseBTN.setText("Play");
         } else {
             System.out.println("Simulation is playing");
             playPauseBTN.setText("Pause");
         }
-
-
     }
 
     @FXML
-    void updateGConstSLD(ActionEvent event) {
-        try {
-            gConstSLD.setValue(Double.parseDouble(gConstantTXTF.getText()));
-            updateGConst();
-        } catch (NumberFormatException e) {
-            System.out.println("Input Corrected in G Constant Slider");
+    void onTXTFUpdate(ActionEvent event) {
+        Slider source = (Slider) event.getSource();
+
+        if (source.equals(gConstSLD)) {
+            try {
+                gConstSLD.setValue(Double.parseDouble(gConstantTXTF.getText()));
+                updateGConst();
+            } catch (NumberFormatException e) {
+                System.out.println("Input Corrected in G Constant Slider");
+            }
+
+        } else if (source.equals(massSLD)) {
+            try {
+                massSLD.setValue(Double.parseDouble(massTXTF.getText()));
+            } catch (NumberFormatException e) {
+                System.out.println("Input corrected in mass slider");
+            }
+        } else if (source.equals(radiusSLD)) {
+            try {
+                massSLD.setValue(Double.parseDouble(massTXTF.getText()));
+                updateGConst();
+            } catch (NumberFormatException e) {
+                System.out.println("Input Corrected in mass Slider");
+            }
+
         }
+
+
     }
 
     public void updateSelectedPlanetInfo(Planet planet) {

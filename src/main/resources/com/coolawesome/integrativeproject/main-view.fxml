@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -42,6 +43,12 @@
                <Font name="Marlett" size="28.0" />
             </font>
          </Label>
+         <HBox prefHeight="5.0" prefWidth="241.0" spacing="5.0">
+            <children>
+               <Button mnemonicParsing="false" text="Save" />
+               <Button mnemonicParsing="false" text="Load" />
+            </children>
+         </HBox>
       <Label text="Simulation Info:" />
       <ListView fx:id="simulationInfoList" prefHeight="220.0" prefWidth="220.0">
         <!-- Add items here -->
@@ -93,7 +100,7 @@
                                  <Insets />
                               </HBox.margin>
                            </Slider>
-                           <TextField fx:id="gConstantTXTF" onAction="#updateGConstSLD" prefHeight="25.0" prefWidth="80.0" />
+                           <TextField fx:id="gConstantTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="80.0" />
                         </children>
                      </HBox>
                   </children>
@@ -111,8 +118,32 @@
     <VBox spacing="10" style="-fx-padding: 10;">
       <TitledPane collapsible="false" text="New Planet Preview">
         <VBox>
-          <!-- Contents for preview -->
-        </VBox>
+               <children>
+                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="164.0" prefWidth="214.0">
+                     <padding>
+                        <Insets left="1.0" right="1.0" />
+                     </padding>
+                  </AnchorPane>
+                  <VBox prefHeight="200.0" prefWidth="100.0" spacing="30.0">
+                     <children>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Slider fx:id="massSLD" />
+                              <TextField fx:id="massTXTF" onAction="#onTXTFUpdate" />
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Slider fx:id="radiusSLD" />
+                              <TextField fx:id="radiusTXTF" onAction="#onTXTFUpdate" />
+                           </children>
+                        </HBox>
+                        <CheckBox fx:id="sunCheckB" mnemonicParsing="false" text="Sun" />
+                        <Button fx:id="TextureBTN" mnemonicParsing="false" text="Texture" />
+                        <Button fx:id="createBTN" mnemonicParsing="false" text="Create" />
+                     </children>
+                  </VBox>
+               </children></VBox>
       </TitledPane>
       <TitledPane collapsible="false" text="Currently Selected Planet Info">
         <VBox alignment="TOP_CENTER" spacing="10.0">
