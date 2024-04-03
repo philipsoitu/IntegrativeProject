@@ -130,19 +130,24 @@
                            <children>
                               <Label text="Radius:" />
                               <Slider fx:id="radiusSLD" max="10.0" min="1.0" prefWidth="110.0" />
-                              <TextField fx:id="radiusTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="65.0" />
+                              <TextField fx:id="radiusTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="49.0" />
                            </children>
                         </HBox>
                         <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
                            <children>
                               <Label text="Mass:" />
-                              <Slider fx:id="massSLD" max="999999.0" min="1000.0" prefHeight="14.0" prefWidth="109.0" />
+                              <Slider fx:id="massSLD" max="10000.0" min="100.0" prefHeight="14.0" prefWidth="109.0" />
                               <TextField fx:id="massTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="60.0" />
                            </children>
                         </HBox>
-                        <CheckBox fx:id="sunCheckB" mnemonicParsing="false" text="Sun" />
-                        <Button fx:id="TextureBTN" mnemonicParsing="false" text="Texture" />
-                        <Button fx:id="createBTN" mnemonicParsing="false" onAction="#createCustomPlanet" text="Create" />
+                        <CheckBox fx:id="sunCheckB" mnemonicParsing="false" onAction="#sunCheckBSelected" text="Sun" />
+                        <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
+                           <children>
+                              <Button fx:id="textureBTN" mnemonicParsing="false" onAction="#chooseCustomTexture" text="Add Custom Texture" />
+                              <Button fx:id="resetTextureBTN" mnemonicParsing="false" onAction="#resetTexture" text="Reset Texture" />
+                           </children>
+                        </HBox>
+                        <Button mnemonicParsing="false" onAction="#createCustomPlanet" text="Create" />
                      </children>
                   </VBox>
                </children></VBox>

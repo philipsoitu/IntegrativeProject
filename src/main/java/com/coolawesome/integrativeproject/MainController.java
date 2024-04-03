@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -38,10 +39,10 @@ public class MainController {
     private ChoiceBox<String> algoChoiceBox;
 
     @FXML
-    private Button TextureBTN;
+    private Button textureBTN;
 
     @FXML
-    private Button createBTN;
+    private Button resetTextureBTN;
 
     @FXML
     private Slider massSLD;
@@ -58,24 +59,20 @@ public class MainController {
     @FXML
     private CheckBox sunCheckB;
 
+    File SelectedImgFile;
+
+    Image customTexture;
     public AnchorPane viewport;
     private Simulation simulation;
     private int secondsElapsed = 0;
     Timeline timeline;
-    private ObservableList<String> simulationListContent = FXCollections.observableArrayList(
+
+    private final ObservableList<String> simulationListContent = FXCollections.observableArrayList(
             Constants.TIME_ELAPSED_PREFIX,
             Constants.PLANET_COUNT_PREFIX,
             Constants.AVERAGE_FORCE_PREFIX,
             Constants.NUMBER_OF_COLLISIONS_PREFIX
     );
-
-
-    /*
-    mass
-    radius
-    isSun
-    import texture
-     */
 
     @FXML
     public void initialize() {
@@ -105,10 +102,10 @@ public class MainController {
         }
 
         initializeTime();
-        sliderSetup();
+        listenerSetup();
     }
 
-    public void sliderSetup() {
+    public void listenerSetup() {
         //g constant
         if (!isNull(gConstSLD) && !isNull(gConstantTXTF)) {
             gConstSLD.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
@@ -154,6 +151,10 @@ public class MainController {
                 }
             });
         }
+
+        //sun check box
+
+
         setInitialValues();
     }
 
@@ -181,10 +182,10 @@ public class MainController {
             System.out.println("Gravity Constant Slider is null");
         }
 
-        massSLD.setValue(0);
-        massTXTF.setText("0");
-        radiusSLD.setValue(0);
-        radiusTXTF.setText("0");
+        massSLD.setValue(massSLD.getMax() / 2);
+        massTXTF.setText(massSLD.getValue() + "");
+        radiusSLD.setValue(2.5);
+        radiusTXTF.setText(radiusSLD.getValue() + "");
 
         algoChoiceBox.getItems().addAll(Constants.ALGORITHM_CHOICES);
 
@@ -263,18 +264,16 @@ public class MainController {
             } catch (NumberFormatException e) {
                 System.out.println("Input Corrected in mass Slider");
             }
-
         }
     }
     @FXML
     void createCustomPlanet(ActionEvent event) {
-
         double Vx = Math.random() * 2;
         double Vy = Math.random() * 2;
         double Vz = Math.random() * 2;
 
         Vector3D position = simulation.simulationView.getPositionInFrontOfCamera(50);
-        Vector3D velocity = new Vector3D(Vx,Vy,Vz);
+        Vector3D velocity = new Vector3D(Vx, Vy, Vz);
 
         double radius = Double.parseDouble(radiusTXTF.getText());
         double mass = Double.parseDouble(massTXTF.getText());
@@ -282,7 +281,9 @@ public class MainController {
 
         String uniqueID = UUID.randomUUID().toString().replaceAll("-", "");
 
-        Planet planet = new Planet(uniqueID, position, velocity, radius, mass, isSun);
+        Planet planet;
+
+        planet = new Planet(uniqueID, position, velocity, radius, mass, isSun, customTexture);
 
         simulation.planetMap.put(uniqueID, planet);
 
@@ -313,6 +314,38 @@ public class MainController {
 
         // Update the current camera planet in the SimulationView
         simulation.simulationView.setCurrentCamPlanetID(randomKey);
+    }
+
+    @FXML
+    void chooseCustomTexture(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
+        );
+
+        SelectedImgFile = fileChooser.showOpenDialog(new Stage());
+
+        if (SelectedImgFile != null) {
+             customTexture = new Image(SelectedImgFile.toURI().toString());
+        } else {
+            customTexture = null;
+        }
+    }
+
+    @FXML
+    void resetTexture(ActionEvent event) {
+        customTexture = null;
+    }
+
+    @FXML
+    void sunCheckBSelected(ActionEvent event) {
+        if(sunCheckB.isSelected()) {
+            textureBTN.setDisable(true);
+            resetTextureBTN.setDisable(true);
+        } else if(!sunCheckB.isSelected()) {
+            textureBTN.setDisable(false);
+            resetTextureBTN.setDisable(false);
+        }
     }
 
     public void saveJson(ActionEvent actionEvent) {

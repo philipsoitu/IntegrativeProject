@@ -64,6 +64,7 @@ public class Planet {
         planetNode.setTranslateY(position.y);
         planetNode.setTranslateZ(position.z);
         material = new PhongMaterial(color);
+
         if (isSun) {
             initSun();
         } else {
@@ -74,6 +75,19 @@ public class Planet {
     public Planet(String name, Vector3D position, Vector3D velocity, double radius, double mass, boolean isSun, Color color) {
         this(name, position, velocity, radius, mass, isSun);
         this.color = color;
+    }
+
+    public Planet(String name, Vector3D position, Vector3D velocity, double radius, double mass, boolean isSun, Image customTexture) {
+        this(name, position, velocity, radius, mass, isSun);
+        if (customTexture != null) {
+            material = new PhongMaterial();
+            material.setDiffuseMap(customTexture);
+            planetNode.setMaterial(material);
+        } else {
+            material.setDiffuseMap(planetTextures[(int) (Math.random() * planetTextures.length)]);
+            planetNode.setMaterial(material);
+        }
+
     }
 
     private void initSphere() {
