@@ -267,9 +267,23 @@ public class SimulationView extends Group {
         return facing;
     }
 
-    public Vector3D getFacinVector() {
-        return getFacingVector(Math.toRadians(cameraTransform.ry.getAngle()), Math.toRadians(cameraTransform.rx.getAngle()));
+    public Vector3D getPositionInFrontOfCamera(double distance) {
+        //camera position
+        double camX = cameraTransform.t.getX();
+        double camY = cameraTransform.t.getY();
+        double camZ = cameraTransform.t.getZ();
+
+        //orientation
+        double pitch = Math.toRadians(cameraTransform.rx.getAngle());
+        double yaw = Math.toRadians(cameraTransform.ry.getAngle());
+
+        double x = camX + distance * Math.sin(yaw) * Math.cos(pitch);
+        double y = camY - distance * Math.sin(pitch);
+        double z = camZ + distance * Math.cos(yaw) * Math.cos(pitch);
+
+        return new Vector3D(x, y, z);
     }
+
 
     public void setCurrentCamPlanetID(String planetID) {
         this.currentCamPlanetID = planetID;

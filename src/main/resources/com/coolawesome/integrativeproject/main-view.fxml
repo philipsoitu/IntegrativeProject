@@ -45,8 +45,8 @@
          </Label>
          <HBox prefHeight="5.0" prefWidth="241.0" spacing="5.0">
             <children>
-               <Button fx:id="saveBTN" mnemonicParsing="false" text="Save" onAction="#saveJson"/>
-               <Button fx:id="loadBTN" mnemonicParsing="false" text="Load" onAction="#loadJson"/>
+               <Button fx:id="saveBTN" mnemonicParsing="false" onAction="#saveJson" text="Save" />
+               <Button fx:id="loadBTN" mnemonicParsing="false" onAction="#loadJson" text="Load" />
             </children>
          </HBox>
       <Label text="Simulation Info:" />
@@ -119,7 +119,7 @@
       <TitledPane collapsible="false" text="New Planet Preview">
         <VBox>
                <children>
-                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="164.0" prefWidth="214.0">
+                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="53.0" prefWidth="214.0">
                      <padding>
                         <Insets left="1.0" right="1.0" />
                      </padding>
@@ -129,15 +129,15 @@
                         <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
                            <children>
                               <Label text="Radius:" />
-                              <Slider fx:id="massSLD" max="10.0" min="1.0" prefWidth="110.0" />
-                              <TextField fx:id="massTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="65.0" />
+                              <Slider fx:id="radiusSLD" max="10.0" min="1.0" prefWidth="110.0" />
+                              <TextField fx:id="radiusTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="65.0" />
                            </children>
                         </HBox>
                         <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
                            <children>
                               <Label text="Mass:" />
-                              <Slider fx:id="radiusSLD" max="999999.0" min="1000.0" prefHeight="14.0" prefWidth="109.0" />
-                              <TextField fx:id="radiusTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="60.0" />
+                              <Slider fx:id="massSLD" max="999999.0" min="1000.0" prefHeight="14.0" prefWidth="109.0" />
+                              <TextField fx:id="massTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="60.0" />
                            </children>
                         </HBox>
                         <CheckBox fx:id="sunCheckB" mnemonicParsing="false" text="Sun" />

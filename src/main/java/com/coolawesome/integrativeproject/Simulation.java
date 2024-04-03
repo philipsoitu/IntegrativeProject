@@ -17,7 +17,7 @@ public class Simulation {
 
     public Simulation(AnchorPane viewport, MainController controller) {
         simulationView = new SimulationView(viewport, planetMap, controller);
-        initialize(0);
+        initialize(100);
     }
 
     public void initialize(int numOfBodies) {

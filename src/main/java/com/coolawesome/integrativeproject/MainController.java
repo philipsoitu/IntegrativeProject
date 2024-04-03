@@ -273,7 +273,7 @@ public class MainController {
         double Vy = Math.random() * 2;
         double Vz = Math.random() * 2;
 
-        Vector3D position = simulation.simulationView.getFacinVector();
+        Vector3D position = simulation.simulationView.getPositionInFrontOfCamera(50);
         Vector3D velocity = new Vector3D(Vx,Vy,Vz);
 
         double radius = Double.parseDouble(radiusTXTF.getText());
