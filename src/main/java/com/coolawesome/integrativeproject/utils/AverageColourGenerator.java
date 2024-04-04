@@ -9,9 +9,7 @@ import java.io.FileNotFoundException;
 import java.util.Objects;
 
 public class AverageColourGenerator {
-    public static Color getAverageColor(String imagePath) throws FileNotFoundException {
-
-        Image image = new Image(Objects.requireNonNull(AverageColourGenerator.class.getResourceAsStream(Constants.defaultCustomPlanetTextureFilePath)));
+    public static Color getAverageColor(Image image) {
 
         PixelReader pixelReader = image.getPixelReader();
 
@@ -37,6 +35,7 @@ public class AverageColourGenerator {
         double avgBlue = totalBlue / totalPixels;
 
         return Color.color(avgRed, avgGreen, avgBlue);
+
     }
 
 

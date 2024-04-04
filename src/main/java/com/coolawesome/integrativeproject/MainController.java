@@ -76,7 +76,7 @@ public class MainController {
     private Simulation simulation;
     private int secondsElapsed = 0;
     private Sphere previewSphere;
-    private PhongMaterial material;
+    private PhongMaterial previewSphereMaterial;
     Timeline timeline;
     private final ObservableList<String> simulationListContent = FXCollections.observableArrayList(Constants.TIME_ELAPSED_PREFIX, Constants.PLANET_COUNT_PREFIX, Constants.NUMBER_OF_COLLISIONS_PREFIX, Constants.AVERAGE_FORCE_PREFIX);
     public final Image defaultCustomPlanetTexture = new Image(getClass().getResourceAsStream(Constants.defaultCustomPlanetTextureFilePath));
@@ -88,6 +88,7 @@ public class MainController {
     get average colour of image and make that the colour of planet
     add go home button (0,0,0)
     delete planet button
+    cycle through preset textures
      */
 
     @FXML
@@ -108,25 +109,16 @@ public class MainController {
         PerspectiveCamera camera = new PerspectiveCamera(true);
 
         previewSphere = new Sphere();
+
+        defaultColor = AverageColourGenerator.getAverageColor(defaultCustomPlanetTexture);
+
+        previewSphereMaterial = new PhongMaterial(defaultColor);
         previewSphere.setTranslateX(previewViewport.getPrefWidth() / 2);
         previewSphere.setTranslateY(previewViewport.getPrefHeight() / 2);
-
-        try{
-            defaultColor = AverageColourGenerator.getAverageColor(defaultCustomPlanetTexture.getUrl());
-        } catch (FileNotFoundException e) {
-            System.out.println("file not found");
-        }
-
-        material = new PhongMaterial(defaultColor);
-
-        material.setDiffuseMap(defaultCustomPlanetTexture);
-
-
-
+        previewSphere.setMaterial(previewSphereMaterial);
+        previewSphereMaterial.setDiffuseMap(defaultCustomPlanetTexture);
 
         AmbientLight ambientLight = new AmbientLight(Color.rgb(255, 255, 255, 0.5));
-
-        previewSphere.setMaterial(material);
 
         RotateTransition rotateTransition = new RotateTransition(Duration.seconds(20), previewSphere);
         rotateTransition.setByAngle(-360);
@@ -141,7 +133,6 @@ public class MainController {
 
         previewViewport.getChildren().addAll(previewSphere, camera, ambientLight);
     }
-
 
     void controllerSetup(Simulation simulation) {
         if (!isNull(simulation)) {
@@ -354,7 +345,7 @@ public class MainController {
 
         if (!isNull(customTexture)) {
             planet = new Planet(uniqueID, position, velocity, radius, mass, isSun, customTexture);
-            material.setDiffuseMap(customTexture);
+            previewSphereMaterial.setDiffuseMap(customTexture);
         } else {
 
             planet = new Planet(uniqueID, position, velocity, radius, mass, isSun, defaultCustomPlanetTexture);
@@ -397,24 +388,24 @@ public class MainController {
 
         if (SelectedImgFile != null) {
             customTexture = new Image(SelectedImgFile.toURI().toString());
-            Color color =  AverageColourGenerator.getAverageColor(customTexture.getUrl());
+            //for preview sphere
+            Color color =  AverageColourGenerator.getAverageColor(customTexture);
+            previewSphereMaterial.setDiffuseColor(color);
 
-            material = new PhongMaterial(color);
-            material.setDiffuseMap(customTexture);
+            previewSphereMaterial.setDiffuseMap(customTexture);
             resetTextureBTN.setDisable(false);
         } else {
             if (isNull(customTexture)) {
-                material.setDiffuseMap(defaultCustomPlanetTexture);
-                System.out.println("does tihs work??");
+                previewSphereMaterial.setDiffuseMap(defaultCustomPlanetTexture);
             } else {
-                material.setDiffuseMap(customTexture);
+                previewSphereMaterial.setDiffuseMap(customTexture);
             }
         }
     }
 
     private void resetTexture() {
         customTexture = null;
-        material.setDiffuseMap(defaultCustomPlanetTexture);
+        previewSphereMaterial.setDiffuseMap(defaultCustomPlanetTexture);
         sunCheckB.setSelected(false);
         textureBTN.setDisable(false);
     }
@@ -422,12 +413,12 @@ public class MainController {
     @FXML
     void sunCheckBSelected(ActionEvent event) {
         if (sunCheckB.isSelected()) {
-            material.setDiffuseMap(Planet.sunTexture);
+            previewSphereMaterial.setDiffuseMap(Planet.sunTexture);
             customTexture = Planet.sunTexture;
             resetTextureBTN.setDisable(false);
         } else if (!sunCheckB.isSelected()) {
             customTexture = defaultCustomPlanetTexture;
-            material.setDiffuseMap(defaultCustomPlanetTexture);
+            previewSphereMaterial.setDiffuseMap(defaultCustomPlanetTexture);
         }
         textureBTN.setDisable(sunCheckB.isSelected());
     }

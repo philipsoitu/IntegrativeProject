@@ -1,5 +1,6 @@
 package com.coolawesome.integrativeproject;
 
+import com.coolawesome.integrativeproject.utils.AverageColourGenerator;
 import com.coolawesome.integrativeproject.utils.Vector3D;
 import javafx.geometry.Point3D;
 import javafx.scene.PointLight;
@@ -7,6 +8,8 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
+
+import java.io.FileNotFoundException;
 
 
 public class Planet {
@@ -78,10 +81,14 @@ public class Planet {
     }
 
     //this constructor is for custom planets
-    public Planet(String name, Vector3D position, Vector3D velocity, double radius, double mass, boolean isSun, Image customTexture) {
+    public Planet(String name, Vector3D position, Vector3D velocity, double radius, double mass, boolean isSun, Image texture) {
         this(name, position, velocity, radius, mass, isSun);
-        material = new PhongMaterial();
-        material.setDiffuseMap(customTexture);
+
+        Color colour = AverageColourGenerator.getAverageColor(texture);
+
+        material.setDiffuseColor(colour);
+        material.setDiffuseMap(texture);
+        this.color = colour;
         planetNode.setMaterial(material);
     }
 
