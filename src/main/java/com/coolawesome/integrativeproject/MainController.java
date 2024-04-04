@@ -3,6 +3,7 @@ package com.coolawesome.integrativeproject;
 import com.coolawesome.integrativeproject.utils.Constants;
 import com.coolawesome.integrativeproject.utils.Vector3D;
 import javafx.animation.KeyFrame;
+import javafx.animation.RotateTransition;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,7 +12,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.Point3D;
 import javafx.scene.AmbientLight;
 import javafx.scene.PerspectiveCamera;
-import javafx.scene.PointLight;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
@@ -21,6 +21,7 @@ import javafx.scene.shape.Sphere;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,22 +44,16 @@ public class MainController {
     private Button playPauseBTN;
     @FXML
     private ChoiceBox<String> algoChoiceBox;
-
     @FXML
     private Button textureBTN;
-
     @FXML
     private Button resetTextureBTN;
-
     @FXML
     private Slider massSLD;
-
     @FXML
     private TextField massTXTF;
-
     @FXML
     private Slider radiusSLD;
-
     @FXML
     private TextField radiusTXTF;
 
@@ -111,22 +106,15 @@ public class MainController {
 
         previewSphere.setMaterial(material);
 
-        previewSphere.setOnMouseDragged(event -> {
-            double deltaX = event.getSceneX() - lastX;
-            double deltaY = event.getSceneY() - lastY;
+        RotateTransition rotateTransition = new RotateTransition(Duration.seconds(20), previewSphere);
+        rotateTransition.setByAngle(-360);
+        rotateTransition.setCycleCount(RotateTransition.INDEFINITE);
+        rotateTransition.setAutoReverse(false);
 
-            double angle = Math.sqrt(deltaX * deltaX + deltaY * deltaY) * 0.025;
+        rotateTransition.setAxis(new Point3D(-1,5,0).normalize());
 
-            double axisX = (deltaY * Math.sin(angle / 2)) / Math.sqrt(2);
-            double axisY = (-deltaX * Math.sin(angle / 2)) / Math.sqrt(2);
-            double axisZ = Math.cos(angle / 2);
+        rotateTransition.play();
 
-            previewSphere.setRotationAxis(new Point3D(axisX, axisY, axisZ));
-            previewSphere.setRotate(previewSphere.getRotate() + angle);
-
-            lastX = event.getSceneX();
-            lastY = event.getSceneY();
-        });
         camera.setTranslateZ(-200);
 
         previewViewport.getChildren().addAll(previewSphere, camera, ambientLight);

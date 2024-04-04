@@ -10,6 +10,8 @@
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -119,10 +121,17 @@
       <TitledPane collapsible="false" text="New Planet Preview">
         <VBox>
                <children>
-                  <AnchorPane fx:id="previewViewport" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="199.0" prefWidth="214.0" style="-fx-background-color: black;">
+                  <AnchorPane fx:id="previewViewport" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="199.0" prefWidth="214.0" style="-fx-background-color: white;">
                      <padding>
                         <Insets left="1.0" right="1.0" />
                      </padding>
+                     <children>
+                        <ImageView fitHeight="199.0" fitWidth="214.0" layoutX="2.0" pickOnBounds="true" smooth="false" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="0.0">
+                           <image>
+                              <Image url="@../../../images/skybox/front.png" />
+                           </image>
+                        </ImageView>
+                     </children>
                   </AnchorPane>
                   <VBox prefHeight="72.0" prefWidth="220.0" spacing="5.0">
                      <children>
