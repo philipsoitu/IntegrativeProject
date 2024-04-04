@@ -8,6 +8,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.layout.AnchorPane;
 
 import javafx.scene.shape.Sphere;
+import lombok.Setter;
 import org.fxyz3d.scene.Skybox;
 import org.fxyz3d.utils.CameraTransformer;
 
@@ -22,8 +23,10 @@ public class SimulationView extends Group {
 
     private final Set<KeyCode> keysPressed = new HashSet<>();
 
-    private final Map<String, Planet> planetMap;
+    private final Simulation simulation;
     private final MainController mainController;
+
+    @Setter
     private String currentCamPlanetID = "";
 
     private final Image
@@ -43,8 +46,8 @@ public class SimulationView extends Group {
 
     private double deltaMouseX, deltaMouseY = 0;
 
-    public SimulationView(AnchorPane pane, Map<String, Planet> planetMap, MainController mainController) {
-        this.planetMap = planetMap;
+    public SimulationView(AnchorPane pane, Simulation simulation, MainController mainController) {
+        this.simulation = simulation;
         this.mainController = mainController;
 
         // Set up the subscene for 3D content
@@ -101,11 +104,11 @@ public class SimulationView extends Group {
     public void update(double dt) {
         // Update the selected planet info list
         if (!currentCamPlanetID.isEmpty()) {
-            this.mainController.updateSelectedPlanetInfo(planetMap.get(currentCamPlanetID));
+            this.mainController.updateSelectedPlanetInfo(simulation.planetMap.get(currentCamPlanetID));
         }
 
         // check if there are any planets not currently in the scene
-        planetMap.forEach((id, planet) -> {
+        simulation.planetMap.forEach((id, planet) -> {
             if (!this.getChildren().contains(planet.planetNode)) {
                 this.getChildren().add(planet.planetNode);
                 planet.planetNode.setOnMouseClicked(event -> {
@@ -122,7 +125,7 @@ public class SimulationView extends Group {
         for (Node node : this.getChildren()) {
             if (node instanceof Sphere) {
                 boolean found = false;
-                for (Planet planet : planetMap.values()) {
+                for (Planet planet : simulation.planetMap.values()) {
                     if (planet.planetNode.equals(node)) {
                         found = true;
                         break;
@@ -137,7 +140,7 @@ public class SimulationView extends Group {
             }
             if (node instanceof PointLight) {
                 boolean found = false;
-                for (Planet planet : planetMap.values()) {
+                for (Planet planet : simulation.planetMap.values()) {
                     if (planet.isSun && planet.sunLight.equals(node)) {
                         found = true;
                         break;
@@ -151,7 +154,7 @@ public class SimulationView extends Group {
         this.getChildren().removeAll(nodesToRemove);
 
         //update the position of the planets
-        for (var planet : planetMap.values()) {
+        for (var planet : simulation.planetMap.values()) {
             planet.planetNode.setTranslateX(planet.position.x);
             planet.planetNode.setTranslateY(planet.position.y);
             planet.planetNode.setTranslateZ(planet.position.z);
@@ -179,7 +182,7 @@ public class SimulationView extends Group {
         up.multiply(0.6);
 
         if (!currentCamPlanetID.isEmpty()) {
-            Planet planet = planetMap.get(currentCamPlanetID);
+            Planet planet = simulation.planetMap.get(currentCamPlanetID);
             if (planet != null) {
                 Vector3D camPos = new Vector3D(
                         cameraTransform.t.getX(),
@@ -282,10 +285,5 @@ public class SimulationView extends Group {
         double z = camZ + distance * Math.cos(yaw) * Math.cos(pitch);
 
         return new Vector3D(x, y, z);
-    }
-
-
-    public void setCurrentCamPlanetID(String planetID) {
-        this.currentCamPlanetID = planetID;
     }
 }

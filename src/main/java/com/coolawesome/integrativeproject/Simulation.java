@@ -17,7 +17,7 @@ public class Simulation {
     boolean isPaused = false;
 
     public Simulation(AnchorPane viewport, MainController controller) {
-        simulationView = new SimulationView(viewport, planetMap, controller);
+        simulationView = new SimulationView(viewport, this, controller);
         initialize(100);
     }
 
