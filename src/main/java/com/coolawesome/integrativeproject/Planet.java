@@ -24,8 +24,8 @@ public class Planet {
     public boolean isSun;
     public PointLight sunLight;
 
-    private static final Image sunTexture = new Image("file:src/main/resources/images/planets/sun.jpg");
-    private static final Image[] planetTextures = {
+    public static final Image sunTexture = new Image("file:src/main/resources/images/planets/sun.jpg");
+    public static final Image[] planetTextures = {
             new Image("file:src/main/resources/images/planets/Alpine.png"),
             new Image("file:src/main/resources/images/planets/Gaseous1.png"),
             new Image("file:src/main/resources/images/planets/Gaseous2.png"),
@@ -54,7 +54,7 @@ public class Planet {
         this.mass = mass;
         this.radius = radius;
         double hue = Math.random() * 360;
-        Color randColor = Color.hsb(hue, 1,1);
+        Color randColor = Color.hsb(hue, 1, 1);
         this.color = randColor;
         this.spinRate = -1.5 + (Math.random() * 3);
         this.isSun = isSun;
@@ -77,21 +77,16 @@ public class Planet {
         this.color = color;
     }
 
+    //this constructor is for custom planets
     public Planet(String name, Vector3D position, Vector3D velocity, double radius, double mass, boolean isSun, Image customTexture) {
         this(name, position, velocity, radius, mass, isSun);
-        if (customTexture != null) {
-            material = new PhongMaterial();
-            material.setDiffuseMap(customTexture);
-            planetNode.setMaterial(material);
-        } else {
-            material.setDiffuseMap(planetTextures[(int) (Math.random() * planetTextures.length)]);
-            planetNode.setMaterial(material);
-        }
-
+        material = new PhongMaterial();
+        material.setDiffuseMap(customTexture);
+        planetNode.setMaterial(material);
     }
 
     private void initSphere() {
-        material.setDiffuseMap(planetTextures[(int) (Math.random() * planetTextures.length)]);
+        material.setDiffuseMap(planetTextures[(int) (Math.random() * Planet.planetTextures.length)]);
         planetNode.setMaterial(material);
         planetNode.setRotationAxis(new Point3D(0, 1, 0));
     }

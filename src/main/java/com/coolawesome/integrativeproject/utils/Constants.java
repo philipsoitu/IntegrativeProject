@@ -1,5 +1,7 @@
 package com.coolawesome.integrativeproject.utils;
 
+import javafx.scene.image.Image;
+
 public final class Constants {
 
     public static final String TIME_ELAPSED_PREFIX = "Time Elapsed: ";
@@ -11,6 +13,11 @@ public final class Constants {
     public static final String NUMBER_OF_COLLISIONS_PREFIX = "Number of Collisions: ";
 
     public static final String[] ALGORITHM_CHOICES = {"Brute Force", "Barnes Hut"};
+
+    public static final double defaultMass = 5000;
+
+    public static final String defaultCustomPlanetTextureFilePath = "/images/planets/defaultCustomPlanet.jpg";
+
 
 
     //shouldn't be able to create an instance of this class

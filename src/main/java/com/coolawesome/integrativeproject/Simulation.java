@@ -1,5 +1,6 @@
 package com.coolawesome.integrativeproject;
 
+import com.coolawesome.integrativeproject.utils.Constants;
 import com.coolawesome.integrativeproject.utils.JsonPlanetManager;
 import com.coolawesome.integrativeproject.utils.Vector3D;
 import javafx.scene.layout.AnchorPane;
@@ -22,29 +23,34 @@ public class Simulation {
 
     public void initialize(int numOfBodies) {
         for (int i = 0; i < numOfBodies; i++) {
-
-            // Randomizing parameters
-            double x = Math.random() * 300 - 150;
-            double y = Math.random() * 300 - 150;
-            double z = Math.random() * 300 - 150;
-            Vector3D randPos = new Vector3D(x,y,z);
-            Vector3D randVel = new Vector3D();
-            double randRad = 1 + Math.random() * 2;
-            double randMass = 5000;
-//            boolean sun = Math.random() * 4 < 1;
-            boolean sun = false;
-
-            // Generate a unique ID for the planet
             String uniqueID = UUID.randomUUID().toString().replaceAll("-", "");
-
-            // Create the Planet object
-            Planet randPlanet = new Planet(uniqueID, randPos, randVel, randRad, randMass, sun);
+            Planet randPlanet = createRandomPlanet(uniqueID);
 
             // Add the Planet to the Map
             planetMap.put(uniqueID, randPlanet);
         }
         String uniqueID = UUID.randomUUID().toString().replaceAll("-", "");
         planetMap.put(uniqueID, new Planet("sun", new Vector3D(5000, 0, 0), new Vector3D(), 1000, 100000, true));
+    }
+
+    public Planet createRandomPlanet(String uniqueID) {
+        Vector3D randPos = Vector3D.generateRandomVector();
+        Vector3D randVel = new Vector3D();
+
+//       boolean sun = Math.random() * 4 < 1;
+        boolean sun = false;
+
+        return new Planet(uniqueID, randPos, randVel, getRandomRadius(), Constants.defaultMass, sun);
+    }
+
+    public Planet createRandomPlanet(String uniqueID, Vector3D pos) {
+        boolean sun = Math.random() * 4 < 1;
+        return new Planet(uniqueID, pos, new Vector3D(), getRandomRadius(), Constants.defaultMass, sun);
+    }
+
+
+    private double getRandomRadius() {
+        return 1 + Math.random() * 2;
     }
 
     public void update(double dt){

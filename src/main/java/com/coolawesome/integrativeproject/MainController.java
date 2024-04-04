@@ -8,13 +8,19 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Point3D;
+import javafx.scene.AmbientLight;
+import javafx.scene.PerspectiveCamera;
+import javafx.scene.PointLight;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Sphere;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,20 +65,22 @@ public class MainController {
     @FXML
     private CheckBox sunCheckB;
 
-    File SelectedImgFile;
+    @FXML
+    private AnchorPane previewViewport;
 
+    @FXML
+    private Button spawnRandomPlanetBTN;
+    File SelectedImgFile;
     Image customTexture;
     public AnchorPane viewport;
     private Simulation simulation;
     private int secondsElapsed = 0;
+    private Sphere previewSphere;
+    private PhongMaterial material;
+    private double lastX, lastY;
     Timeline timeline;
-
-    private final ObservableList<String> simulationListContent = FXCollections.observableArrayList(
-            Constants.TIME_ELAPSED_PREFIX,
-            Constants.PLANET_COUNT_PREFIX,
-            Constants.AVERAGE_FORCE_PREFIX,
-            Constants.NUMBER_OF_COLLISIONS_PREFIX
-    );
+    private final ObservableList<String> simulationListContent = FXCollections.observableArrayList(Constants.TIME_ELAPSED_PREFIX, Constants.PLANET_COUNT_PREFIX, Constants.AVERAGE_FORCE_PREFIX, Constants.NUMBER_OF_COLLISIONS_PREFIX);
+    public final Image defaultCustomPlanetTexture = new Image(getClass().getResourceAsStream(Constants.defaultCustomPlanetTextureFilePath));
 
     @FXML
     public void initialize() {
@@ -85,7 +93,45 @@ public class MainController {
                 });
             }
         });
+        previewSetup();
     }
+
+    void previewSetup() {
+        PerspectiveCamera camera = new PerspectiveCamera(true);
+
+        previewSphere = new Sphere();
+        previewSphere.setTranslateX(previewViewport.getPrefWidth() / 2);
+        previewSphere.setTranslateY(previewViewport.getPrefHeight() / 2);
+
+        material = new PhongMaterial();
+
+        material.setDiffuseMap(defaultCustomPlanetTexture);
+
+        AmbientLight ambientLight = new AmbientLight(Color.rgb(255, 255,255, 0.5));
+
+        previewSphere.setMaterial(material);
+
+        previewSphere.setOnMouseDragged(event -> {
+            double deltaX = event.getSceneX() - lastX;
+            double deltaY = event.getSceneY() - lastY;
+
+            double angle = Math.sqrt(deltaX * deltaX + deltaY * deltaY) * 0.025;
+
+            double axisX = (deltaY * Math.sin(angle / 2)) / Math.sqrt(2);
+            double axisY = (-deltaX * Math.sin(angle / 2)) / Math.sqrt(2);
+            double axisZ = Math.cos(angle / 2);
+
+            previewSphere.setRotationAxis(new Point3D(axisX, axisY, axisZ));
+            previewSphere.setRotate(previewSphere.getRotate() + angle);
+
+            lastX = event.getSceneX();
+            lastY = event.getSceneY();
+        });
+        camera.setTranslateZ(-200);
+
+        previewViewport.getChildren().addAll(previewSphere, camera, ambientLight);
+    }
+
 
     void controllerSetup(Simulation simulation) {
         if (!isNull(simulation)) {
@@ -142,19 +188,17 @@ public class MainController {
             radiusSLD.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
                 String valueString = String.valueOf(newValue);
                 int endIndex = Math.min(valueString.length(), 4);
+                previewSphere.setRadius(radiusSLD.getValue() * 10);
                 radiusTXTF.setText(valueString.substring(0, endIndex));
             }));
 
             radiusTXTF.textProperty().addListener((observableValue, oldValue, newValue) -> {
                 if (!newValue.isEmpty() && !isValidDouble(newValue)) {
+                    previewSphere.setScaleX(Double.parseDouble(radiusTXTF.getText()) - 1);
                     radiusTXTF.setText(oldValue);
                 }
             });
         }
-
-        //sun check box
-
-
         setInitialValues();
     }
 
@@ -184,8 +228,10 @@ public class MainController {
 
         massSLD.setValue(massSLD.getMax() / 2);
         massTXTF.setText(massSLD.getValue() + "");
-        radiusSLD.setValue(2.5);
+        radiusSLD.setValue(5);
         radiusTXTF.setText(radiusSLD.getValue() + "");
+
+        resetTextureBTN.setDisable(true);
 
         algoChoiceBox.getItems().addAll(Constants.ALGORITHM_CHOICES);
 
@@ -195,13 +241,10 @@ public class MainController {
     }
 
     private void initializeTime() {
-        timeline = new Timeline(new KeyFrame(
-                Duration.seconds(1),
-                event -> {
-                    secondsElapsed++;
-                    updateTimer();
-                }
-        ));
+        timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            secondsElapsed++;
+            updateTimer();
+        }));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
@@ -266,14 +309,11 @@ public class MainController {
             }
         }
     }
+
     @FXML
     void createCustomPlanet(ActionEvent event) {
-        double Vx = Math.random() * 2;
-        double Vy = Math.random() * 2;
-        double Vz = Math.random() * 2;
-
-        Vector3D position = simulation.simulationView.getPositionInFrontOfCamera(50);
-        Vector3D velocity = new Vector3D(Vx, Vy, Vz);
+        Vector3D position = getPositionInFrontOfCamera();
+        Vector3D velocity = new Vector3D();
 
         double radius = Double.parseDouble(radiusTXTF.getText());
         double mass = Double.parseDouble(massTXTF.getText());
@@ -283,22 +323,31 @@ public class MainController {
 
         Planet planet;
 
-        planet = new Planet(uniqueID, position, velocity, radius, mass, isSun, customTexture);
+        if(!isNull(customTexture)) {
+            planet = new Planet(uniqueID, position, velocity, radius, mass, isSun, customTexture);
+            material.setDiffuseMap(customTexture);
+        } else {
+
+            planet = new Planet(uniqueID, position, velocity, radius, mass, isSun, defaultCustomPlanetTexture);
+        }
+
+
+        simulation.planetMap.put(uniqueID, planet);
+
+    }
+
+    @FXML
+    void spawnRandomPlanet(ActionEvent event) {
+        String uniqueID = UUID.randomUUID().toString().replaceAll("-", "");
+
+        Planet planet = simulation.createRandomPlanet(uniqueID, getPositionInFrontOfCamera());
 
         simulation.planetMap.put(uniqueID, planet);
 
     }
 
     public void updateSelectedPlanetInfo(Planet planet) {
-        ObservableList<String> planetInfo = FXCollections.observableArrayList(
-                "ID: " + planet.name,
-                "Position: " + String.format("%.3f, %.3f, %.3f", planet.position.x, planet.position.y, planet.position.z),
-                "Velocity: " + String.format("%.3f, %.3f, %.3f", planet.velocity.x, planet.velocity.y, planet.velocity.z),
-                "Accel: " + String.format("%.1e, %.1e, %.1e", planet.acceleration.x, planet.acceleration.y, planet.acceleration.z),
-                "Radius: " + String.format("%.3f", planet.radius),
-                "Mass: " + String.format("%.3f", planet.mass),
-                "Color: " + planet.color
-        );
+        ObservableList<String> planetInfo = FXCollections.observableArrayList("ID: " + planet.name, "Position: " + String.format("%.3f, %.3f, %.3f", planet.position.x, planet.position.y, planet.position.z), "Velocity: " + String.format("%.3f, %.3f, %.3f", planet.velocity.x, planet.velocity.y, planet.velocity.z), "Accel: " + String.format("%.1e, %.1e, %.1e", planet.acceleration.x, planet.acceleration.y, planet.acceleration.z), "Radius: " + String.format("%.3f", planet.radius), "Mass: " + String.format("%.3f", planet.mass), "Color: " + planet.color);
         selectedPlanetInfoList.setItems(planetInfo);
     }
 
@@ -317,16 +366,16 @@ public class MainController {
     }
 
     @FXML
-    void chooseCustomTexture(ActionEvent event) {
+    private void chooseCustomTexture(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
-        );
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));
 
         SelectedImgFile = fileChooser.showOpenDialog(new Stage());
 
         if (SelectedImgFile != null) {
-             customTexture = new Image(SelectedImgFile.toURI().toString());
+            customTexture = new Image(SelectedImgFile.toURI().toString());
+            material.setDiffuseMap(customTexture);
+            resetTextureBTN.setDisable(false);
         } else {
             customTexture = null;
         }
@@ -335,17 +384,28 @@ public class MainController {
     @FXML
     void resetTexture(ActionEvent event) {
         customTexture = null;
+        material.setDiffuseMap(defaultCustomPlanetTexture);
+        sunCheckB.setSelected(false);
+        textureBTN.setDisable(false);
     }
 
     @FXML
     void sunCheckBSelected(ActionEvent event) {
-        if(sunCheckB.isSelected()) {
-            textureBTN.setDisable(true);
-            resetTextureBTN.setDisable(true);
-        } else if(!sunCheckB.isSelected()) {
-            textureBTN.setDisable(false);
+        if (sunCheckB.isSelected()) {
+            material.setDiffuseMap(Planet.sunTexture);
+            customTexture = Planet.sunTexture;
             resetTextureBTN.setDisable(false);
+        } else if (!sunCheckB.isSelected()) {
+            customTexture = defaultCustomPlanetTexture;
+            material.setDiffuseMap(defaultCustomPlanetTexture);
         }
+
+        textureBTN.setDisable(sunCheckB.isSelected());
+
+    }
+
+    private Vector3D getPositionInFrontOfCamera() {
+       return simulation.simulationView.getPositionInFrontOfCamera(50);
     }
 
     public void saveJson(ActionEvent actionEvent) {

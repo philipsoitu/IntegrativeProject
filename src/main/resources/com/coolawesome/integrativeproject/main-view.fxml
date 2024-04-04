@@ -119,36 +119,40 @@
       <TitledPane collapsible="false" text="New Planet Preview">
         <VBox>
                <children>
-                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="53.0" prefWidth="214.0">
+                  <AnchorPane fx:id="previewViewport" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="199.0" prefWidth="214.0" style="-fx-background-color: black;">
                      <padding>
                         <Insets left="1.0" right="1.0" />
                      </padding>
                   </AnchorPane>
-                  <VBox prefHeight="200.0" prefWidth="100.0" spacing="30.0">
+                  <VBox prefHeight="72.0" prefWidth="220.0" spacing="5.0">
                      <children>
-                        <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
+                        <HBox prefHeight="30.0" prefWidth="220.0" spacing="5.0">
                            <children>
-                              <Label text="Radius:" />
+                              <Label prefWidth="40.0" text="Radius:" />
                               <Slider fx:id="radiusSLD" max="10.0" min="1.0" prefWidth="110.0" />
-                              <TextField fx:id="radiusTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="49.0" />
+                              <TextField fx:id="radiusTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="51.0" />
                            </children>
                         </HBox>
-                        <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
+                        <HBox prefHeight="23.0" prefWidth="220.0" spacing="5.0">
                            <children>
-                              <Label text="Mass:" />
-                              <Slider fx:id="massSLD" max="10000.0" min="100.0" prefHeight="14.0" prefWidth="109.0" />
-                              <TextField fx:id="massTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="60.0" />
+                              <Label prefWidth="40.0" text="Mass:" />
+                              <Slider fx:id="massSLD" max="10000.0" min="100.0" prefHeight="14.0" prefWidth="110.0" />
+                              <TextField fx:id="massTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="51.0" />
                            </children>
                         </HBox>
                         <CheckBox fx:id="sunCheckB" mnemonicParsing="false" onAction="#sunCheckBSelected" text="Sun" />
-                        <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
+                        <HBox prefHeight="30.0" prefWidth="220.0" spacing="5.0">
                            <children>
                               <Button fx:id="textureBTN" mnemonicParsing="false" onAction="#chooseCustomTexture" text="Add Custom Texture" />
                               <Button fx:id="resetTextureBTN" mnemonicParsing="false" onAction="#resetTexture" text="Reset Texture" />
                            </children>
                         </HBox>
                         <Button mnemonicParsing="false" onAction="#createCustomPlanet" text="Create" />
+                        <Button fx:id="spawnRandomPlanetBTN" mnemonicParsing="false" onAction="#spawnRandomPlanet" text="Spawn Random Planet" />
                      </children>
+                     <padding>
+                        <Insets top="5.0" />
+                     </padding>
                   </VBox>
                </children></VBox>
       </TitledPane>

@@ -111,6 +111,15 @@ public class Vector3D {
         this.z = -this.z;
     }
 
+    public static Vector3D generateRandomVector() {
+        // Randomizing parameters
+        double x = Math.random() * 300 - 150;
+        double y = Math.random() * 300 - 150;
+        double z = Math.random() * 300 - 150;
+
+        return new Vector3D(x,y,x);
+    }
+
     @Override
     public String toString() {
         return "x: " + x + " y: " + y + " z: " + z;
