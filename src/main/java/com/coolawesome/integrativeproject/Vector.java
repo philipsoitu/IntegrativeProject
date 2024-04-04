@@ -64,8 +64,8 @@ public class Vector {
         return new Vector(this.x * scalar, this.y * scalar);
     }
 
-    static public Vector unitVector(Vector v){
-        return new Vector(v.x/ v.magnitude(),v.y/ v.magnitude());
+    static public Vector unitVector(Vector v) {
+        return new Vector(v.x / v.magnitude(), v.y / v.magnitude());
     }
 
 }
