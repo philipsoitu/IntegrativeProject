@@ -97,7 +97,7 @@ public class Main extends Application {
             System.out.println(dt);
 
             for (Particle p : particles) {
-                p.update(dt);
+//                p.update(dt);
             }
 
             constructTree();
@@ -142,11 +142,12 @@ public class Main extends Application {
     private void render(GraphicsContext gc) {
         gc.clearRect(0, 0, screenX, screenY);
 
+        root.draw(gc);
+
         for (Particle particle : particles) {
             particle.drawWithCameraOffset(gc, cameraX, cameraY);
         }
 
-        root.draw(gc);
     }
 
     public static void main(String[] args) {

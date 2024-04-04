@@ -112,10 +112,9 @@ class TreeNode {
                 tn.draw(gc);
             }
         }
+
         gc.setFill(Color.BLACK);
         gc.strokeRect(this.x, this.y, this.w, this.w);
-
-
     }
 
 //    void display() {
