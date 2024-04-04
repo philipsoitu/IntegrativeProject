@@ -79,7 +79,7 @@
                      </ChoiceBox>
                      <HBox prefHeight="42.0" prefWidth="220.0">
                         <children>
-                           <Button fx:id="playPauseBTN" mnemonicParsing="false" onAction="#playPauseSim" text="Pause" />
+                           <Button fx:id="playPauseBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="Pause" />
                         </children>
                         <VBox.margin>
                            <Insets top="10.0" />
@@ -118,8 +118,8 @@
   </center>
   <right>
     <VBox spacing="10" style="-fx-padding: 10;">
-      <TitledPane collapsible="false" text="New Planet Preview">
-        <VBox>
+      <TitledPane collapsible="false" prefHeight="385.0" prefWidth="241.0" text="New Planet Preview">
+        <VBox prefHeight="236.0" prefWidth="239.0">
                <children>
                   <AnchorPane fx:id="previewViewport" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="199.0" prefWidth="214.0" style="-fx-background-color: white;">
                      <padding>
@@ -133,7 +133,7 @@
                         </ImageView>
                      </children>
                   </AnchorPane>
-                  <VBox prefHeight="72.0" prefWidth="220.0" spacing="5.0">
+                  <VBox prefHeight="146.0" prefWidth="220.0" spacing="3.0">
                      <children>
                         <HBox prefHeight="30.0" prefWidth="220.0" spacing="5.0">
                            <children>
@@ -152,12 +152,12 @@
                         <CheckBox fx:id="sunCheckB" mnemonicParsing="false" onAction="#sunCheckBSelected" text="Sun" />
                         <HBox prefHeight="30.0" prefWidth="220.0" spacing="5.0">
                            <children>
-                              <Button fx:id="textureBTN" mnemonicParsing="false" onAction="#chooseCustomTexture" text="Add Custom Texture" />
-                              <Button fx:id="resetTextureBTN" mnemonicParsing="false" onAction="#resetTexture" text="Reset Texture" />
+                              <Button fx:id="textureBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="Add Custom Texture" />
+                              <Button fx:id="resetTextureBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="Reset Texture" />
                            </children>
                         </HBox>
-                        <Button mnemonicParsing="false" onAction="#createCustomPlanet" text="Create" />
-                        <Button fx:id="spawnRandomPlanetBTN" mnemonicParsing="false" onAction="#spawnRandomPlanet" text="Spawn Random Planet" />
+                        <Button fx:id="createBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="Spawn" />
+                        <Button fx:id="spawnRandomPlanetBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="Spawn Random Planet" />
                      </children>
                      <padding>
                         <Insets top="5.0" />
@@ -165,10 +165,10 @@
                   </VBox>
                </children></VBox>
       </TitledPane>
-      <TitledPane collapsible="false" text="Currently Selected Planet Info">
+      <TitledPane collapsible="false" prefWidth="241.0" text="Currently Selected Planet Info">
         <VBox alignment="TOP_CENTER" spacing="10.0">
                <children>
-                  <Button fx:id="viewRandBtn" alignment="CENTER" mnemonicParsing="false" onAction="#viewRandPlanet" text="View Random Planet" textAlignment="CENTER" />
+                  <Button fx:id="viewRandBtn" alignment="CENTER" mnemonicParsing="false" onAction="#onBTNUpdate" text="View Random Planet" textAlignment="CENTER" />
                   <Separator prefWidth="200.0" />
                    <ListView fx:id="selectedPlanetInfoList" prefHeight="220.0" prefWidth="220.0">
                        <!-- Add items here -->

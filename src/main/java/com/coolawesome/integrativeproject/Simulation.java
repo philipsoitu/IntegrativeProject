@@ -14,6 +14,7 @@ public class Simulation {
     SimulationView simulationView;
     JsonPlanetManager planetManager = new JsonPlanetManager();
 
+    static int collisionCount = 0;
     boolean isPaused = false;
 
     public Simulation(AnchorPane viewport, MainController controller) {
@@ -93,6 +94,8 @@ public class Simulation {
                         int red = (int)Math.min(((p1.mass/totalMass)*p1.color.getRed() + (p2.mass/totalMass)*p2.color.getRed())*255,255);
                         int green = (int)Math.min(((p1.mass/totalMass)*p1.color.getGreen() + (p2.mass/totalMass)*p2.color.getGreen())*255,255);
                         int blue = (int)Math.min(((p1.mass/totalMass)*p1.color.getBlue() + (p2.mass/totalMass)*p2.color.getBlue())*255,255);
+
+                        collisionCount++;
 
                         p1.color = Color.rgb(red, green, blue);
                         idPlanetsToRemove.add(id2);

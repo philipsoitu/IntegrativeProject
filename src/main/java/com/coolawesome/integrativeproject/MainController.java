@@ -1,5 +1,6 @@
 package com.coolawesome.integrativeproject;
 
+import com.coolawesome.integrativeproject.utils.AverageColourGenerator;
 import com.coolawesome.integrativeproject.utils.Constants;
 import com.coolawesome.integrativeproject.utils.Vector3D;
 import javafx.animation.KeyFrame;
@@ -23,6 +24,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -64,6 +66,9 @@ public class MainController {
     private AnchorPane previewViewport;
 
     @FXML
+    private Button createBTN;
+
+    @FXML
     private Button spawnRandomPlanetBTN;
     File SelectedImgFile;
     Image customTexture;
@@ -72,10 +77,18 @@ public class MainController {
     private int secondsElapsed = 0;
     private Sphere previewSphere;
     private PhongMaterial material;
-    private double lastX, lastY;
     Timeline timeline;
-    private final ObservableList<String> simulationListContent = FXCollections.observableArrayList(Constants.TIME_ELAPSED_PREFIX, Constants.PLANET_COUNT_PREFIX, Constants.AVERAGE_FORCE_PREFIX, Constants.NUMBER_OF_COLLISIONS_PREFIX);
+    private final ObservableList<String> simulationListContent = FXCollections.observableArrayList(Constants.TIME_ELAPSED_PREFIX, Constants.PLANET_COUNT_PREFIX, Constants.NUMBER_OF_COLLISIONS_PREFIX, Constants.AVERAGE_FORCE_PREFIX);
     public final Image defaultCustomPlanetTexture = new Image(getClass().getResourceAsStream(Constants.defaultCustomPlanetTextureFilePath));
+
+    Color defaultColor;
+
+    /*
+    TODO
+    get average colour of image and make that the colour of planet
+    add go home button (0,0,0)
+    delete planet button
+     */
 
     @FXML
     public void initialize() {
@@ -98,11 +111,20 @@ public class MainController {
         previewSphere.setTranslateX(previewViewport.getPrefWidth() / 2);
         previewSphere.setTranslateY(previewViewport.getPrefHeight() / 2);
 
-        material = new PhongMaterial();
+        try{
+            defaultColor = AverageColourGenerator.getAverageColor(defaultCustomPlanetTexture.getUrl());
+        } catch (FileNotFoundException e) {
+            System.out.println("file not found");
+        }
+
+        material = new PhongMaterial(defaultColor);
 
         material.setDiffuseMap(defaultCustomPlanetTexture);
 
-        AmbientLight ambientLight = new AmbientLight(Color.rgb(255, 255,255, 0.5));
+
+
+
+        AmbientLight ambientLight = new AmbientLight(Color.rgb(255, 255, 255, 0.5));
 
         previewSphere.setMaterial(material);
 
@@ -111,7 +133,7 @@ public class MainController {
         rotateTransition.setCycleCount(RotateTransition.INDEFINITE);
         rotateTransition.setAutoReverse(false);
 
-        rotateTransition.setAxis(new Point3D(-1,5,0).normalize());
+        rotateTransition.setAxis(new Point3D(-1, 5, 0).normalize());
 
         rotateTransition.play();
 
@@ -144,23 +166,24 @@ public class MainController {
         if (!isNull(gConstSLD) && !isNull(gConstantTXTF)) {
             gConstSLD.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
                 String valueString = String.valueOf(newValue);
-                int endIndex = Math.min(valueString.length(), 4);
-                gConstantTXTF.setText(valueString.substring(0, endIndex));
-                updateGConst();
-            }));
 
-            gConstantTXTF.textProperty().addListener((observableValue, oldValue, newValue) -> {
-                if (!newValue.isEmpty() && !isValidDouble(newValue)) {
-                    gConstantTXTF.setText(oldValue);
+                int endIndex = Math.min(valueString.length(), 6);
+
+                if(Double.parseDouble(valueString) > gConstSLD.getMin() || Double.parseDouble(valueString) < gConstSLD.getMax()) {
+                    gConstantTXTF.setText(valueString.substring(0, endIndex));
+                } else {
+                    gConstantTXTF.setText(String.format(oldValue + ""));
                 }
-            });
+            }));
         }
 
         //mass
         if (!isNull(massSLD) && !isNull(massTXTF)) {
             massSLD.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
                 String valueString = String.valueOf(newValue);
-                int endIndex = Math.min(valueString.length(), 4);
+
+                int endIndex = Math.min(valueString.length(), 5);
+
                 massTXTF.setText(valueString.substring(0, endIndex));
             }));
 
@@ -198,13 +221,13 @@ public class MainController {
             Double.parseDouble(str);
             return true;
         } catch (NumberFormatException e) {
-            System.out.println("Input Corrected");
             return false;
         }
     }
 
     public void updateSimInfo() {
         simulationListContent.set(1, Constants.PLANET_COUNT_PREFIX + getPlanetCount());
+        simulationListContent.set(2, Constants.NUMBER_OF_COLLISIONS_PREFIX + Simulation.collisionCount);
     }
 
     private void setInitialValues() {
@@ -257,8 +280,7 @@ public class MainController {
         return obj == null;
     }
 
-    @FXML
-    void playPauseSim(ActionEvent event) {
+    private void playPauseSim() {
         simulation.isPaused = !simulation.isPaused;
 
         if (simulation.isPaused) {
@@ -267,6 +289,26 @@ public class MainController {
         } else {
             System.out.println("Simulation is playing");
             playPauseBTN.setText("Pause");
+        }
+    }
+
+    @FXML
+    void onBTNUpdate(ActionEvent event) throws FileNotFoundException {
+
+        Button btn = (Button) event.getSource();
+
+        if(btn.equals(playPauseBTN)) {
+            playPauseSim();
+        } else if(btn.equals(viewRandBtn)) {
+            viewRandPlanet();
+        } else if(btn.equals(textureBTN)) {
+            chooseCustomTexture();
+        } else if(btn.equals(resetTextureBTN)) {
+            resetTexture();
+        } else if(btn.equals(spawnRandomPlanetBTN)) {
+            spawnRandomPlanet();
+        } else if(btn.equals(createBTN)) {
+            createCustomPlanet();
         }
     }
 
@@ -298,8 +340,7 @@ public class MainController {
         }
     }
 
-    @FXML
-    void createCustomPlanet(ActionEvent event) {
+    private void createCustomPlanet() {
         Vector3D position = getPositionInFrontOfCamera();
         Vector3D velocity = new Vector3D();
 
@@ -311,21 +352,17 @@ public class MainController {
 
         Planet planet;
 
-        if(!isNull(customTexture)) {
+        if (!isNull(customTexture)) {
             planet = new Planet(uniqueID, position, velocity, radius, mass, isSun, customTexture);
             material.setDiffuseMap(customTexture);
         } else {
 
             planet = new Planet(uniqueID, position, velocity, radius, mass, isSun, defaultCustomPlanetTexture);
         }
-
-
         simulation.planetMap.put(uniqueID, planet);
-
     }
 
-    @FXML
-    void spawnRandomPlanet(ActionEvent event) {
+    private void spawnRandomPlanet() {
         String uniqueID = UUID.randomUUID().toString().replaceAll("-", "");
 
         Planet planet = simulation.createRandomPlanet(uniqueID, getPositionInFrontOfCamera());
@@ -339,8 +376,7 @@ public class MainController {
         selectedPlanetInfoList.setItems(planetInfo);
     }
 
-    @FXML
-    public void viewRandPlanet(ActionEvent event) {
+    private void viewRandPlanet() {
         // Get a random planet from the planetMap
         List<String> keys = new ArrayList<>(simulation.planetMap.keySet());
         String randomKey = keys.get(new Random().nextInt(keys.size()));
@@ -353,8 +389,7 @@ public class MainController {
         simulation.simulationView.setCurrentCamPlanetID(randomKey);
     }
 
-    @FXML
-    private void chooseCustomTexture(ActionEvent event) {
+    private void chooseCustomTexture() throws FileNotFoundException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));
 
@@ -362,15 +397,22 @@ public class MainController {
 
         if (SelectedImgFile != null) {
             customTexture = new Image(SelectedImgFile.toURI().toString());
+            Color color =  AverageColourGenerator.getAverageColor(customTexture.getUrl());
+
+            material = new PhongMaterial(color);
             material.setDiffuseMap(customTexture);
             resetTextureBTN.setDisable(false);
         } else {
-            customTexture = null;
+            if (isNull(customTexture)) {
+                material.setDiffuseMap(defaultCustomPlanetTexture);
+                System.out.println("does tihs work??");
+            } else {
+                material.setDiffuseMap(customTexture);
+            }
         }
     }
 
-    @FXML
-    void resetTexture(ActionEvent event) {
+    private void resetTexture() {
         customTexture = null;
         material.setDiffuseMap(defaultCustomPlanetTexture);
         sunCheckB.setSelected(false);
@@ -387,13 +429,11 @@ public class MainController {
             customTexture = defaultCustomPlanetTexture;
             material.setDiffuseMap(defaultCustomPlanetTexture);
         }
-
         textureBTN.setDisable(sunCheckB.isSelected());
-
     }
 
     private Vector3D getPositionInFrontOfCamera() {
-       return simulation.simulationView.getPositionInFrontOfCamera(50);
+        return simulation.simulationView.getPositionInFrontOfCamera(50);
     }
 
     public void saveJson(ActionEvent actionEvent) {
