@@ -24,7 +24,7 @@ public class Planet {
     public boolean isSun;
     public PointLight sunLight;
 
-    public static final Image sunTexture = new Image("file:src/main/resources/images/planets/sun.jpg");
+    public static final Image sunTexture = new Image("file:src/main/resources/images/planets/lebron.jpg");
     public static final Image[] planetTextures = {
             new Image("file:src/main/resources/images/planets/Alpine.png"),
             new Image("file:src/main/resources/images/planets/Gaseous1.png"),
