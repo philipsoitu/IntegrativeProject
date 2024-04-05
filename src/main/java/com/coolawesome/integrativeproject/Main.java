@@ -36,23 +36,29 @@ public class Main extends Application {
 
 //        particles.add(new Particle(350, 350, 0, 0, 20, 300000, Color.YELLOW));
 
+//        DEBUG CASE:
+        particles.add(new Particle(00, 00, 0, 0, 4, 100, Color.RED));
+        particles.add(new Particle(30, 30, 0, 0, 4, 100, Color.GREEN));
+        particles.add(new Particle(50, 10, 0, 0, 4, 100, Color.YELLOW));
+        particles.add(new Particle(70, 30, 0, 0, 4, 100, Color.PINK));
+        particles.add(new Particle(80, 80, 0, 0, 4, 100, Color.BROWN));
 
-        for (int i = 1; i < 100; i++) {
-//           Initial values randomization
-            double x = 100 + Math.random() * 500;
-            double y = 100 + Math.random() * 500;
-            double xVel = -0.01 + Math.random() * 0.02;
-            double yVel = -0.01 + Math.random() * 0.02;
-            double radius = 2 + Math.random() * 4;
-            double mass = 500;
-            int r = (int) (Math.random() * 255);
-            int g = (int) (Math.random() * 255);
-            int b = (int) (Math.random() * 255);
-            Color color = Color.rgb(r, g, b);
-
-            particles.add(new Particle(x, y, xVel, yVel, radius, mass, color));
-
-        }
+//        for (int i = 0; i < 10; i++) {
+////           Initial values randomization
+//            double x = 100 + Math.random() * 500;
+//            double y = 100 + Math.random() * 500;
+//            double xVel = -0.01 + Math.random() * 0.02;
+//            double yVel = -0.01 + Math.random() * 0.02;
+//            double radius = 2 + Math.random() * 4;
+//            double mass = 500;
+//            int r = (int) (Math.random() * 255);
+//            int g = (int) (Math.random() * 255);
+//            int b = (int) (Math.random() * 255);
+//            Color color = Color.rgb(r, g, b);
+//
+//            particles.add(new Particle(x, y, xVel, yVel, radius, mass, color));
+//
+//        }
 
 
         // Create a Canvas
@@ -142,7 +148,7 @@ public class Main extends Application {
     private void render(GraphicsContext gc) {
         gc.clearRect(0, 0, screenX, screenY);
 
-        root.draw(gc);
+        root.draw(gc, cameraX, cameraY);
 
         for (Particle particle : particles) {
             particle.drawWithCameraOffset(gc, cameraX, cameraY);

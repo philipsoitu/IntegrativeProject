@@ -11,8 +11,7 @@ class TreeNode {
     boolean leaf;
     Particle particle;
 
-    Vector totalCenter; // "Total" center of mass
-    Vector center;
+    Vector centerOfMassTimesTotalMass; // http://hyperphysics.phy-astr.gsu.edu/hbase/cm.html
     double totalMass; // Total mass
     int count; // Number of particles
 
@@ -24,8 +23,7 @@ class TreeNode {
         this.particle = null;
         this.children = new TreeNode[4];
 
-        this.totalCenter = new Vector(0, 0);
-        this.center = null;
+        this.centerOfMassTimesTotalMass = new Vector(0, 0);
         this.totalMass = 0;
         this.count = 0;
     }
@@ -49,10 +47,12 @@ class TreeNode {
         }
     }
 
+        //TODO: fix center of mass!!
     void insert(Particle newP) {
         if (this.leaf) {
-            // Case: Leaf already contains another particle
+            // If leaf already contains another particle
             if (this.particle != null) {
+
                 Particle a = this.particle;
                 Particle b = newP;
 
@@ -106,45 +106,15 @@ class TreeNode {
         this.children[this.which(newP.position)].insert(newP);
     }
 
-    void draw(GraphicsContext gc) {
+    void draw(GraphicsContext gc, double camX, double camY) {
         if (!this.leaf) {
             for (TreeNode tn : children) {
-                tn.draw(gc);
+                tn.draw(gc, camX, camY);
             }
         }
 
         gc.setFill(Color.BLACK);
-        gc.strokeRect(this.x, this.y, this.w, this.w);
+        gc.strokeRect(this.x + camX, this.y + camY, this.w, this.w);
     }
 
-//    void display() {
-//        if (this.w < 100) {
-//            if (this.leaf) return;
-//            if (!this.leaf && this.count == 0) {
-//                fill(255, 100);
-//                ellipse(x, y, 10, 10);
-//            } else {
-//                stroke(255);
-//                noFill();
-//            }
-//            strokeWeight(1);
-//            rect(x, y, w, w);
-//
-//            textSize(12);
-//            text(this.count, x + w / 2, y + w / 2);
-//
-//            this.center = mult(this.totalCenter, 1.0f / this.count);
-//            if (this.center != null) {
-//                stroke(255, 0, 0);
-//                strokeWeight(10);
-//                point(this.center.x, this.center.y);
-//            }
-//        }
-//
-//        if (!leaf) {
-//            for (TreeNode tn : children) {
-//                tn.display();
-//            }
-//        }
-//    }
 }
