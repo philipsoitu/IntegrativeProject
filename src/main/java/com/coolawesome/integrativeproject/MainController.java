@@ -70,6 +70,19 @@ public class MainController {
 
     @FXML
     private Button spawnRandomPlanetBTN;
+
+    @FXML
+    private Button originBTN;
+
+    @FXML
+    public Label xPosLBL;
+
+    @FXML
+    public Label yPosLBL;
+
+    @FXML
+    public Label zPosLBL;
+
     File SelectedImgFile;
     Image customTexture;
     public AnchorPane viewport;
@@ -85,8 +98,6 @@ public class MainController {
 
     /*
     TODO
-    get average colour of image and make that the colour of planet
-    add go home button (0,0,0)
     delete planet button
     cycle through preset textures
      */
@@ -300,6 +311,8 @@ public class MainController {
             spawnRandomPlanet();
         } else if(btn.equals(createBTN)) {
             createCustomPlanet();
+        } else if(btn.equals(originBTN)) {
+            simulation.simulationView.goOrigin();
         }
     }
 
@@ -380,7 +393,7 @@ public class MainController {
         simulation.simulationView.setCurrentCamPlanetID(randomKey);
     }
 
-    private void chooseCustomTexture() throws FileNotFoundException {
+    private void chooseCustomTexture() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));
 

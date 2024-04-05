@@ -250,6 +250,14 @@ public class SimulationView extends Group {
         cameraTransform.t.setZ(cameraTransform.t.getZ() + cameraVelocity.z);
 
         cameraVelocity.multiply(0.8);
+
+        updateCameraCoords();
+    }
+
+    private void updateCameraCoords() {
+        this.mainController.xPosLBL.setText(" X: " + String.format("%.3f", cameraTransform.t.getX()));
+        this.mainController.yPosLBL.setText(" Y: " + String.format("%.3f", cameraTransform.t.getY()));
+        this.mainController.zPosLBL.setText(" Z: " + String.format("%.3f", cameraTransform.t.getZ()));
     }
 
     private double lerpAngle(double start, double end, double t) {
@@ -268,6 +276,20 @@ public class SimulationView extends Group {
         Vector3D facing = new Vector3D(x, y, z);
         facing.normalize();
         return facing;
+    }
+
+    public void goOrigin() {
+
+        setCurrentCamPlanetID("");
+
+        cameraTransform.rx.setAngle(cameraTransform.rx.getAngle());
+        cameraTransform.ry.setAngle(cameraTransform.ry.getAngle());
+
+        cameraTransform.t.setX(0);
+        cameraTransform.t.setY(0);
+        cameraTransform.t.setZ(0);
+
+
     }
 
     public Vector3D getPositionInFrontOfCamera(double distance) {
