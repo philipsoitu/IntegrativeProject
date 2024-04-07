@@ -8,7 +8,6 @@ public class Particle {
     Vector position;
     Vector velocity;
     Vector acceleration;
-    Vector force;
     double radius;
     double mass;
     Color color;
@@ -20,11 +19,9 @@ public class Particle {
         this.mass = mass;
         this.radius = radius;
         this.color = color;
-        this.force = new Vector(0, 0);
     }
 
     public void update(double dt) {
-        acceleration = force.scalarProduct(1.0 / mass);
         velocity.add(acceleration.scalarProduct(dt));
         position.add(velocity.scalarProduct(dt));
     }

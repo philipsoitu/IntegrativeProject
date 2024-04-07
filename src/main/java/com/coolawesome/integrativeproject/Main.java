@@ -13,12 +13,13 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Main extends Application {
 
     ArrayList<Particle> particles = new ArrayList<>();
     TreeNode root;
+    double theta = 0.5;
+    double G = 0.0001;
 
     int screenX = 1280;
     int screenY = 720;
@@ -34,7 +35,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Simulation");
 
-//        particles.add(new Particle(350, 350, 0, 0, 20, 300000, Color.YELLOW));
+//        particles.add(new Particle(350, 350, 0, 0, 4, 3000000, Color.YELLOW));
 
 ////        DEBUG CASE:
 //        particles.add(new Particle(0, 0, 0, 0, 4, 100, Color.RED));
@@ -43,20 +44,21 @@ public class Main extends Application {
 //        particles.add(new Particle(70, 30, 0, 0, 4, 200, Color.PINK));
 //        particles.add(new Particle(80, 80, 0, 0, 4, 1000, Color.BROWN));
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
 //           Initial values randomization
             double x = 100 + Math.random() * 500;
             double y = 100 + Math.random() * 500;
             double xVel = -0.01 + Math.random() * 0.02;
             double yVel = -0.01 + Math.random() * 0.02;
-            double radius = 2 + Math.random() * 4;
+//            double radius = 2 + Math.random() * 4;
+            double radius = 1;
             double mass = 500;
-            int r = (int) (Math.random() * 255);
-            int g = (int) (Math.random() * 255);
-            int b = (int) (Math.random() * 255);
-            Color color = Color.rgb(r, g, b);
+//            int r = (int) (Math.random() * 255);
+//            int g = (int) (Math.random() * 255);
+//            int b = (int) (Math.random() * 255);
+//            Color color = Color.rgb(r, g, b);
 
-            particles.add(new Particle(x, y, xVel, yVel, radius, mass, color));
+            particles.add(new Particle(x, y, xVel, yVel, radius, mass, Color.WHITE));
 
         }
 
@@ -106,7 +108,9 @@ public class Main extends Application {
                 p.update(dt);
             }
 
+            //simulation loop
             constructTree();
+            gravity();
 
             render(gc);
             d1 = d2;
@@ -125,11 +129,11 @@ public class Main extends Application {
         double minY = Double.MAX_VALUE;
         double maxY = -Double.MAX_VALUE;
 
-        for (int i = 0; i < particles.size(); i++) {
-            minX = Math.min(minX, particles.get(i).position.x);
-            maxX = Math.max(maxX, particles.get(i).position.x);
-            minY = Math.min(minY, particles.get(i).position.y);
-            maxY = Math.max(maxY, particles.get(i).position.y);
+        for (Particle particle : particles) {
+            minX = Math.min(minX, particle.position.x);
+            maxX = Math.max(maxX, particle.position.x);
+            minY = Math.min(minY, particle.position.y);
+            maxY = Math.max(maxY, particle.position.y);
         }
 
         return new double[]{minX, minY, Math.max(maxX - minX, maxY - minY)};
@@ -144,9 +148,49 @@ public class Main extends Application {
         }
     }
 
+    private void gravity() {
+        for (Particle p : particles) {
+            gravitate(p, root);
+        }
+    }
+
+    void gravitate(Particle p, TreeNode tn) {
+        if (tn.leaf) {
+            if (tn.particle == null || p == tn.particle) return;
+            p.velocity.add(gravityAcc(tn.particle.position, p.position, tn.particle.mass, p.mass));
+        } else {
+
+            if (tn.centerOfMass == null) {
+                tn.centerOfMass = tn.centerOfMassTimesTotalMass.scalarProduct(1.0 / tn.totalMass);
+            }
+            if (tn.w / Vector.distance(p.position, tn.centerOfMass) < theta) {
+                p.velocity.add(gravityAcc(tn.centerOfMass, p.position, tn.totalMass, p.mass));
+            } else {
+
+                for (TreeNode child : tn.children) gravitate(p, child);
+            }
+        }
+    }
+
+
+    // Acceleration due to the gravity exerted by a on particle b
+    Vector gravityAcc(Vector posA, Vector posB, double massA, double massB) {
+
+        // TODO: collision threshold (no acceleration from a certain distance)
+
+        Vector distance = Vector.sub(posA, posB);
+        double dist = distance.magnitude();
+
+        Vector direction = Vector.unitVector(distance);
+        double force = (G * massA * massB) / (dist * dist);
+
+        return direction.scalarProduct(force / massB);
+    }
+
 
     private void render(GraphicsContext gc) {
-        gc.clearRect(0, 0, screenX, screenY);
+        gc.setFill(Color.BLACK);
+        gc.fillRect(0, 0, screenX, screenY);
 
         root.draw(gc, cameraX, cameraY);
 

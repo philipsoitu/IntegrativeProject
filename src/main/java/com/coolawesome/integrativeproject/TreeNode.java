@@ -14,7 +14,7 @@ class TreeNode {
     Vector centerOfMassTimesTotalMass; // http://hyperphysics.phy-astr.gsu.edu/hbase/cm.html
     double totalMass; // Total mass
     Vector centerOfMass;
-    int count; // Number of particles
+    int count; // Number of particles (for debugging)
 
     public TreeNode(double x, double y, double w) {
         this.x = x;
@@ -114,7 +114,7 @@ class TreeNode {
             }
         }
 
-        gc.setFill(Color.BLACK);
+        gc.setFill(Color.WHITE);
         gc.strokeRect(this.x + camX, this.y + camY, this.w, this.w);
     }
 

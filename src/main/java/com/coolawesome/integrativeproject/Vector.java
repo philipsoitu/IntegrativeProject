@@ -76,5 +76,11 @@ public class Vector {
         }
     }
 
+    public static double distance(Vector v1, Vector v2) {
+        Vector difference = Vector.sub(v1, v2);
+        double distance = difference.magnitude();
+        return distance;
+    }
+
 
 }
