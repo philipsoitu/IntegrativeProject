@@ -24,9 +24,9 @@ public class Particle {
     }
 
     public void update(double dt) {
-        acceleration = force.multiply(1.0 / mass);
-        velocity = Vector.add(velocity, acceleration.multiply(dt));
-        position = Vector.add(position, velocity.multiply(dt));
+        acceleration = force.scalarProduct(1.0 / mass);
+        velocity.add(acceleration.scalarProduct(dt));
+        position.add(velocity.scalarProduct(dt));
     }
 
     public void draw(GraphicsContext gc) {

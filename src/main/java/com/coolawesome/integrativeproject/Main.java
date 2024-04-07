@@ -20,10 +20,10 @@ public class Main extends Application {
     ArrayList<Particle> particles = new ArrayList<>();
     TreeNode root;
 
-    int screenX = 700;
-    int screenY = 700;
-    double cameraX = 0;
-    double cameraY = 0;
+    int screenX = 1280;
+    int screenY = 720;
+    double cameraX = 100;
+    double cameraY = 100;
 
     long d1 = System.currentTimeMillis();
     long d2 = System.currentTimeMillis();
@@ -36,29 +36,29 @@ public class Main extends Application {
 
 //        particles.add(new Particle(350, 350, 0, 0, 20, 300000, Color.YELLOW));
 
-//        DEBUG CASE:
-        particles.add(new Particle(00, 00, 0, 0, 4, 100, Color.RED));
-        particles.add(new Particle(30, 30, 0, 0, 4, 100, Color.GREEN));
-        particles.add(new Particle(50, 10, 0, 0, 4, 100, Color.YELLOW));
-        particles.add(new Particle(70, 30, 0, 0, 4, 100, Color.PINK));
-        particles.add(new Particle(80, 80, 0, 0, 4, 100, Color.BROWN));
+////        DEBUG CASE:
+//        particles.add(new Particle(0, 0, 0, 0, 4, 100, Color.RED));
+//        particles.add(new Particle(30, 30, 0, 0, 4, 100, Color.GREEN));
+//        particles.add(new Particle(50, 10, 0, 0, 4, 300, Color.YELLOW));
+//        particles.add(new Particle(70, 30, 0, 0, 4, 200, Color.PINK));
+//        particles.add(new Particle(80, 80, 0, 0, 4, 1000, Color.BROWN));
 
-//        for (int i = 0; i < 10; i++) {
-////           Initial values randomization
-//            double x = 100 + Math.random() * 500;
-//            double y = 100 + Math.random() * 500;
-//            double xVel = -0.01 + Math.random() * 0.02;
-//            double yVel = -0.01 + Math.random() * 0.02;
-//            double radius = 2 + Math.random() * 4;
-//            double mass = 500;
-//            int r = (int) (Math.random() * 255);
-//            int g = (int) (Math.random() * 255);
-//            int b = (int) (Math.random() * 255);
-//            Color color = Color.rgb(r, g, b);
-//
-//            particles.add(new Particle(x, y, xVel, yVel, radius, mass, color));
-//
-//        }
+        for (int i = 0; i < 10; i++) {
+//           Initial values randomization
+            double x = 100 + Math.random() * 500;
+            double y = 100 + Math.random() * 500;
+            double xVel = -0.01 + Math.random() * 0.02;
+            double yVel = -0.01 + Math.random() * 0.02;
+            double radius = 2 + Math.random() * 4;
+            double mass = 500;
+            int r = (int) (Math.random() * 255);
+            int g = (int) (Math.random() * 255);
+            int b = (int) (Math.random() * 255);
+            Color color = Color.rgb(r, g, b);
+
+            particles.add(new Particle(x, y, xVel, yVel, radius, mass, color));
+
+        }
 
 
         // Create a Canvas
@@ -103,7 +103,7 @@ public class Main extends Application {
             System.out.println(dt);
 
             for (Particle p : particles) {
-//                p.update(dt);
+                p.update(dt);
             }
 
             constructTree();

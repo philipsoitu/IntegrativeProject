@@ -16,7 +16,7 @@ public class Vector {
         this.y = 0;
     }
 
-    public static Vector add(Vector... args) {
+    public static Vector sum(Vector... args) {
         double x = 0;
         double y = 0;
 
@@ -31,9 +31,9 @@ public class Vector {
         return new Vector(v1.x - v2.x, v1.y - v2.y);
     }
 
-    public static Vector multiply(double a, Vector v1) {
-        double x = (double) a * (double) v1.x;
-        double y = (double) a * (double) v1.y;
+    public Vector scalarProduct(double a) {
+        double x = a * this.x;
+        double y = a * this.y;
         return new Vector(x, y);
     }
 
@@ -60,12 +60,21 @@ public class Vector {
         return Math.sqrt((this.x * this.x) + (this.y * this.y));
     }
 
-    public Vector multiply(double scalar) {
-        return new Vector(this.x * scalar, this.y * scalar);
+    public void multiply(double multiplier) {
+        this.x *= multiplier;
+        this.y *= multiplier;
     }
 
     static public Vector unitVector(Vector v) {
         return new Vector(v.x / v.magnitude(), v.y / v.magnitude());
     }
+
+    public void add(Vector... vectors) {
+        for (Vector vector : vectors) {
+            this.x += vector.x;
+            this.y += vector.y;
+        }
+    }
+
 
 }

@@ -13,6 +13,7 @@ class TreeNode {
 
     Vector centerOfMassTimesTotalMass; // http://hyperphysics.phy-astr.gsu.edu/hbase/cm.html
     double totalMass; // Total mass
+    Vector centerOfMass;
     int count; // Number of particles
 
     public TreeNode(double x, double y, double w) {
@@ -25,6 +26,7 @@ class TreeNode {
 
         this.centerOfMassTimesTotalMass = new Vector(0, 0);
         this.totalMass = 0;
+        this.centerOfMass = null;
         this.count = 0;
     }
 
@@ -47,7 +49,6 @@ class TreeNode {
         }
     }
 
-        //TODO: fix center of mass!!
     void insert(Particle newP) {
         if (this.leaf) {
             // If leaf already contains another particle
@@ -56,7 +57,7 @@ class TreeNode {
                 Particle a = this.particle;
                 Particle b = newP;
 
-                this.totalCenter.add(b.position);
+                this.centerOfMassTimesTotalMass.add(b.position.scalarProduct(b.mass));
                 this.totalMass += b.mass;
                 this.count++;
 
@@ -70,8 +71,8 @@ class TreeNode {
                     qB = cur.which(b.position);
 
                     // Update total center and mass
-                    cur.totalCenter.add(a.position);
-                    cur.totalCenter.add(b.position);
+                    cur.centerOfMassTimesTotalMass.add(a.position.scalarProduct(a.mass));
+                    cur.centerOfMassTimesTotalMass.add(b.position.scalarProduct(b.mass));
                     cur.totalMass += b.mass + a.mass;
                     cur.count += 2;
                 }
@@ -81,9 +82,9 @@ class TreeNode {
                 cur.children[qB].particle = b;
 
                 // Update center of mass and total for lowest-level child
-                cur.children[qA].totalCenter.add(a.position);
-                cur.children[qB].totalCenter.add(b.position);
-                cur.children[qA].totalMass += b.mass;
+                cur.children[qA].centerOfMassTimesTotalMass.add(a.position.scalarProduct(a.mass));
+                cur.children[qB].centerOfMassTimesTotalMass.add(b.position.scalarProduct(b.mass));
+                cur.children[qA].totalMass += a.mass;
                 cur.children[qB].totalMass += b.mass;
                 cur.children[qA].count++;
                 cur.children[qB].count++;
@@ -93,17 +94,17 @@ class TreeNode {
             }
 
             this.particle = newP;
-            this.totalCenter.add(newP.position);
+            this.centerOfMassTimesTotalMass.add(newP.position.scalarProduct(newP.mass));
             this.totalMass += newP.mass;
             this.count++;
             return;
         }
 
         // Not a leaf
-        this.totalCenter.add(newP.position);
+        this.centerOfMassTimesTotalMass.add(newP.position.scalarProduct(newP.mass));
         this.totalMass += newP.mass;
         this.count++;
-        this.children[this.which(newP.position)].insert(newP);
+        this.children[this.which(newP.position)].insert(newP); //recursive step
     }
 
     void draw(GraphicsContext gc, double camX, double camY) {
