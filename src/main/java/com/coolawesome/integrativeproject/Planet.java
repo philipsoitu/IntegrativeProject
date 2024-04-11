@@ -9,7 +9,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
 
-import java.io.FileNotFoundException;
 
 
 public class Planet {
@@ -108,6 +107,11 @@ public class Planet {
         sunLight.setTranslateX(this.position.x);
         sunLight.setTranslateY(this.position.y);
         sunLight.setTranslateZ(this.position.z);
+    }
+
+    public void update(double dt) {
+        velocity.add(acceleration.scalarProduct(dt));
+        position.add(velocity.scalarProduct(dt));
     }
 
     @Override

@@ -52,6 +52,13 @@ public class Vector3D {
         return new Vector3D(x, y, z);
     }
 
+    public Vector3D scalarProduct(double a) {
+        double x = a * this.x;
+        double y = a * this.y;
+        double z = a * this.z;
+        return new Vector3D(x, y, z);
+    }
+
     public static double dotProduct(Vector3D v1, Vector3D v2) {
         return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
     }
