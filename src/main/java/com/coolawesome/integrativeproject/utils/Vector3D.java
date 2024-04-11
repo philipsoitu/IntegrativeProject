@@ -112,6 +112,12 @@ public class Vector3D {
         return Math.sqrt(Math.pow(this.x - v.x, 2) + Math.pow(this.y - v.y, 2) + Math.pow(this.z - v.z, 2));
     }
 
+    public static double distance(Vector3D v1, Vector3D v2) {
+        Vector3D difference = Vector3D.difference(v1, v2);
+        double distance = difference.magnitude();
+        return distance;
+    }
+
     public void negate() {
         this.x = -this.x;
         this.y = -this.y;

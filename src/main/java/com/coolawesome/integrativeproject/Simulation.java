@@ -90,19 +90,62 @@ public class Simulation {
         double maxX = -Double.MAX_VALUE;
         double minY = Double.MAX_VALUE;
         double maxY = -Double.MAX_VALUE;
+        double minZ = Double.MAX_VALUE;
+        double maxZ = -Double.MAX_VALUE;
 
-        planetMap.forEach((id, p) -> {
+        for (Map.Entry<String, Planet> entry : planetMap.entrySet()) {
+            Planet p = entry.getValue();
             minX = Math.min(minX, p.position.x);
             maxX = Math.max(maxX, p.position.x);
             minY = Math.min(minY, p.position.y);
             maxY = Math.max(maxY, p.position.y);
+            minZ = Math.min(minZ, p.position.y);
+            maxZ = Math.max(maxZ, p.position.y);
 
-        });
+        }
 
 
-        return new double[]{minX, minY, Math.max(maxX - minX, maxY - minY)};
+
+        return new double[]{minX, minY, minZ, Math.max(maxX - minX, Math.max(maxY - minY, maxZ - minZ))};
     }
 
+    private void gravity() {
+        planetMap.forEach((id, p) -> {
+            gravitate(p, root);
+        });
+    }
+
+    private void gravitate(Planet p, TreeNode tn) {
+        if (tn.leaf) {
+            if (tn.planet == null || p == tn.planet) return;
+            p.velocity.add(gravityAcc(tn.planet.position, p.position, tn.planet.mass, p.mass));
+        } else {
+
+            if (tn.centerOfMass == null) {
+                tn.centerOfMass = tn.centerOfMassTimesTotalMass.scalarProduct(1.0 / tn.totalMass);
+            }
+            if (tn.w / Vector3D.distance(p.position, tn.centerOfMass) < theta) {
+                p.velocity.add(gravityAcc(tn.centerOfMass, p.position, tn.totalMass, p.mass));
+            } else {
+
+                for (TreeNode child : tn.children) gravitate(p, child);
+            }
+        }
+    }
+
+    // Acceleration due to the gravity exerted by a on particle b
+    private Vector3D gravityAcc(Vector3D posA, Vector3D posB, double massA, double massB) {
+
+        // TODO: collision threshold (no acceleration from a certain distance)
+
+        Vector3D distance = Vector3D.difference(posA, posB);
+        double dist = distance.magnitude();
+
+        Vector3D direction = Vector3D.unitVector(distance);
+        double force = (G * massA * massB) / (dist * dist);
+
+        return direction.scalarProduct(force / massB);
+    }
 
     public void saveToJson(String filePath) {
         planetManager.saveToJson(planetMap, filePath);
