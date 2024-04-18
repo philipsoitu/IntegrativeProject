@@ -8,6 +8,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.layout.AnchorPane;
 
 import javafx.scene.shape.Sphere;
+import lombok.Getter;
 import lombok.Setter;
 import org.fxyz3d.scene.Skybox;
 import org.fxyz3d.utils.CameraTransformer;
@@ -37,6 +38,7 @@ public class SimulationView extends Group {
         rightImage = new Image("file:src/main/resources/images/skybox/right.png"),
         topImage = new Image("file:src/main/resources/images/skybox/top.png"),
         cubeMap = new Image("file:src/main/resources/images/skybox/cubemap.png");
+
     private final Skybox skyBox;
 
     private final PerspectiveCamera camera;

@@ -100,7 +100,7 @@ public class Planet {
 
     private void initSun() {
         material.setSelfIlluminationMap(sunTexture); //TODO: add more sun textures
-        material.setDiffuseColor(Color.BLACK);
+//        material.setDiffuseColor(Color.BLACK);
         material.setSpecularPower(0);
         planetNode.setMaterial(material);
         planetNode.setRotationAxis(new Point3D(0, 1, 0));

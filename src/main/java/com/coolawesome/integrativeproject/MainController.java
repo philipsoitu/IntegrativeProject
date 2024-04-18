@@ -45,8 +45,6 @@ public class MainController {
     @FXML
     private Button playPauseBTN;
     @FXML
-    private ChoiceBox<String> algoChoiceBox;
-    @FXML
     private Button textureBTN;
     @FXML
     private Button resetTextureBTN;
@@ -83,6 +81,12 @@ public class MainController {
     @FXML
     public Label zPosLBL;
 
+    @FXML
+    private Slider thetaSLD;
+
+    @FXML
+    private TextField thetaTXTF;
+
     File SelectedImgFile;
     Image customTexture;
     public AnchorPane viewport;
@@ -91,16 +95,10 @@ public class MainController {
     private Sphere previewSphere;
     private PhongMaterial previewSphereMaterial;
     Timeline timeline;
-    private final ObservableList<String> simulationListContent = FXCollections.observableArrayList(Constants.TIME_ELAPSED_PREFIX, Constants.PLANET_COUNT_PREFIX, Constants.NUMBER_OF_COLLISIONS_PREFIX, Constants.AVERAGE_FORCE_PREFIX);
+    private final ObservableList<String> simulationListContent = FXCollections.observableArrayList(Constants.TIME_ELAPSED_PREFIX, Constants.PLANET_COUNT_PREFIX, Constants.NUMBER_OF_COLLISIONS_PREFIX);
     public final Image defaultCustomPlanetTexture = new Image(getClass().getResourceAsStream(Constants.defaultCustomPlanetTextureFilePath));
 
     Color defaultColor;
-
-    /*
-    TODO
-    delete planet button
-    cycle through preset textures
-     */
 
     @FXML
     public void initialize() {
@@ -140,8 +138,6 @@ public class MainController {
 
         rotateTransition.play();
 
-        camera.setTranslateZ(-200);
-
         previewViewport.getChildren().addAll(previewSphere, camera, ambientLight);
     }
 
@@ -160,59 +156,36 @@ public class MainController {
         }
 
         initializeTime();
-        listenerSetup();
+
+        listenerSetup(gConstantTXTF, gConstSLD);
+        listenerSetup(thetaTXTF, thetaSLD);
+        listenerSetup(massTXTF, massSLD);
+        listenerSetup(radiusTXTF, radiusSLD);
+
+        setInitialValues();
+
     }
 
-    public void listenerSetup() {
-        //g constant
-        if (!isNull(gConstSLD) && !isNull(gConstantTXTF)) {
-            gConstSLD.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
+
+    private void listenerSetup(TextField t1, Slider s1) {
+        if (!isNull(s1) && !isNull(t1)) {
+            s1.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
                 String valueString = String.valueOf(newValue);
 
                 int endIndex = Math.min(valueString.length(), 6);
 
-                if(Double.parseDouble(valueString) > gConstSLD.getMin() || Double.parseDouble(valueString) < gConstSLD.getMax()) {
-                    gConstantTXTF.setText(valueString.substring(0, endIndex));
+                if(s1.equals(radiusSLD)) {
+                    previewSphere.setRadius(radiusSLD.getValue() * 10);
+                }
+
+                if(Double.parseDouble(valueString) > s1.getMin() || Double.parseDouble(valueString) < s1.getMax()) {
+                    t1.setText(valueString.substring(0, endIndex));
                 } else {
-                    gConstantTXTF.setText(String.format(oldValue + ""));
+                    t1.setText(String.format(oldValue + ""));
                 }
             }));
         }
 
-        //mass
-        if (!isNull(massSLD) && !isNull(massTXTF)) {
-            massSLD.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
-                String valueString = String.valueOf(newValue);
-
-                int endIndex = Math.min(valueString.length(), 5);
-
-                massTXTF.setText(valueString.substring(0, endIndex));
-            }));
-
-            massTXTF.textProperty().addListener((observableValue, oldValue, newValue) -> {
-                if (!newValue.isEmpty() && !isValidDouble(newValue)) {
-                    massTXTF.setText(oldValue);
-                }
-            });
-        }
-
-        //radius
-        if (!isNull(radiusSLD) && !isNull(radiusTXTF)) {
-            radiusSLD.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
-                String valueString = String.valueOf(newValue);
-                int endIndex = Math.min(valueString.length(), 4);
-                previewSphere.setRadius(radiusSLD.getValue() * 10);
-                radiusTXTF.setText(valueString.substring(0, endIndex));
-            }));
-
-            radiusTXTF.textProperty().addListener((observableValue, oldValue, newValue) -> {
-                if (!newValue.isEmpty() && !isValidDouble(newValue)) {
-                    previewSphere.setScaleX(Double.parseDouble(radiusTXTF.getText()) - 1);
-                    radiusTXTF.setText(oldValue);
-                }
-            });
-        }
-        setInitialValues();
     }
 
     private boolean isValidDouble(String str) {
@@ -243,12 +216,10 @@ public class MainController {
         massTXTF.setText(massSLD.getValue() + "");
         radiusSLD.setValue(5);
         radiusTXTF.setText(radiusSLD.getValue() + "");
+        thetaSLD.setValue(0.5);
+        thetaTXTF.setText(thetaSLD.getValue() + "");
 
         resetTextureBTN.setDisable(true);
-
-        algoChoiceBox.getItems().addAll(Constants.ALGORITHM_CHOICES);
-
-        algoChoiceBox.setValue(Constants.ALGORITHM_CHOICES[0]);
 
         gConstantTXTF.setText(g + "");
     }
@@ -421,6 +392,8 @@ public class MainController {
         previewSphereMaterial.setDiffuseMap(defaultCustomPlanetTexture);
         sunCheckB.setSelected(false);
         textureBTN.setDisable(false);
+        resetTextureBTN.setDisable(true);
+
     }
 
     @FXML
