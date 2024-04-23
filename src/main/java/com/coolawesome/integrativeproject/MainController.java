@@ -13,8 +13,12 @@ import javafx.fxml.FXML;
 import javafx.geometry.Point3D;
 import javafx.scene.AmbientLight;
 import javafx.scene.PerspectiveCamera;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -36,67 +40,52 @@ public class MainController {
     public ListView<String> selectedPlanetInfoList;
     @FXML
     public Button viewRandBtn;
-
+    @FXML
+    public TextField SearchBar;
+    @FXML
+    public Button SearchBtn;
+    @FXML
+    public Button RenameBtn;
     @FXML
     private ListView<String> simulationInfoList;
-
     @FXML
     private Slider gConstSLD;
-
     @FXML
     private TextField gConstantTXTF;
-
     @FXML
     private Button playPauseBTN;
-
     @FXML
     private Button textureBTN;
-
     @FXML
     private Button resetBTN;
-
     @FXML
     private Slider massSLD;
-
     @FXML
     private TextField massTXTF;
-
     @FXML
     private Slider radiusSLD;
-
     @FXML
     private TextField radiusTXTF;
-
     @FXML
     private CheckBox sunCheckB;
-
     @FXML
     private AnchorPane previewViewport;
-
     @FXML
     private Button createBTN;
-
     @FXML
     private Button spawnRandomPlanetBTN;
-
     @FXML
     private Button originBTN;
-
     @FXML
     public Label xPosLBL;
-
     @FXML
     public Label yPosLBL;
-
     @FXML
     public Label zPosLBL;
-
     @FXML
     private Slider thetaSLD;
-
     @FXML
     private TextField thetaTXTF;
-
     @FXML
     private ColorPicker planetColourPicker;
 
@@ -110,21 +99,43 @@ public class MainController {
     Timeline timeline;
     private final ObservableList<String> simulationListContent = FXCollections.observableArrayList(Constants.TIME_ELAPSED_PREFIX, Constants.PLANET_COUNT_PREFIX, Constants.NUMBER_OF_COLLISIONS_PREFIX);
     public final Image defaultCustomPlanetTexture = new Image(getClass().getResourceAsStream(Constants.defaultCustomPlanetTextureFilePath));
-
     Color defaultColor;
 
     @FXML
     public void initialize() {
-        viewport.sceneProperty().addListener((observableScene, oldScene, newScene) -> {
-            if (newScene != null) {
-                newScene.focusOwnerProperty().addListener((observable, oldFocusOwner, newFocusOwner) -> {
-                    if (newFocusOwner != viewport) {
-                        viewport.requestFocus();
-                    }
-                });
-            }
-        });
+//        viewport.sceneProperty().addListener((observableScene, oldScene, newScene) -> {
+//            if (newScene != null) {
+//                newScene.focusOwnerProperty().addListener((observable, oldFocusOwner, newFocusOwner) -> {
+//                    if (newFocusOwner != viewport) {
+//                        viewport.requestFocus();
+//                    }
+//                });
+//            }
+//        });
         previewSetup();
+        viewport.requestFocus();
+
+        Scene scene = viewport.getScene();
+        if (scene != null) {
+            scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                if (event.getCode() == KeyCode.ESCAPE) {
+                    viewport.requestFocus();
+                    event.consume();
+                }
+            });
+        } else {
+            // Scene might not be set yet, set up a listener to add the filter when it's available
+            viewport.sceneProperty().addListener((observableScene, oldScene, newScene) -> {
+                if (newScene != null) {
+                    newScene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                        if (event.getCode() == KeyCode.ESCAPE) {
+                            viewport.requestFocus();
+                            event.consume();
+                        }
+                    });
+                }
+            });
+        }
     }
 
     void previewSetup() {
@@ -307,6 +318,7 @@ public class MainController {
         } else if (btn.equals(originBTN)) {
             simulation.simulationView.setGoingToOrigin(true);
         }
+        viewport.requestFocus();
     }
 
     @FXML
@@ -349,6 +361,7 @@ public class MainController {
         } else {
             System.out.println("Planet color picker is null");
         }
+        viewport.requestFocus();
     }
 
     private void createCustomPlanet() {
@@ -460,6 +473,7 @@ public class MainController {
         if (file != null) {
             simulation.saveToJson(file.getPath());
         }
+        viewport.requestFocus();
     }
 
     public void loadJson(ActionEvent actionEvent) {
@@ -471,6 +485,46 @@ public class MainController {
 
         if (file != null) {
             simulation.loadFromJson(file.getPath());
+        }
+        viewport.requestFocus();
+    }
+
+    public void handleSearch(ActionEvent actionEvent) {
+        String searchText = SearchBar.getText().trim();
+        Planet foundPlanet = null;
+
+        for (Planet planet : simulation.planetMap.values()) {
+            if (planet.name.equalsIgnoreCase(searchText)) {
+                foundPlanet = planet;
+                break;
+            }
+        }
+        if (foundPlanet == null) {
+            SearchBar.setText("Planet not found");
+            return;
+        }
+        for (String planetKey : simulation.planetMap.keySet()) {
+            if (simulation.planetMap.get(planetKey).equals(foundPlanet)) {
+                simulation.simulationView.setCurrentCamPlanetID(planetKey);
+                break;
+            }
+        }
+        viewport.requestFocus();
+        SearchBar.clear();
+    }
+
+    public void handleRename(ActionEvent actionEvent) {
+        String searchText = SearchBar.getText().trim();
+        if (!simulation.simulationView.getCurrentCamPlanetID().isEmpty()){
+            simulation.planetMap.get(simulation.simulationView.getCurrentCamPlanetID()).name = searchText;
+        }
+        viewport.requestFocus();
+        SearchBar.clear();
+    }
+
+    public void searchClicked(MouseEvent mouseEvent) {
+        if (SearchBar.getText().equals("Planet not found")) {
+            SearchBar.clear();
         }
     }
 }
