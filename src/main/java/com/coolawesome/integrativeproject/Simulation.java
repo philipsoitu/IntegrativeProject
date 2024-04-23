@@ -103,6 +103,9 @@ public class Simulation {
                 }
             });
         });
+        if (idPlanetsToRemove.contains(simulationView.getCurrentCamPlanetID())){
+            simulationView.setCurrentCamPlanetID("");
+        }
         idPlanetsToRemove.forEach((id) -> planetMap.remove(id));
     }
 

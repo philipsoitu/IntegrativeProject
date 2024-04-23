@@ -28,6 +28,7 @@ public class SimulationView extends Group {
     private final MainController mainController;
 
     @Setter
+    @Getter
     private String currentCamPlanetID = "";
 
     private final Image
@@ -47,6 +48,10 @@ public class SimulationView extends Group {
     private final Vector3D cameraVelocity = new Vector3D();
 
     private double deltaMouseX, deltaMouseY = 0;
+
+    @Setter
+    @Getter
+    private boolean goingToOrigin;
 
     public SimulationView(AnchorPane pane, Simulation simulation, MainController mainController) {
         this.simulation = simulation;
@@ -182,6 +187,14 @@ public class SimulationView extends Group {
         facing.multiply(0.6); // reduce the speed of the camera
         right.multiply(0.6);
         up.multiply(0.6);
+
+        if (goingToOrigin) {
+            currentCamPlanetID = "";
+            goOrigin();
+            if (getCameraPos().distance(new Vector3D(0, 0, 0)) < 1) {
+                goingToOrigin = false;
+            }
+        }
 
         if (!currentCamPlanetID.isEmpty()) {
             Planet planet = simulation.planetMap.get(currentCamPlanetID);

@@ -305,7 +305,7 @@ public class MainController {
         } else if (btn.equals(createBTN)) {
             createCustomPlanet();
         } else if (btn.equals(originBTN)) {
-            simulation.simulationView.goOrigin();
+            simulation.simulationView.setGoingToOrigin(true);
         }
     }
 
