@@ -80,15 +80,15 @@ public class Planet {
         this.color = color;
     }
 
-    //this constructor is for custom planets
-    public Planet(String name, Vector3D position, Vector3D velocity, double radius, double mass, boolean isSun, Image texture) {
+    //constructor for custom planets
+    public Planet(String name, Vector3D position, Vector3D velocity, double radius, double mass, boolean isSun, Image texture, Color color) {
         this(name, position, velocity, radius, mass, isSun);
 
-        Color colour = AverageColourGenerator.getAverageColor(texture);
+        //Color colour = AverageColourGenerator.getAverageColor(texture);
 
-        material.setDiffuseColor(colour);
+        material.setDiffuseColor(color);
         material.setDiffuseMap(texture);
-        this.color = colour;
+        this.color = color;
         planetNode.setMaterial(material);
     }
 

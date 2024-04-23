@@ -31,13 +31,13 @@ public class SimulationView extends Group {
     private String currentCamPlanetID = "";
 
     private final Image
-        backImage = new Image("file:src/main/resources/images/skybox/back.png"),
-        bottomImage = new Image("file:src/main/resources/images/skybox/bottom.png"),
-        frontImage = new Image("file:src/main/resources/images/skybox/front.png"),
-        leftImage = new Image("file:src/main/resources/images/skybox/left.png"),
-        rightImage = new Image("file:src/main/resources/images/skybox/right.png"),
-        topImage = new Image("file:src/main/resources/images/skybox/top.png"),
-        cubeMap = new Image("file:src/main/resources/images/skybox/cubemap.png");
+            backImage = new Image("file:src/main/resources/images/skybox/back.png"),
+            bottomImage = new Image("file:src/main/resources/images/skybox/bottom.png"),
+            frontImage = new Image("file:src/main/resources/images/skybox/front.png"),
+            leftImage = new Image("file:src/main/resources/images/skybox/left.png"),
+            rightImage = new Image("file:src/main/resources/images/skybox/right.png"),
+            topImage = new Image("file:src/main/resources/images/skybox/top.png"),
+            cubeMap = new Image("file:src/main/resources/images/skybox/cubemap.png");
 
     private final Skybox skyBox;
 
@@ -160,7 +160,7 @@ public class SimulationView extends Group {
             planet.planetNode.setTranslateX(planet.position.x);
             planet.planetNode.setTranslateY(planet.position.y);
             planet.planetNode.setTranslateZ(planet.position.z);
-            if (planet.isSun){
+            if (planet.isSun) {
                 planet.sunLight.setTranslateX(planet.position.x);
                 planet.sunLight.setTranslateY(planet.position.y);
                 planet.sunLight.setTranslateZ(planet.position.z);
@@ -186,11 +186,7 @@ public class SimulationView extends Group {
         if (!currentCamPlanetID.isEmpty()) {
             Planet planet = simulation.planetMap.get(currentCamPlanetID);
             if (planet != null) {
-                Vector3D camPos = new Vector3D(
-                        cameraTransform.t.getX(),
-                        cameraTransform.t.getY(),
-                        cameraTransform.t.getZ()
-                );
+                Vector3D camPos = getCameraPos();
                 Vector3D planetPos = planet.position;
                 Vector3D direction = Vector3D.difference(planetPos, camPos);
                 double distance = direction.magnitude();
@@ -281,17 +277,25 @@ public class SimulationView extends Group {
     }
 
     public void goOrigin() {
-
         setCurrentCamPlanetID("");
 
-        cameraTransform.rx.setAngle(cameraTransform.rx.getAngle());
-        cameraTransform.ry.setAngle(cameraTransform.ry.getAngle());
+        Vector3D origin = new Vector3D(0,0,0);
+        Vector3D camPos = getCameraPos();
+        Vector3D direction = Vector3D.difference(origin, camPos);
+        double distance = direction.magnitude();
+        direction.normalize();
 
-        cameraTransform.t.setX(0);
-        cameraTransform.t.setY(0);
-        cameraTransform.t.setZ(0);
+        double directionPitch = -Math.toDegrees(Math.asin(direction.y));
+        double directionYaw = Math.toDegrees(Math.atan2(direction.x, direction.z));
 
+        cameraTransform.rx.setAngle(lerpAngle(cameraTransform.rx.getAngle(), directionPitch, 0.5));
+        cameraTransform.ry.setAngle(lerpAngle(cameraTransform.ry.getAngle(), directionYaw, 0.5));
 
+        direction.negate();
+        PIDController pidController = new PIDController(1e-15, 1e-2, 1e-8);
+        double pidOutput = pidController.calculate(0, distance);
+        direction.multiply(pidOutput);
+        cameraVelocity.add(direction);
     }
 
     public Vector3D getPositionInFrontOfCamera(double distance) {
@@ -310,4 +314,13 @@ public class SimulationView extends Group {
 
         return new Vector3D(x, y, z);
     }
+
+    private Vector3D getCameraPos() {
+        return new Vector3D(
+                cameraTransform.t.getX(),
+                cameraTransform.t.getY(),
+                cameraTransform.t.getZ()
+        );
+    }
+
 }

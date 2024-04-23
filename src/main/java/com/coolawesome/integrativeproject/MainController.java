@@ -24,7 +24,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -32,28 +31,39 @@ import java.util.UUID;
 
 public class MainController {
     public static double g = 0.001;
+    public static double theta;
     @FXML
     public ListView<String> selectedPlanetInfoList;
     @FXML
     public Button viewRandBtn;
+
     @FXML
     private ListView<String> simulationInfoList;
+
     @FXML
     private Slider gConstSLD;
+
     @FXML
     private TextField gConstantTXTF;
+
     @FXML
     private Button playPauseBTN;
+
     @FXML
     private Button textureBTN;
+
     @FXML
-    private Button resetTextureBTN;
+    private Button resetBTN;
+
     @FXML
     private Slider massSLD;
+
     @FXML
     private TextField massTXTF;
+
     @FXML
     private Slider radiusSLD;
+
     @FXML
     private TextField radiusTXTF;
 
@@ -86,6 +96,9 @@ public class MainController {
 
     @FXML
     private TextField thetaTXTF;
+
+    @FXML
+    private ColorPicker planetColourPicker;
 
     File SelectedImgFile;
     Image customTexture;
@@ -157,47 +170,47 @@ public class MainController {
 
         initializeTime();
 
-        listenerSetup(gConstantTXTF, gConstSLD);
-        listenerSetup(thetaTXTF, thetaSLD);
-        listenerSetup(massTXTF, massSLD);
-        listenerSetup(radiusTXTF, radiusSLD);
+        TextField[] textFields = {gConstantTXTF, thetaTXTF, massTXTF, radiusTXTF};
+        Slider[] sliders = {gConstSLD, thetaSLD, massSLD, radiusSLD};
 
+        for (int i = 0; i < textFields.length; i++) {
+            listenerSetup(textFields[i], sliders[i]);
+        }
         setInitialValues();
-
     }
-
 
     private void listenerSetup(TextField t1, Slider s1) {
         if (!isNull(s1) && !isNull(t1)) {
             s1.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
+                resetBTN.setDisable(false);
+
                 String valueString = String.valueOf(newValue);
 
                 int endIndex = Math.min(valueString.length(), 6);
 
-                if(s1.equals(radiusSLD)) {
+                if (s1.equals(radiusSLD)) {
                     previewSphere.setRadius(radiusSLD.getValue() * 10);
                 }
 
-                if(Double.parseDouble(valueString) > s1.getMin() || Double.parseDouble(valueString) < s1.getMax()) {
+                if (s1.equals(gConstSLD)) {
+                    updateGConst();
+                }
+
+                if (s1.equals(thetaSLD)) {
+                    updateTheta();
+                }
+
+                if (Double.parseDouble(valueString) > s1.getMin() || Double.parseDouble(valueString) < s1.getMax()) {
                     t1.setText(valueString.substring(0, endIndex));
                 } else {
                     t1.setText(String.format(oldValue + ""));
                 }
             }));
         }
-
     }
 
-    private boolean isValidDouble(String str) {
-        if (isNull(str)) {
-            return false;
-        }
-        try {
-            Double.parseDouble(str);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+    private void updateTheta() {
+        theta = thetaSLD.getValue();
     }
 
     public void updateSimInfo() {
@@ -206,22 +219,32 @@ public class MainController {
     }
 
     private void setInitialValues() {
-        if (!isNull(gConstSLD)) {
-            gConstSLD.setValue(g);
-        } else {
-            System.out.println("Gravity Constant Slider is null");
-        }
+        setInitialControls();
+        setDefaultPlanetParameters();
+    }
 
+    private void setDefaultPlanetParameters() {
         massSLD.setValue(massSLD.getMax() / 2);
         massTXTF.setText(massSLD.getValue() + "");
         radiusSLD.setValue(5);
         radiusTXTF.setText(radiusSLD.getValue() + "");
-        thetaSLD.setValue(0.5);
-        thetaTXTF.setText(thetaSLD.getValue() + "");
+        resetBTN.setDisable(true);
+    }
 
-        resetTextureBTN.setDisable(true);
+    private void setInitialControls() {
+        if (!isNull(gConstSLD) && !isNull(gConstantTXTF)) {
+            gConstSLD.setValue(g);
+            gConstantTXTF.setText(gConstSLD.getValue() + "");
+        } else {
+            System.out.println("Gravity Constant Slider is null");
+        }
 
-        gConstantTXTF.setText(g + "");
+        if (!isNull(thetaSLD) && !isNull(thetaTXTF)) {
+            thetaSLD.setValue(0.5);
+            thetaTXTF.setText(thetaSLD.getValue() + "");
+        } else {
+            System.out.println("Theta Slider is null");
+        }
     }
 
     private void initializeTime() {
@@ -266,23 +289,22 @@ public class MainController {
     }
 
     @FXML
-    void onBTNUpdate(ActionEvent event) throws FileNotFoundException {
-
+    void onBTNUpdate(ActionEvent event) {
         Button btn = (Button) event.getSource();
 
-        if(btn.equals(playPauseBTN)) {
+        if (btn.equals(playPauseBTN)) {
             playPauseSim();
-        } else if(btn.equals(viewRandBtn)) {
+        } else if (btn.equals(viewRandBtn)) {
             viewRandPlanet();
-        } else if(btn.equals(textureBTN)) {
+        } else if (btn.equals(textureBTN)) {
             chooseCustomTexture();
-        } else if(btn.equals(resetTextureBTN)) {
-            resetTexture();
-        } else if(btn.equals(spawnRandomPlanetBTN)) {
+        } else if (btn.equals(resetBTN)) {
+            resetCustomPlanetInputs();
+        } else if (btn.equals(spawnRandomPlanetBTN)) {
             spawnRandomPlanet();
-        } else if(btn.equals(createBTN)) {
+        } else if (btn.equals(createBTN)) {
             createCustomPlanet();
-        } else if(btn.equals(originBTN)) {
+        } else if (btn.equals(originBTN)) {
             simulation.simulationView.goOrigin();
         }
     }
@@ -315,6 +337,20 @@ public class MainController {
         }
     }
 
+    @FXML
+    void setPlanetColour(ActionEvent event) {
+        if (!isNull(planetColourPicker)) {
+            previewSphereMaterial.setDiffuseColor(planetColourPicker.getValue());
+            previewSphere.setMaterial(previewSphereMaterial);
+            if (!isNull(customTexture)) {
+                previewSphereMaterial.setDiffuseMap(customTexture);
+            }
+            resetBTN.setDisable(false);
+        } else {
+            System.out.println("Planet color picker is null");
+        }
+    }
+
     private void createCustomPlanet() {
         Vector3D position = getPositionInFrontOfCamera();
         Vector3D velocity = new Vector3D();
@@ -328,11 +364,10 @@ public class MainController {
         Planet planet;
 
         if (!isNull(customTexture)) {
-            planet = new Planet(uniqueID, position, velocity, radius, mass, isSun, customTexture);
+            planet = new Planet(uniqueID, position, velocity, radius, mass, isSun, customTexture, planetColourPicker.getValue());
             previewSphereMaterial.setDiffuseMap(customTexture);
         } else {
-
-            planet = new Planet(uniqueID, position, velocity, radius, mass, isSun, defaultCustomPlanetTexture);
+            planet = new Planet(uniqueID, position, velocity, radius, mass, isSun, defaultCustomPlanetTexture, planetColourPicker.getValue());
         }
         simulation.planetMap.put(uniqueID, planet);
     }
@@ -343,7 +378,6 @@ public class MainController {
         Planet planet = simulation.createRandomPlanet(uniqueID, getPositionInFrontOfCamera());
 
         simulation.planetMap.put(uniqueID, planet);
-
     }
 
     public void updateSelectedPlanetInfo(Planet planet) {
@@ -373,27 +407,31 @@ public class MainController {
         if (SelectedImgFile != null) {
             customTexture = new Image(SelectedImgFile.toURI().toString());
             //for preview sphere
-            Color color =  AverageColourGenerator.getAverageColor(customTexture);
+            Color color = AverageColourGenerator.getAverageColor(customTexture);
             previewSphereMaterial.setDiffuseColor(color);
-
             previewSphereMaterial.setDiffuseMap(customTexture);
-            resetTextureBTN.setDisable(false);
         } else {
             if (isNull(customTexture)) {
                 previewSphereMaterial.setDiffuseMap(defaultCustomPlanetTexture);
             } else {
                 previewSphereMaterial.setDiffuseMap(customTexture);
+                resetBTN.setDisable(false);
             }
         }
+        previewSphereMaterial.setDiffuseColor(planetColourPicker.getValue());
     }
 
-    private void resetTexture() {
+    private void resetCustomPlanetInputs() {
         customTexture = null;
         previewSphereMaterial.setDiffuseMap(defaultCustomPlanetTexture);
+        previewSphereMaterial.setDiffuseColor(Color.WHITE);
+
+        setDefaultPlanetParameters();
+
+        planetColourPicker.setValue(Color.WHITE);
         sunCheckB.setSelected(false);
         textureBTN.setDisable(false);
-        resetTextureBTN.setDisable(true);
-
+        resetBTN.setDisable(true);
     }
 
     @FXML
@@ -401,12 +439,11 @@ public class MainController {
         if (sunCheckB.isSelected()) {
             previewSphereMaterial.setDiffuseMap(Planet.sunTexture);
             customTexture = Planet.sunTexture;
-            resetTextureBTN.setDisable(false);
         } else if (!sunCheckB.isSelected()) {
             customTexture = defaultCustomPlanetTexture;
             previewSphereMaterial.setDiffuseMap(defaultCustomPlanetTexture);
         }
-        textureBTN.setDisable(sunCheckB.isSelected());
+        resetBTN.setDisable(false);
     }
 
     private Vector3D getPositionInFrontOfCamera() {
