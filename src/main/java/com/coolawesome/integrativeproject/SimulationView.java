@@ -199,24 +199,7 @@ public class SimulationView extends Group {
         if (!currentCamPlanetID.isEmpty()) {
             Planet planet = simulation.planetMap.get(currentCamPlanetID);
             if (planet != null) {
-                Vector3D camPos = getCameraPos();
-                Vector3D planetPos = planet.position;
-                Vector3D direction = Vector3D.difference(planetPos, camPos);
-                double distance = direction.magnitude();
-                direction.normalize();
-
-                double directionPitch = -Math.toDegrees(Math.asin(direction.y));
-                double directionYaw = Math.toDegrees(Math.atan2(direction.x, direction.z));
-
-                cameraTransform.rx.setAngle(lerpAngle(cameraTransform.rx.getAngle(), directionPitch, 0.5));
-                cameraTransform.ry.setAngle(lerpAngle(cameraTransform.ry.getAngle(), directionYaw, 0.5));
-
-                //Use PID controller to move towards planet
-                direction.negate();
-                PIDController pidController = new PIDController(1e-15, 1e-2, 1e-8);
-                double pidOutput = pidController.calculate(planet.radius * 3, distance);
-                direction.multiply(pidOutput);
-                cameraVelocity.add(direction);
+                goToCoordinate(planet.position, planet);
             }
 
         } else {
@@ -265,6 +248,31 @@ public class SimulationView extends Group {
         updateCameraCoords();
     }
 
+    private void goToCoordinate(Vector3D coordinates, Planet planet) {
+        Vector3D camPos = getCameraPos();
+        Vector3D direction = Vector3D.difference(coordinates, camPos);
+        double distance = direction.magnitude();
+        direction.normalize();
+
+        double directionPitch = -Math.toDegrees(Math.asin(direction.y));
+        double directionYaw = Math.toDegrees(Math.atan2(direction.x, direction.z));
+
+        cameraTransform.rx.setAngle(lerpAngle(cameraTransform.rx.getAngle(), directionPitch, 0.5));
+        cameraTransform.ry.setAngle(lerpAngle(cameraTransform.ry.getAngle(), directionYaw, 0.5));
+
+        //Use PID controller to move towards planet
+        direction.negate();
+        PIDController pidController = new PIDController(1e-15, 1e-2, 1e-8);
+        double pidOutput;
+        if (planet != null) {
+            pidOutput = pidController.calculate(planet.radius * 3, distance);
+        } else {
+            pidOutput = pidController.calculate(0, distance);
+        }
+        direction.multiply(pidOutput);
+        cameraVelocity.add(direction);
+    }
+
     private void updateCameraCoords() {
         this.mainController.xPosLBL.setText(" X: " + String.format("%.3f", cameraTransform.t.getX()));
         this.mainController.yPosLBL.setText(" Y: " + String.format("%.3f", cameraTransform.t.getY()));
@@ -291,24 +299,7 @@ public class SimulationView extends Group {
 
     public void goOrigin() {
         setCurrentCamPlanetID("");
-
-        Vector3D origin = new Vector3D(0,0,0);
-        Vector3D camPos = getCameraPos();
-        Vector3D direction = Vector3D.difference(origin, camPos);
-        double distance = direction.magnitude();
-        direction.normalize();
-
-        double directionPitch = -Math.toDegrees(Math.asin(direction.y));
-        double directionYaw = Math.toDegrees(Math.atan2(direction.x, direction.z));
-
-        cameraTransform.rx.setAngle(lerpAngle(cameraTransform.rx.getAngle(), directionPitch, 0.5));
-        cameraTransform.ry.setAngle(lerpAngle(cameraTransform.ry.getAngle(), directionYaw, 0.5));
-
-        direction.negate();
-        PIDController pidController = new PIDController(1e-15, 1e-2, 1e-8);
-        double pidOutput = pidController.calculate(0, distance);
-        direction.multiply(pidOutput);
-        cameraVelocity.add(direction);
+        goToCoordinate(new Vector3D(), null);
     }
 
     public Vector3D getPositionInFrontOfCamera(double distance) {

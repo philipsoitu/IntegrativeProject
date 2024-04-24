@@ -103,15 +103,6 @@ public class MainController {
 
     @FXML
     public void initialize() {
-//        viewport.sceneProperty().addListener((observableScene, oldScene, newScene) -> {
-//            if (newScene != null) {
-//                newScene.focusOwnerProperty().addListener((observable, oldFocusOwner, newFocusOwner) -> {
-//                    if (newFocusOwner != viewport) {
-//                        viewport.requestFocus();
-//                    }
-//                });
-//            }
-//        });
         previewSetup();
         viewport.requestFocus();
 
@@ -192,33 +183,37 @@ public class MainController {
 
     private void listenerSetup(TextField t1, Slider s1) {
         if (!isNull(s1) && !isNull(t1)) {
-            s1.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
+
+            //sliders
+            s1.valueProperty().addListener((observableValue, oldValue, newValue) -> {
                 resetBTN.setDisable(false);
 
-                String valueString = String.valueOf(newValue);
-
-                int endIndex = Math.min(valueString.length(), 6);
+                if (!t1.equals(massTXTF)) {
+                    t1.setText(String.format("%.3f", newValue.doubleValue()));
+                } else {
+                    t1.setText(String.format("%.1f", newValue.doubleValue()));
+                }
 
                 if (s1.equals(radiusSLD)) {
-                    previewSphere.setRadius(radiusSLD.getValue() * 10);
-                }
-
-                if (s1.equals(gConstSLD)) {
+                    previewSphere.setRadius(newValue.doubleValue() * 10);
+                } else if (s1.equals(gConstSLD)) {
                     updateGConst();
-                }
-
-                if (s1.equals(thetaSLD)) {
+                } else if (s1.equals(thetaSLD)) {
                     updateTheta();
                 }
+            });
 
-                if (Double.parseDouble(valueString) > s1.getMin() || Double.parseDouble(valueString) < s1.getMax()) {
-                    t1.setText(valueString.substring(0, endIndex));
+            //textFields
+            t1.textProperty().addListener((observableValue, oldValue, newValue) -> {
+                if (newValue.isEmpty() || isValidDouble(newValue)) {
+                    t1.setText(newValue);
                 } else {
-                    t1.setText(String.format(oldValue + ""));
+                    t1.setText(oldValue);
                 }
-            }));
+            });
         }
     }
+
 
     private void updateTheta() {
         theta = thetaSLD.getValue();
@@ -291,10 +286,8 @@ public class MainController {
         simulation.isPaused = !simulation.isPaused;
 
         if (simulation.isPaused) {
-            System.out.println("Simulation is paused");
             playPauseBTN.setText("Play");
         } else {
-            System.out.println("Simulation is playing");
             playPauseBTN.setText("Pause");
         }
     }
@@ -323,29 +316,59 @@ public class MainController {
 
     @FXML
     void onTXTFUpdate(ActionEvent event) {
-        Slider source = (Slider) event.getSource();
+        TextField source = (TextField) event.getSource();
 
-        if (source.equals(gConstSLD)) {
-            try {
-                gConstSLD.setValue(Double.parseDouble(gConstantTXTF.getText()));
-                updateGConst();
-            } catch (NumberFormatException e) {
-                System.out.println("Input Corrected in G Constant Slider");
+        if (source.equals(gConstantTXTF)) {
+            updateTextFieldAndSlider(gConstantTXTF, gConstSLD);
+            updateGConst();
+        } else if (source.equals(massTXTF)) {
+            updateTextFieldAndSlider(massTXTF, massSLD);
+        } else if (source.equals(radiusTXTF)) {
+            updateTextFieldAndSlider(radiusTXTF, radiusSLD);
+        } else if (source.equals(thetaTXTF)) {
+            updateTextFieldAndSlider(thetaTXTF, thetaSLD);
+            updateTheta();
+        }
+
+        viewport.requestFocus();
+    }
+
+    private void updateTextFieldAndSlider(TextField textField, Slider slider) {
+        try {
+
+            if (textField.getText().isEmpty()) {
+                textField.setText(slider.getMin() + "");
             }
 
-        } else if (source.equals(massSLD)) {
-            try {
-                massSLD.setValue(Double.parseDouble(massTXTF.getText()));
-            } catch (NumberFormatException e) {
-                System.out.println("Input corrected in mass slider");
+
+            double newValue = Double.parseDouble(textField.getText());
+
+
+            if (newValue >= slider.getMin() && newValue <= slider.getMax()) {
+                slider.setValue(newValue);
+            } else if (newValue > slider.getMax()) {
+                textField.setText(slider.getMax() + "");
+            } else if (newValue < slider.getMin()) {
+                textField.setText(slider.getMin() + "");
+            } else if (String.valueOf(newValue).isEmpty()) {
+
+                textField.setText(slider.getMin() + "");
+
             }
-        } else if (source.equals(radiusSLD)) {
-            try {
-                massSLD.setValue(Double.parseDouble(massTXTF.getText()));
-                updateGConst();
-            } catch (NumberFormatException e) {
-                System.out.println("Input Corrected in mass Slider");
-            }
+
+            slider.setValue(Double.parseDouble(textField.getText()));
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input");
+        }
+    }
+
+
+    private boolean isValidDouble(String s) {
+        try {
+            Double.parseDouble(s);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 
@@ -365,6 +388,8 @@ public class MainController {
     }
 
     private void createCustomPlanet() {
+        Planet planet;
+
         Vector3D position = getPositionInFrontOfCamera();
         Vector3D velocity = new Vector3D();
 
@@ -373,8 +398,6 @@ public class MainController {
         boolean isSun = sunCheckB.isSelected();
 
         String uniqueID = UUID.randomUUID().toString().replaceAll("-", "");
-
-        Planet planet;
 
         if (!isNull(customTexture)) {
             planet = new Planet(uniqueID, position, velocity, radius, mass, isSun, customTexture, planetColourPicker.getValue());
@@ -423,12 +446,12 @@ public class MainController {
             Color color = AverageColourGenerator.getAverageColor(customTexture);
             previewSphereMaterial.setDiffuseColor(color);
             previewSphereMaterial.setDiffuseMap(customTexture);
+            resetBTN.setDisable(false);
         } else {
             if (isNull(customTexture)) {
                 previewSphereMaterial.setDiffuseMap(defaultCustomPlanetTexture);
             } else {
                 previewSphereMaterial.setDiffuseMap(customTexture);
-                resetBTN.setDisable(false);
             }
         }
         previewSphereMaterial.setDiffuseColor(planetColourPicker.getValue());
@@ -515,7 +538,7 @@ public class MainController {
 
     public void handleRename(ActionEvent actionEvent) {
         String searchText = SearchBar.getText().trim();
-        if (!simulation.simulationView.getCurrentCamPlanetID().isEmpty()){
+        if (!simulation.simulationView.getCurrentCamPlanetID().isEmpty()) {
             simulation.planetMap.get(simulation.simulationView.getCurrentCamPlanetID()).name = searchText;
         }
         viewport.requestFocus();

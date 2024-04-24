@@ -117,7 +117,7 @@ public class Vector3D {
         double y = Math.random() * 300 - 150;
         double z = Math.random() * 300 - 150;
 
-        return new Vector3D(x,y,x);
+        return new Vector3D(x,y,z);
     }
 
     @Override

@@ -1,13 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.coolawesome.integrativeproject.MainController">
+<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.coolawesome.integrativeproject.MainController">
   <left>
     <VBox prefHeight="751.0" prefWidth="223.0" spacing="10" style="-fx-padding: 10;">
          <Label text="Space Simulation">
@@ -45,7 +59,10 @@
             <children>
                <VBox layoutY="23.0" prefHeight="163.0" prefWidth="239.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0">
                   <children>
-                     <Label text="Controls:" />
+                     <Label text="Controls:">
+                        <VBox.margin>
+                           <Insets bottom="5.0" />
+                        </VBox.margin></Label>
                      <Button fx:id="playPauseBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="Pause" />
                      <Button fx:id="originBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="To Origin" />
                      <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="239.0">
@@ -58,7 +75,7 @@
                                  <Insets right="5.0" />
                               </HBox.margin>
                            </Label>
-                           <Slider fx:id="gConstSLD" blockIncrement="0.005" max="0.01" min="1.0E-8" prefHeight="0.0" prefWidth="84.0" showTickMarks="true">
+                           <Slider fx:id="gConstSLD" blockIncrement="0.005" max="0.1" min="0.001" prefHeight="0.0" prefWidth="84.0" showTickMarks="true">
                               <HBox.margin>
                                  <Insets top="10.0" />
                               </HBox.margin>
@@ -77,7 +94,7 @@
                                  <Insets right="35.0" />
                               </HBox.margin>
                            </Label>
-                           <Slider fx:id="thetaSLD" blockIncrement="0.005" max="1.0" min="1.0E-4" prefHeight="0.0" prefWidth="84.0" showTickMarks="true" value="0.5">
+                           <Slider fx:id="thetaSLD" blockIncrement="0.005" max="1.0" min="0.001" prefHeight="0.0" prefWidth="84.0" showTickMarks="true" value="0.5">
                               <HBox.margin>
                                  <Insets top="10.0" />
                               </HBox.margin>
