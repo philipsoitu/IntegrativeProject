@@ -3,7 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Separator?>
@@ -23,7 +23,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.coolawesome.integrativeproject.MainController">
   <left>
-    <VBox spacing="10" style="-fx-padding: 10;">
+    <VBox prefHeight="751.0" prefWidth="223.0" spacing="10" style="-fx-padding: 10;">
          <Label text="Space Simulation">
             <textFill>
                <LinearGradient endX="0.6926713947990544" endY="0.7990543735224587" startY="0.6832151300236406">
@@ -45,75 +45,76 @@
                <Font name="Marlett" size="28.0" />
             </font>
          </Label>
-         <HBox prefHeight="5.0" prefWidth="241.0" spacing="5.0">
+         <HBox prefHeight="5.0" prefWidth="200.0" spacing="5.0">
             <children>
                <Button fx:id="saveBTN" mnemonicParsing="false" onAction="#saveJson" text="Save" />
                <Button fx:id="loadBTN" mnemonicParsing="false" onAction="#loadJson" text="Load" />
             </children>
          </HBox>
       <Label text="Simulation Info:" />
-      <ListView fx:id="simulationInfoList" prefHeight="220.0" prefWidth="220.0">
+      <ListView fx:id="simulationInfoList" prefHeight="220.0" prefWidth="198.0">
         <!-- Add items here -->
       </ListView>
-         <AnchorPane prefHeight="200.0" prefWidth="200.0">
+         <AnchorPane prefHeight="148.0" prefWidth="239.0">
             <children>
-               <Label text="Controls:">
-                  <font>
-                     <Font size="14.0" />
-                  </font>
-               </Label>
-               <VBox layoutY="23.0" prefHeight="376.0" prefWidth="247.0">
+               <VBox layoutY="23.0" prefHeight="163.0" prefWidth="239.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0">
                   <children>
-                     <Button fx:id="originBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="Origin" />
-                     <Label text="Algorithm:">
+                     <Label text="Controls:">
                         <VBox.margin>
-                           <Insets top="20.0" />
-                        </VBox.margin>
-                        <padding>
-                           <Insets top="10.0" />
-                        </padding>
-                     </Label>
-                     <ChoiceBox fx:id="algoChoiceBox" prefHeight="25.0" prefWidth="95.0">
-                        <VBox.margin>
-                           <Insets top="5.0" />
-                        </VBox.margin>
-                     </ChoiceBox>
-                     <HBox prefHeight="42.0" prefWidth="220.0">
-                        <children>
-                           <Button fx:id="playPauseBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="Pause" />
-                        </children>
-                        <VBox.margin>
-                           <Insets top="10.0" />
-                        </VBox.margin>
-                     </HBox>
-                     <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                           <Insets bottom="5.0" />
+                        </VBox.margin></Label>
+                     <Button fx:id="playPauseBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="Pause" />
+                     <Button fx:id="originBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="To Origin" />
+                     <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="239.0">
                         <VBox.margin>
                            <Insets top="5.0" />
                         </VBox.margin>
                         <children>
-                           <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="253.0">
-                              <children>
-                                 <Label text="G Constant:">
-                                    <HBox.margin>
-                                       <Insets right="5.0" />
-                                    </HBox.margin>
-                                 </Label>
-                                 <Slider fx:id="gConstSLD" blockIncrement="0.005" max="0.01" min="1.0E-8" prefHeight="14.0" prefWidth="84.0" showTickMarks="true">
-                                    <HBox.margin>
-                                       <Insets />
-                                    </HBox.margin>
-                                 </Slider>
-                                 <TextField fx:id="gConstantTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="80.0" />
-                              </children>
-                           </HBox>
+                           <Label text="G Constant:">
+                              <HBox.margin>
+                                 <Insets right="5.0" />
+                              </HBox.margin>
+                           </Label>
+                           <Slider fx:id="gConstSLD" blockIncrement="0.005" max="0.1" min="0.001" prefHeight="0.0" prefWidth="84.0" showTickMarks="true">
+                              <HBox.margin>
+                                 <Insets top="10.0" />
+                              </HBox.margin>
+                           </Slider>
+                           <TextField fx:id="gConstantTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="80.0">
+                              <HBox.margin>
+                                 <Insets top="5.0" />
+                              </HBox.margin>
+                           </TextField>
                         </children>
                      </HBox>
-                     <HBox alignment="BOTTOM_LEFT" prefHeight="118.0" prefWidth="247.0">
+                     <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="92.0" prefHeight="21.0" prefWidth="239.0">
+                        <children>
+                           <Label text="Theta:">
+                              <HBox.margin>
+                                 <Insets right="35.0" />
+                              </HBox.margin>
+                           </Label>
+                           <Slider fx:id="thetaSLD" blockIncrement="0.005" max="1.0" min="0.001" prefHeight="0.0" prefWidth="84.0" showTickMarks="true" value="0.5">
+                              <HBox.margin>
+                                 <Insets top="10.0" />
+                              </HBox.margin>
+                           </Slider>
+                           <TextField fx:id="thetaTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="80.0">
+                              <HBox.margin>
+                                 <Insets top="5.0" />
+                              </HBox.margin>
+                           </TextField>
+                        </children>
+                     </HBox>
+                     <HBox alignment="BOTTOM_LEFT" prefHeight="0.0" prefWidth="239.0">
                         <children>
                            <Label text=" X: " fx:id="xPosLBL" />
                            <Label fx:id="yPosLBL" layoutX="10.0" layoutY="10.0" text=" Y: " />
                            <Label fx:id="zPosLBL" layoutX="38.0" layoutY="10.0" text=" Z: " />
                         </children>
+                        <VBox.margin>
+                           <Insets top="300.0" />
+                        </VBox.margin>
                      </HBox>
                   </children>
                </VBox>
@@ -129,7 +130,7 @@
   <right>
     <VBox spacing="10" style="-fx-padding: 10;">
       <TitledPane collapsible="false" prefHeight="385.0" prefWidth="241.0" text="New Planet Preview">
-        <VBox prefHeight="236.0" prefWidth="239.0">
+        <VBox prefHeight="401.0" prefWidth="239.0">
                <children>
                   <AnchorPane fx:id="previewViewport" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="199.0" prefWidth="214.0" style="-fx-background-color: white;">
                      <padding>
@@ -143,31 +144,44 @@
                         </ImageView>
                      </children>
                   </AnchorPane>
-                  <VBox prefHeight="146.0" prefWidth="220.0" spacing="3.0">
+                  <VBox prefHeight="183.0" prefWidth="220.0" spacing="5.0">
                      <children>
-                        <HBox prefHeight="30.0" prefWidth="220.0" spacing="5.0">
+                        <HBox prefHeight="30.0" prefWidth="220.0" spacing="9.0">
                            <children>
                               <Label prefWidth="40.0" text="Radius:" />
                               <Slider fx:id="radiusSLD" max="10.0" min="1.0" prefWidth="110.0" />
                               <TextField fx:id="radiusTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="51.0" />
                            </children>
                         </HBox>
-                        <HBox prefHeight="23.0" prefWidth="220.0" spacing="5.0">
+                        <HBox prefHeight="23.0" prefWidth="220.0" spacing="9.0">
                            <children>
                               <Label prefWidth="40.0" text="Mass:" />
-                              <Slider fx:id="massSLD" max="10000.0" min="100.0" prefHeight="14.0" prefWidth="110.0" />
+                              <Slider fx:id="massSLD" max="9999.0" min="100.0" prefHeight="14.0" prefWidth="110.0" />
                               <TextField fx:id="massTXTF" onAction="#onTXTFUpdate" prefHeight="25.0" prefWidth="51.0" />
                            </children>
                         </HBox>
-                        <CheckBox fx:id="sunCheckB" mnemonicParsing="false" onAction="#sunCheckBSelected" text="Sun" />
+                        <HBox minHeight="25.0" prefHeight="0.0" prefWidth="220.0" spacing="52.0">
+                           <children>
+                              <CheckBox fx:id="sunCheckB" mnemonicParsing="false" onAction="#sunCheckBSelected" text="Sun">
+                                 <HBox.margin>
+                                    <Insets top="3.0" />
+                                 </HBox.margin>
+                              </CheckBox>
+                              <ColorPicker fx:id="planetColourPicker" onAction="#setPlanetColour" prefHeight="22.0" prefWidth="125.0" />
+                           </children>
+                        </HBox>
                         <HBox prefHeight="30.0" prefWidth="220.0" spacing="5.0">
                            <children>
                               <Button fx:id="textureBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="Add Custom Texture" />
-                              <Button fx:id="resetTextureBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="Reset Texture" />
+                              <Button fx:id="resetBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="Reset" />
                            </children>
                         </HBox>
-                        <Button fx:id="createBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="Spawn" />
-                        <Button fx:id="spawnRandomPlanetBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="Spawn Random Planet" />
+                        <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
+                           <children>
+                              <Button fx:id="createBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="Spawn" />
+                              <Button fx:id="spawnRandomPlanetBTN" mnemonicParsing="false" onAction="#onBTNUpdate" text="Spawn Random Planet" />
+                           </children>
+                        </HBox>
                      </children>
                      <padding>
                         <Insets top="5.0" />
@@ -178,7 +192,14 @@
       <TitledPane collapsible="false" prefWidth="241.0" text="Currently Selected Planet Info">
         <VBox alignment="TOP_CENTER" spacing="10.0">
                <children>
-                  <Button fx:id="viewRandBtn" alignment="CENTER" mnemonicParsing="false" onAction="#onBTNUpdate" text="View Random Planet" textAlignment="CENTER" />
+                  <HBox alignment="CENTER" spacing="5.0">
+                     <children>
+                        <Button fx:id="viewRandBtn" alignment="CENTER" mnemonicParsing="false" onAction="#onBTNUpdate" text="View Rand" textAlignment="CENTER" />
+                        <Button fx:id="SearchBtn" mnemonicParsing="false" onAction="#handleSearch" text="Search" />
+                        <Button fx:id="RenameBtn" mnemonicParsing="false" onAction="#handleRename" text="Rename" />
+                     </children>
+                  </HBox>
+                  <TextField fx:id="SearchBar" onMouseClicked="#searchClicked" promptText="Search / Rename Planet" />
                   <Separator prefWidth="200.0" />
                    <ListView fx:id="selectedPlanetInfoList" prefHeight="220.0" prefWidth="220.0">
                        <!-- Add items here -->

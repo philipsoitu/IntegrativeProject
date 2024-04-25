@@ -8,6 +8,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.layout.AnchorPane;
 
 import javafx.scene.shape.Sphere;
+import lombok.Getter;
 import lombok.Setter;
 import org.fxyz3d.scene.Skybox;
 import org.fxyz3d.utils.CameraTransformer;
@@ -27,16 +28,18 @@ public class SimulationView extends Group {
     private final MainController mainController;
 
     @Setter
+    @Getter
     private String currentCamPlanetID = "";
 
     private final Image
-        backImage = new Image("file:src/main/resources/images/skybox/back.png"),
-        bottomImage = new Image("file:src/main/resources/images/skybox/bottom.png"),
-        frontImage = new Image("file:src/main/resources/images/skybox/front.png"),
-        leftImage = new Image("file:src/main/resources/images/skybox/left.png"),
-        rightImage = new Image("file:src/main/resources/images/skybox/right.png"),
-        topImage = new Image("file:src/main/resources/images/skybox/top.png"),
-        cubeMap = new Image("file:src/main/resources/images/skybox/cubemap.png");
+            backImage = new Image("file:src/main/resources/images/skybox/back.png"),
+            bottomImage = new Image("file:src/main/resources/images/skybox/bottom.png"),
+            frontImage = new Image("file:src/main/resources/images/skybox/front.png"),
+            leftImage = new Image("file:src/main/resources/images/skybox/left.png"),
+            rightImage = new Image("file:src/main/resources/images/skybox/right.png"),
+            topImage = new Image("file:src/main/resources/images/skybox/top.png"),
+            cubeMap = new Image("file:src/main/resources/images/skybox/cubemap.png");
+
     private final Skybox skyBox;
 
     private final PerspectiveCamera camera;
@@ -45,6 +48,10 @@ public class SimulationView extends Group {
     private final Vector3D cameraVelocity = new Vector3D();
 
     private double deltaMouseX, deltaMouseY = 0;
+
+    @Setter
+    @Getter
+    private boolean goingToOrigin;
 
     public SimulationView(AnchorPane pane, Simulation simulation, MainController mainController) {
         this.simulation = simulation;
@@ -158,7 +165,7 @@ public class SimulationView extends Group {
             planet.planetNode.setTranslateX(planet.position.x);
             planet.planetNode.setTranslateY(planet.position.y);
             planet.planetNode.setTranslateZ(planet.position.z);
-            if (planet.isSun){
+            if (planet.isSun) {
                 planet.sunLight.setTranslateX(planet.position.x);
                 planet.sunLight.setTranslateY(planet.position.y);
                 planet.sunLight.setTranslateZ(planet.position.z);
@@ -181,31 +188,18 @@ public class SimulationView extends Group {
         right.multiply(0.6);
         up.multiply(0.6);
 
+        if (goingToOrigin) {
+            currentCamPlanetID = "";
+            goOrigin();
+            if (getCameraPos().distance(new Vector3D(0, 0, 0)) < 1) {
+                goingToOrigin = false;
+            }
+        }
+
         if (!currentCamPlanetID.isEmpty()) {
             Planet planet = simulation.planetMap.get(currentCamPlanetID);
             if (planet != null) {
-                Vector3D camPos = new Vector3D(
-                        cameraTransform.t.getX(),
-                        cameraTransform.t.getY(),
-                        cameraTransform.t.getZ()
-                );
-                Vector3D planetPos = planet.position;
-                Vector3D direction = Vector3D.difference(planetPos, camPos);
-                double distance = direction.magnitude();
-                direction.normalize();
-
-                double directionPitch = -Math.toDegrees(Math.asin(direction.y));
-                double directionYaw = Math.toDegrees(Math.atan2(direction.x, direction.z));
-
-                cameraTransform.rx.setAngle(lerpAngle(cameraTransform.rx.getAngle(), directionPitch, 0.5));
-                cameraTransform.ry.setAngle(lerpAngle(cameraTransform.ry.getAngle(), directionYaw, 0.5));
-
-                //Use PID controller to move towards planet
-                direction.negate();
-                PIDController pidController = new PIDController(1e-15, 1e-2, 1e-8);
-                double pidOutput = pidController.calculate(planet.radius * 3, distance);
-                direction.multiply(pidOutput);
-                cameraVelocity.add(direction);
+                goToCoordinate(planet.position, planet);
             }
 
         } else {
@@ -254,6 +248,31 @@ public class SimulationView extends Group {
         updateCameraCoords();
     }
 
+    private void goToCoordinate(Vector3D coordinates, Planet planet) {
+        Vector3D camPos = getCameraPos();
+        Vector3D direction = Vector3D.difference(coordinates, camPos);
+        double distance = direction.magnitude();
+        direction.normalize();
+
+        double directionPitch = -Math.toDegrees(Math.asin(direction.y));
+        double directionYaw = Math.toDegrees(Math.atan2(direction.x, direction.z));
+
+        cameraTransform.rx.setAngle(lerpAngle(cameraTransform.rx.getAngle(), directionPitch, 0.5));
+        cameraTransform.ry.setAngle(lerpAngle(cameraTransform.ry.getAngle(), directionYaw, 0.5));
+
+        //Use PID controller to move towards planet
+        direction.negate();
+        PIDController pidController = new PIDController(1e-15, 1e-2, 1e-8);
+        double pidOutput;
+        if (planet != null) {
+            pidOutput = pidController.calculate(planet.radius * 3, distance);
+        } else {
+            pidOutput = pidController.calculate(0, distance);
+        }
+        direction.multiply(pidOutput);
+        cameraVelocity.add(direction);
+    }
+
     private void updateCameraCoords() {
         this.mainController.xPosLBL.setText(" X: " + String.format("%.3f", cameraTransform.t.getX()));
         this.mainController.yPosLBL.setText(" Y: " + String.format("%.3f", cameraTransform.t.getY()));
@@ -279,17 +298,8 @@ public class SimulationView extends Group {
     }
 
     public void goOrigin() {
-
         setCurrentCamPlanetID("");
-
-        cameraTransform.rx.setAngle(cameraTransform.rx.getAngle());
-        cameraTransform.ry.setAngle(cameraTransform.ry.getAngle());
-
-        cameraTransform.t.setX(0);
-        cameraTransform.t.setY(0);
-        cameraTransform.t.setZ(0);
-
-
+        goToCoordinate(new Vector3D(), null);
     }
 
     public Vector3D getPositionInFrontOfCamera(double distance) {
@@ -308,4 +318,13 @@ public class SimulationView extends Group {
 
         return new Vector3D(x, y, z);
     }
+
+    private Vector3D getCameraPos() {
+        return new Vector3D(
+                cameraTransform.t.getX(),
+                cameraTransform.t.getY(),
+                cameraTransform.t.getZ()
+        );
+    }
+
 }
