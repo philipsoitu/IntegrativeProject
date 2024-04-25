@@ -11,6 +11,10 @@ import java.util.*;
 public class Simulation {
 
     Map<String, Planet> planetMap = new HashMap<>();
+    TreeNode root;
+    double theta = 0.5;
+    double G = 0.0001;
+
     SimulationView simulationView;
     JsonPlanetManager planetManager = new JsonPlanetManager();
 
@@ -57,56 +61,90 @@ public class Simulation {
     public void update(double dt){
         // handle physics and collisions
         if(!isPaused) {
-            updatePosition(dt);
-            handleCollisions();
+            planetMap.forEach((id, p) -> {
+                p.update(dt);
+            });
+
+            constructTree();
+            gravity();
+
         }
 
         simulationView.update(dt);
     }
 
-    private void updatePosition(double dt) {
-        planetMap.forEach((id, p1) -> {
-            Vector3D ftotal = new Vector3D();
-            planetMap.forEach((id2, p2) -> {
-                if (p1 != p2) {
-                    Vector3D dist = Vector3D.difference(p2.position, p1.position);
-                    Vector3D f = Vector3D.multiplication((MainController.g * p1.mass * p2.mass) / (dist.magnitude() * dist.magnitude()), Vector3D.unitVector(dist));
-                    ftotal.add(f);
-                }
-                p1.acceleration = Vector3D.multiplication((1 / p1.mass), ftotal);
-                p1.velocity.add(Vector3D.multiplication(dt, p1.acceleration));
-                p1.position.add(Vector3D.multiplication(dt, p1.velocity));
-            });
+
+
+    private void constructTree() {
+        double[] boundingSquare = getBoundingSquare();
+        root = new TreeNode(boundingSquare[0], boundingSquare[1], boundingSquare[2], boundingSquare[3]);
+
+        planetMap.forEach((id, p) -> {
+            root.insert(p);
         });
     }
 
-    private void handleCollisions() {
-        List<String> idPlanetsToRemove = new ArrayList<>();
-        planetMap.forEach((id, p1) -> {
-            planetMap.forEach((id2, p2) -> {
-                if (p1 != p2 && p1 != null && p2 != null) {
-                    Vector3D n = Vector3D.unitVector(Vector3D.difference(p1.position, p2.position));
-                    double dist = Math.min(Vector3D.sum(Vector3D.difference(p2.position, Vector3D.multiplication(p2.radius, n)), p1.position).magnitude(), Vector3D.difference(Vector3D.difference(p2.position, Vector3D.multiplication(p2.radius, n)), p1.position).magnitude());
-                    if (p1.radius > dist) {
-                        p1.mass += p2.mass;
-                        p1.radius = Math.sqrt(p1.radius * p1.radius + p2.radius * p2.radius);
-                        double totalMass = p1.mass + p2.mass;
-                        int red = (int)Math.min(((p1.mass/totalMass)*p1.color.getRed() + (p2.mass/totalMass)*p2.color.getRed())*255,255);
-                        int green = (int)Math.min(((p1.mass/totalMass)*p1.color.getGreen() + (p2.mass/totalMass)*p2.color.getGreen())*255,255);
-                        int blue = (int)Math.min(((p1.mass/totalMass)*p1.color.getBlue() + (p2.mass/totalMass)*p2.color.getBlue())*255,255);
+    public double[] getBoundingSquare() {
+        // Indices
+        double minX = Double.MAX_VALUE;
+        double maxX = -Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxY = -Double.MAX_VALUE;
+        double minZ = Double.MAX_VALUE;
+        double maxZ = -Double.MAX_VALUE;
 
-                        collisionCount++;
+        for (Map.Entry<String, Planet> entry : planetMap.entrySet()) {
+            Planet p = entry.getValue();
+            minX = Math.min(minX, p.position.x);
+            maxX = Math.max(maxX, p.position.x);
+            minY = Math.min(minY, p.position.y);
+            maxY = Math.max(maxY, p.position.y);
+            minZ = Math.min(minZ, p.position.y);
+            maxZ = Math.max(maxZ, p.position.y);
 
-                        p1.color = Color.rgb(red, green, blue);
-                        idPlanetsToRemove.add(id2);
-                    }
-                }
-            });
-        });
-        if (idPlanetsToRemove.contains(simulationView.getCurrentCamPlanetID())){
-            simulationView.setCurrentCamPlanetID("");
         }
-        idPlanetsToRemove.forEach((id) -> planetMap.remove(id));
+
+
+
+        return new double[]{minX, minY, minZ, Math.max(maxX - minX, Math.max(maxY - minY, maxZ - minZ))};
+    }
+
+    private void gravity() {
+        planetMap.forEach((id, p) -> {
+            gravitate(p, root);
+        });
+    }
+
+    private void gravitate(Planet p, TreeNode tn) {
+        if (tn.leaf) {
+            if (tn.planet == null || p == tn.planet) return;
+            p.velocity.add(gravityAcc(tn.planet.position, p.position, tn.planet.mass, p.mass));
+        } else {
+
+            if (tn.centerOfMass == null) {
+                tn.centerOfMass = tn.centerOfMassTimesTotalMass.scalarProduct(1.0 / tn.totalMass);
+            }
+            if (tn.w / Vector3D.distance(p.position, tn.centerOfMass) < theta) {
+                p.velocity.add(gravityAcc(tn.centerOfMass, p.position, tn.totalMass, p.mass));
+            } else {
+
+                for (TreeNode child : tn.children) gravitate(p, child);
+            }
+        }
+    }
+
+    // Acceleration due to the gravity exerted by a on particle b
+    private Vector3D gravityAcc(Vector3D posA, Vector3D posB, double massA, double massB) {
+
+        // TODO: collision threshold (no acceleration from a certain distance)
+
+        Vector3D distance = Vector3D.difference(posA, posB);
+        double dist = distance.magnitude();
+
+        Vector3D direction = Vector3D.unitVector(distance);
+        double force = (G * massA * massB) / (dist * dist);
+
+        return direction.scalarProduct(force / massB);
     }
 
     public void saveToJson(String filePath) {

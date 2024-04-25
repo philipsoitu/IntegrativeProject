@@ -52,6 +52,13 @@ public class Vector3D {
         return new Vector3D(x, y, z);
     }
 
+    public Vector3D scalarProduct(double a) {
+        double x = a * this.x;
+        double y = a * this.y;
+        double z = a * this.z;
+        return new Vector3D(x, y, z);
+    }
+
     public static double dotProduct(Vector3D v1, Vector3D v2) {
         return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
     }
@@ -103,6 +110,12 @@ public class Vector3D {
 
     public double distance(Vector3D v) {
         return Math.sqrt(Math.pow(this.x - v.x, 2) + Math.pow(this.y - v.y, 2) + Math.pow(this.z - v.z, 2));
+    }
+
+    public static double distance(Vector3D v1, Vector3D v2) {
+        Vector3D difference = Vector3D.difference(v1, v2);
+        double distance = difference.magnitude();
+        return distance;
     }
 
     public void negate() {
