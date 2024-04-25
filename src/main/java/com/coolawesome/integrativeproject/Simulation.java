@@ -13,7 +13,7 @@ public class Simulation {
     Map<String, Planet> planetMap = new HashMap<>();
     TreeNode root;
     double theta = 0.5;
-    double G = 0.0001;
+    double G = 0.001;
 
     SimulationView simulationView;
     JsonPlanetManager planetManager = new JsonPlanetManager();
@@ -23,7 +23,7 @@ public class Simulation {
 
     public Simulation(AnchorPane viewport, MainController controller) {
         simulationView = new SimulationView(viewport, this, controller);
-        initialize(100);
+        initialize(400);
     }
 
     public void initialize(int numOfBodies) {
@@ -99,8 +99,8 @@ public class Simulation {
             maxX = Math.max(maxX, p.position.x);
             minY = Math.min(minY, p.position.y);
             maxY = Math.max(maxY, p.position.y);
-            minZ = Math.min(minZ, p.position.y);
-            maxZ = Math.max(maxZ, p.position.y);
+            minZ = Math.min(minZ, p.position.z);
+            maxZ = Math.max(maxZ, p.position.z);
 
         }
 
