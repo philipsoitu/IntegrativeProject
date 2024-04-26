@@ -157,17 +157,13 @@ public class MainController {
     }
 
     void controllerSetup(Simulation simulation) {
-        if (!isNull(simulation)) {
+        if (simulation != null) {
             this.simulation = simulation;
             updateSimInfo();
-        } else {
-            System.out.println("Simulation is null");
         }
 
         if (!simulationListContent.isEmpty()) {
             simulationInfoList.setItems(simulationListContent);
-        } else {
-            System.out.println("simulation list is empty");
         }
 
         initializeTime();
@@ -201,6 +197,7 @@ public class MainController {
                 } else if (s1.equals(thetaSLD)) {
                     updateTheta();
                 }
+                viewport.requestFocus();
             });
 
             //textFields
@@ -241,15 +238,11 @@ public class MainController {
         if (!isNull(gConstSLD) && !isNull(gConstantTXTF)) {
             gConstSLD.setValue(g);
             gConstantTXTF.setText(gConstSLD.getValue() + "");
-        } else {
-            System.out.println("Gravity Constant Slider is null");
         }
 
         if (!isNull(thetaSLD) && !isNull(thetaTXTF)) {
-            thetaSLD.setValue(0.5);
+            thetaSLD.setValue(1);
             thetaTXTF.setText(thetaSLD.getValue() + "");
-        } else {
-            System.out.println("Theta Slider is null");
         }
     }
 
@@ -313,7 +306,6 @@ public class MainController {
         }
         viewport.requestFocus();
     }
-
     @FXML
     void onTXTFUpdate(ActionEvent event) {
         TextField source = (TextField) event.getSource();
@@ -335,14 +327,11 @@ public class MainController {
 
     private void updateTextFieldAndSlider(TextField textField, Slider slider) {
         try {
-
             if (textField.getText().isEmpty()) {
                 textField.setText(slider.getMin() + "");
             }
 
-
             double newValue = Double.parseDouble(textField.getText());
-
 
             if (newValue >= slider.getMin() && newValue <= slider.getMax()) {
                 slider.setValue(newValue);
@@ -381,8 +370,6 @@ public class MainController {
                 previewSphereMaterial.setDiffuseMap(customTexture);
             }
             resetBTN.setDisable(false);
-        } else {
-            System.out.println("Planet color picker is null");
         }
         viewport.requestFocus();
     }
@@ -480,6 +467,7 @@ public class MainController {
             previewSphereMaterial.setDiffuseMap(defaultCustomPlanetTexture);
         }
         resetBTN.setDisable(false);
+        viewport.requestFocus();
     }
 
     private Vector3D getPositionInFrontOfCamera() {

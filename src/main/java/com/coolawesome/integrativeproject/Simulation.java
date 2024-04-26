@@ -12,8 +12,6 @@ public class Simulation {
 
     Map<String, Planet> planetMap = new HashMap<>();
     TreeNode root;
-    double theta = 0.5;
-    double G = 0.001;
 
     SimulationView simulationView;
     JsonPlanetManager planetManager = new JsonPlanetManager();
@@ -73,8 +71,6 @@ public class Simulation {
         simulationView.update(dt);
     }
 
-
-
     private void constructTree() {
         double[] boundingSquare = getBoundingSquare();
         root = new TreeNode(boundingSquare[0], boundingSquare[1], boundingSquare[2], boundingSquare[3]);
@@ -124,7 +120,7 @@ public class Simulation {
             if (tn.centerOfMass == null) {
                 tn.centerOfMass = tn.centerOfMassTimesTotalMass.scalarProduct(1.0 / tn.totalMass);
             }
-            if (tn.w / Vector3D.distance(p.position, tn.centerOfMass) < theta) {
+            if (tn.w / Vector3D.distance(p.position, tn.centerOfMass) < MainController.theta) {
                 p.velocity.add(gravityAcc(tn.centerOfMass, p.position, tn.totalMass, p.mass));
             } else {
 
@@ -142,7 +138,7 @@ public class Simulation {
         double dist = distance.magnitude();
 
         Vector3D direction = Vector3D.unitVector(distance);
-        double force = (G * massA * massB) / (dist * dist);
+        double force = (MainController.g * massA * massB) / (dist * dist);
 
         return direction.scalarProduct(force / massB);
     }
