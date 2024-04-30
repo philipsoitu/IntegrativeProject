@@ -1,3 +1,6 @@
+/**
+ * Integrative Project
+ */
 module com.coolawesome.integrativeproject {
     requires javafx.controls;
     requires javafx.fxml;

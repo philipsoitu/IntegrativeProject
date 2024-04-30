@@ -18,7 +18,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -32,12 +31,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+
 /**
  * UI controller class for the main application window.
  */
 public class MainController {
     public static double g = 0.001;
     public static double theta;
+    public final Image defaultCustomPlanetTexture = new Image(Constants.defaultCustomPlanetTextureFilePath);
+    private final ObservableList<String> simulationListContent = FXCollections.observableArrayList(Constants.TIME_ELAPSED_PREFIX, Constants.PLANET_COUNT_PREFIX, Constants.NUMBER_OF_COLLISIONS_PREFIX);
     @FXML
     public ListView<String> selectedPlanetInfoList;
     @FXML
@@ -48,6 +50,17 @@ public class MainController {
     public Button SearchBtn;
     @FXML
     public Button RenameBtn;
+    @FXML
+    public Label xPosLBL;
+    @FXML
+    public Label yPosLBL;
+    @FXML
+    public Label zPosLBL;
+    public AnchorPane viewport;
+    File SelectedImgFile;
+    Image customTexture;
+    Timeline timeline;
+    Color defaultColor;
     @FXML
     private ListView<String> simulationInfoList;
     @FXML
@@ -79,29 +92,17 @@ public class MainController {
     @FXML
     private Button originBTN;
     @FXML
-    public Label xPosLBL;
-    @FXML
-    public Label yPosLBL;
-    @FXML
-    public Label zPosLBL;
-    @FXML
     private Slider thetaSLD;
     @FXML
     private TextField thetaTXTF;
     @FXML
     private ColorPicker planetColourPicker;
-
-    File SelectedImgFile;
-    Image customTexture;
-    public AnchorPane viewport;
     private Simulation simulation;
     private int secondsElapsed = 0;
     private Sphere previewSphere;
     private PhongMaterial previewSphereMaterial;
-    Timeline timeline;
-    private final ObservableList<String> simulationListContent = FXCollections.observableArrayList(Constants.TIME_ELAPSED_PREFIX, Constants.PLANET_COUNT_PREFIX, Constants.NUMBER_OF_COLLISIONS_PREFIX);
-    public final Image defaultCustomPlanetTexture = new Image(getClass().getResourceAsStream(Constants.defaultCustomPlanetTextureFilePath));
-    Color defaultColor;
+
+
     /**
      * Initializes the controller once the root element has been completely loaded
      */
@@ -240,6 +241,7 @@ public class MainController {
         simulationListContent.set(1, Constants.PLANET_COUNT_PREFIX + getPlanetCount());
         simulationListContent.set(2, Constants.NUMBER_OF_COLLISIONS_PREFIX + Simulation.collisionCount);
     }
+
     /**
      * Sets the initial values for the controls and default planet parameters
      */
@@ -247,6 +249,7 @@ public class MainController {
         setInitialControls();
         setDefaultPlanetParameters();
     }
+
     /**
      * Sets the default values for all planet parameters for text fields, sliders, and buttons
      */
@@ -284,6 +287,7 @@ public class MainController {
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
+
     /**
      * Updates the time elapsed and refreshes the timer display
      */
@@ -297,6 +301,7 @@ public class MainController {
 
     /**
      * Retrieves the planet count from the planet map
+     *
      * @return the amount of planets in the planet map
      */
     private int getPlanetCount() {
@@ -309,13 +314,16 @@ public class MainController {
     private void updateGConst() {
         g = gConstSLD.getValue();
     }
+
     /**
-     *Validates if an object is null or not
+     * Validates if an object is null or not
+     *
      * @param obj the object being validated
      */
     private boolean isNull(Object obj) {
         return obj == null;
     }
+
     /**
      * Plays or pauses the simulation
      */
@@ -328,6 +336,7 @@ public class MainController {
             playPauseBTN.setText("Pause");
         }
     }
+
     /**
      * Handles button actions
      *
@@ -354,6 +363,7 @@ public class MainController {
         }
         viewport.requestFocus();
     }
+
     /**
      * Handles text field updates
      *
@@ -377,10 +387,11 @@ public class MainController {
 
         viewport.requestFocus();
     }
+
     /**
      * Updates the text fields and the sliders
      *
-     * @param slider The slider to be updated
+     * @param slider    The slider to be updated
      * @param textField The text field to be updated
      */
     private void updateTextFieldAndSlider(TextField textField, Slider slider) {
@@ -423,14 +434,13 @@ public class MainController {
             return false;
         }
     }
+
     /**
      * Updates the color of the planet preview sphere based on the selected planet color from
      * the planet picker
-     *
-     * @param event The ActionEvent triggered by setting the planet color
      */
     @FXML
-    void setPlanetColour(ActionEvent event) {
+    void setPlanetColour() {
         if (!isNull(planetColourPicker)) {
             previewSphereMaterial.setDiffuseColor(planetColourPicker.getValue());
             previewSphere.setMaterial(previewSphereMaterial);
@@ -441,6 +451,7 @@ public class MainController {
         }
         viewport.requestFocus();
     }
+
     /**
      * Creates a custom planet based on the input parameters
      */
@@ -464,6 +475,7 @@ public class MainController {
         }
         simulation.planetMap.put(uniqueID, planet);
     }
+
     /**
      * Spawns a random planet into the viewport and places into the planet map
      */
@@ -474,15 +486,23 @@ public class MainController {
 
         simulation.planetMap.put(uniqueID, planet);
     }
+
     /**
      * Updated the selected planet info
      *
      * @param planet the planet that the info is retrieved from
      */
     public void updateSelectedPlanetInfo(Planet planet) {
-        ObservableList<String> planetInfo = FXCollections.observableArrayList("ID: " + planet.name, "Position: " + String.format("%.3f, %.3f, %.3f", planet.position.x, planet.position.y, planet.position.z), "Velocity: " + String.format("%.3f, %.3f, %.3f", planet.velocity.x, planet.velocity.y, planet.velocity.z), "Accel: " + String.format("%.1e, %.1e, %.1e", planet.acceleration.x, planet.acceleration.y, planet.acceleration.z), "Radius: " + String.format("%.3f", planet.radius), "Mass: " + String.format("%.3f", planet.mass), "Color: " + planet.color);
+        ObservableList<String> planetInfo = FXCollections.observableArrayList("ID: " + planet.name,
+                "Position: " + String.format("%.3f, %.3f, %.3f", planet.position.x, planet.position.y, planet.position.z),
+                "Velocity: " + String.format("%.3f, %.3f, %.3f", planet.velocity.x, planet.velocity.y, planet.velocity.z),
+                "Accel: " + String.format("%.1e, %.1e, %.1e", planet.acceleration.x, planet.acceleration.y, planet.acceleration.z),
+                "Radius: " + String.format("%.3f", planet.radius),
+                "Mass: " + String.format("%.3f", planet.mass),
+                "Color: " + planet.color);
         selectedPlanetInfoList.setItems(planetInfo);
     }
+
     /**
      * Views a random planet in the viewport and sets the camera planet ID to that planet
      */
@@ -498,6 +518,7 @@ public class MainController {
         // Update the current camera planet in the SimulationView
         simulation.simulationView.setCurrentCamPlanetID(randomKey);
     }
+
     /**
      * Opens a file chooser to select an image from local storage, and pastes it onto the
      * preview planet sphere
@@ -524,6 +545,7 @@ public class MainController {
         }
         previewSphereMaterial.setDiffuseColor(planetColourPicker.getValue());
     }
+
     /**
      * Resets all possible planet inputs and sets all button statuses to their default status
      */
@@ -542,10 +564,9 @@ public class MainController {
 
     /**
      * Handles the case where the checkbox for isSun is selected or deselected
-     * @param event the event to be executed by selecting and unselecting the sun checkbox
      */
     @FXML
-    void sunCheckBSelected(ActionEvent event) {
+    void sunCheckBSelected() {
         if (sunCheckB.isSelected()) {
             previewSphereMaterial.setDiffuseMap(Planet.sunTexture);
             customTexture = Planet.sunTexture;
@@ -556,13 +577,16 @@ public class MainController {
         resetBTN.setDisable(false);
         viewport.requestFocus();
     }
+
     /**
      * Retrieves the vector of the position in front of the camera
+     *
      * @return the vector position 50 units in front of the vector
      */
     private Vector3D getPositionInFrontOfCamera() {
         return simulation.simulationView.getPositionInFrontOfCamera(50);
     }
+
     /**
      * Saves the planet data to a JSON file
      *
@@ -580,6 +604,7 @@ public class MainController {
         }
         viewport.requestFocus();
     }
+
     /**
      * Loads planet data from a JSON file
      *
@@ -597,12 +622,11 @@ public class MainController {
         }
         viewport.requestFocus();
     }
+
     /**
      * Handles the search action to find a planet by its name
-     *
-     * @param actionEvent The ActionEvent triggered by the search action
      */
-    public void handleSearch(ActionEvent actionEvent) {
+    public void handleSearch() {
         String searchText = SearchBar.getText().trim();
         Planet foundPlanet = null;
 
@@ -625,12 +649,11 @@ public class MainController {
         viewport.requestFocus();
         SearchBar.clear();
     }
+
     /**
      * Handles the renaming of a planet
-     *
-     * @param actionEvent The ActionEvent triggered by the rename action
      */
-    public void handleRename(ActionEvent actionEvent) {
+    public void handleRename() {
         String searchText = SearchBar.getText().trim();
         if (!simulation.simulationView.getCurrentCamPlanetID().isEmpty()) {
             simulation.planetMap.get(simulation.simulationView.getCurrentCamPlanetID()).name = searchText;
@@ -638,12 +661,11 @@ public class MainController {
         viewport.requestFocus();
         SearchBar.clear();
     }
+
     /**
      * Clears the search bar text when clicked, if it displays "Planet not found"
-     *
-     * @param mouseEvent The MouseEvent triggered by clicking on the search bar
      */
-    public void searchClicked(MouseEvent mouseEvent) {
+    public void searchClicked() {
         if (SearchBar.getText().equals("Planet not found")) {
             SearchBar.clear();
         }

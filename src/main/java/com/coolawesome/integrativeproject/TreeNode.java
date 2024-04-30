@@ -2,9 +2,10 @@ package com.coolawesome.integrativeproject;
 
 import com.coolawesome.integrativeproject.utils.Vector3D;
 
-public // Quadtree!
-
-class TreeNode {
+/**
+ * Represents a node in the Barnes-Hut tree used for the gravitational simulation.
+ */
+public class TreeNode {
     double x, y, z, w;
     TreeNode[] children; // Children
     boolean leaf;
@@ -15,6 +16,14 @@ class TreeNode {
     Vector3D centerOfMass; //calculated after
     int count; // Number of planets (for debugging)
 
+    /**
+     * Constructs a TreeNode object with specified properties.
+     *
+     * @param x The x-coordinate of the node.
+     * @param y The y-coordinate of the node.
+     * @param z The z-coordinate of the node.
+     * @param w The w of the node.
+     */
     public TreeNode(double x, double y, double z, double w) {
         this.x = x;
         this.y = y;
@@ -30,6 +39,9 @@ class TreeNode {
         this.count = 0;
     }
 
+    /**
+     * Splits the node into 8 children.
+     */
     void split() {
         double newWidth = w * 0.5;
         children[0] = new TreeNode(x, y, z, newWidth); // front nw
@@ -43,7 +55,12 @@ class TreeNode {
         this.leaf = false;
     }
 
-    // Return index of child that contains given vector
+    /**
+     * Returns the index of the child that contains the given vector.
+     *
+     * @param v The vector to check.
+     * @return The index of the child that contains the given vector.
+     */
     int which(Vector3D v) {
         int quad;
         double halfWidth = w * 0.5;
@@ -56,6 +73,11 @@ class TreeNode {
         return quad;
     }
 
+    /**
+     * Inserts a planet into the tree.
+     *
+     * @param newP The planet to insert.
+     */
     void insert(Planet newP) {
         if (this.leaf) {
             // If leaf already contains another planet

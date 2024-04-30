@@ -1,76 +1,73 @@
 package com.coolawesome.integrativeproject;
 
+import com.coolawesome.integrativeproject.utils.Constants;
 import com.coolawesome.integrativeproject.utils.PIDController;
+import com.coolawesome.integrativeproject.utils.Vector3D;
 import javafx.scene.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
-import javafx.scene.paint.Color;
 import javafx.scene.layout.AnchorPane;
-
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Sphere;
 import lombok.Getter;
 import lombok.Setter;
 import org.fxyz3d.scene.Skybox;
 import org.fxyz3d.utils.CameraTransformer;
 
-import com.coolawesome.integrativeproject.utils.Vector3D;
-
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-
+/**
+ * Class that represents the view of the simulation.
+ */
 public class SimulationView extends Group {
 
-    private final Set<KeyCode> keysPressed = new HashSet<>();
-
-    private final Simulation simulation;
-    private final MainController mainController;
-
-    @Setter
-    @Getter
-    private String currentCamPlanetID = "";
-
-    private final Image
+    private static final Image
             backImage = new Image("file:src/main/resources/images/skybox/back.png"),
             bottomImage = new Image("file:src/main/resources/images/skybox/bottom.png"),
             frontImage = new Image("file:src/main/resources/images/skybox/front.png"),
             leftImage = new Image("file:src/main/resources/images/skybox/left.png"),
             rightImage = new Image("file:src/main/resources/images/skybox/right.png"),
-            topImage = new Image("file:src/main/resources/images/skybox/top.png"),
-            cubeMap = new Image("file:src/main/resources/images/skybox/cubemap.png");
-
-    private final Skybox skyBox;
-
-    private final PerspectiveCamera camera;
-    private final double FOV = 60;
+            topImage = new Image("file:src/main/resources/images/skybox/top.png");
+    private final Set<KeyCode> keysPressed = new HashSet<>();
+    private final Simulation simulation;
+    private final MainController mainController;
     private final CameraTransformer cameraTransform = new CameraTransformer();
     private final Vector3D cameraVelocity = new Vector3D();
-
+    @Setter
+    @Getter
+    private String currentCamPlanetID = "";
     private double deltaMouseX, deltaMouseY = 0;
 
     @Setter
     @Getter
     private boolean goingToOrigin;
 
+    /**
+     * Constructor for the SimulationView class.
+     *
+     * @param pane           The AnchorPane to add the simulation view to.
+     * @param simulation     The simulation to display.
+     * @param mainController The main controller for the simulation.
+     */
     public SimulationView(AnchorPane pane, Simulation simulation, MainController mainController) {
         this.simulation = simulation;
         this.mainController = mainController;
 
-        // Set up the subscene for 3D content
+        // Set up the sub scene for 3D content
         SubScene subScene = new SubScene(this, pane.getWidth(), pane.getHeight(), true, SceneAntialiasing.BALANCED);
         subScene.widthProperty().bind(pane.widthProperty());
         subScene.heightProperty().bind(pane.heightProperty());
         subScene.setFill(Color.BLACK);
         pane.getChildren().add(subScene);
         // Set up the camera
-        camera = new PerspectiveCamera(true);
+        PerspectiveCamera camera = new PerspectiveCamera(true);
         camera.setNearClip(0.1);
         camera.setFarClip(100000.0);
         camera.setTranslateX(0);
         camera.setTranslateY(0);
         camera.setTranslateZ(0);
-        camera.setFieldOfView(FOV);
+        camera.setFieldOfView(Constants.CAM_FOV);
         cameraTransform.getChildren().add(camera);
         cameraTransform.t.setX(0);
         cameraTransform.t.setY(0);
@@ -82,7 +79,7 @@ public class SimulationView extends Group {
 
         AmbientLight al = new AmbientLight(Color.rgb(100, 100, 100));
 
-        skyBox = new Skybox(topImage, bottomImage, rightImage, leftImage, frontImage, backImage, 100000, camera);
+        Skybox skyBox = new Skybox(topImage, bottomImage, rightImage, leftImage, frontImage, backImage, 100000, camera);
 
         this.getChildren().addAll(al, skyBox);
 
@@ -108,7 +105,10 @@ public class SimulationView extends Group {
         subScene.requestFocus();
     }
 
-    public void update(double dt) {
+    /**
+     * Updates the simulation view.
+     */
+    public void update() {
         // Update the selected planet info list
         if (!currentCamPlanetID.isEmpty()) {
             this.mainController.updateSelectedPlanetInfo(simulation.planetMap.get(currentCamPlanetID));
@@ -118,9 +118,7 @@ public class SimulationView extends Group {
         simulation.planetMap.forEach((id, planet) -> {
             if (!this.getChildren().contains(planet.planetNode)) {
                 this.getChildren().add(planet.planetNode);
-                planet.planetNode.setOnMouseClicked(event -> {
-                    currentCamPlanetID = id;
-                });
+                planet.planetNode.setOnMouseClicked(event -> currentCamPlanetID = id);
             }
             if (planet.isSun && !this.getChildren().contains(planet.sunLight)) {
                 this.getChildren().add(planet.sunLight);
@@ -248,6 +246,12 @@ public class SimulationView extends Group {
         updateCameraCoords();
     }
 
+    /**
+     * Moves the camera to the specified coordinates.
+     *
+     * @param coordinates The coordinates to move the camera to.
+     * @param planet      The planet to move the camera to. (null if no planet)
+     */
     private void goToCoordinate(Vector3D coordinates, Planet planet) {
         Vector3D camPos = getCameraPos();
         Vector3D direction = Vector3D.difference(coordinates, camPos);
@@ -257,8 +261,8 @@ public class SimulationView extends Group {
         double directionPitch = -Math.toDegrees(Math.asin(direction.y));
         double directionYaw = Math.toDegrees(Math.atan2(direction.x, direction.z));
 
-        cameraTransform.rx.setAngle(lerpAngle(cameraTransform.rx.getAngle(), directionPitch, 0.5));
-        cameraTransform.ry.setAngle(lerpAngle(cameraTransform.ry.getAngle(), directionYaw, 0.5));
+        cameraTransform.rx.setAngle(lerpAngle(cameraTransform.rx.getAngle(), directionPitch));
+        cameraTransform.ry.setAngle(lerpAngle(cameraTransform.ry.getAngle(), directionYaw));
 
         //Use PID controller to move towards planet
         direction.negate();
@@ -273,20 +277,37 @@ public class SimulationView extends Group {
         cameraVelocity.add(direction);
     }
 
+    /**
+     * Updates the camera coordinates on the main controller.
+     */
     private void updateCameraCoords() {
         this.mainController.xPosLBL.setText(" X: " + String.format("%.3f", cameraTransform.t.getX()));
         this.mainController.yPosLBL.setText(" Y: " + String.format("%.3f", cameraTransform.t.getY()));
         this.mainController.zPosLBL.setText(" Z: " + String.format("%.3f", cameraTransform.t.getZ()));
     }
 
-    private double lerpAngle(double start, double end, double t) {
+    /**
+     * Linearly interpolates between two angles.
+     *
+     * @param start The starting angle.
+     * @param end   The ending angle.
+     * @return The interpolated angle.
+     */
+    private double lerpAngle(double start, double end) {
         double diff = end - start;
         // Normalize the difference in the angle
         while (diff < -180) diff += 360;
         while (diff > 180) diff -= 360;
-        return start + diff * t;
+        return start + diff * 0.5;
     }
 
+    /**
+     * Gets the facing vector of the camera.
+     *
+     * @param pitch The pitch of the camera.
+     * @param yaw   The yaw of the camera.
+     * @return The facing vector of the camera.
+     */
     private Vector3D getFacingVector(double pitch, double yaw) {
         double x = Math.cos(pitch) * Math.sin(yaw);
         double y = Math.sin(pitch);
@@ -297,11 +318,20 @@ public class SimulationView extends Group {
         return facing;
     }
 
+    /**
+     * Moves the camera to the origin.
+     */
     public void goOrigin() {
         setCurrentCamPlanetID("");
         goToCoordinate(new Vector3D(), null);
     }
 
+    /**
+     * Gets the position in front of the camera.
+     *
+     * @param distance The distance in front of the camera.
+     * @return The position in front of the camera.
+     */
     public Vector3D getPositionInFrontOfCamera(double distance) {
         //camera position
         double camX = cameraTransform.t.getX();
@@ -319,12 +349,12 @@ public class SimulationView extends Group {
         return new Vector3D(x, y, z);
     }
 
+    /**
+     * Gets the position of the camera.
+     *
+     * @return The position of the camera.
+     */
     private Vector3D getCameraPos() {
-        return new Vector3D(
-                cameraTransform.t.getX(),
-                cameraTransform.t.getY(),
-                cameraTransform.t.getZ()
-        );
+        return new Vector3D(cameraTransform.t.getX(), cameraTransform.t.getY(), cameraTransform.t.getZ());
     }
-
 }

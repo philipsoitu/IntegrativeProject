@@ -4,26 +4,38 @@ import com.coolawesome.integrativeproject.utils.Constants;
 import com.coolawesome.integrativeproject.utils.JsonPlanetManager;
 import com.coolawesome.integrativeproject.utils.Vector3D;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
+/**
+ * Class that represents the simulation of the planets.
+ */
 public class Simulation {
 
+    static int collisionCount = 0;
     Map<String, Planet> planetMap = new HashMap<>();
     TreeNode root;
-
     SimulationView simulationView;
-    JsonPlanetManager planetManager = new JsonPlanetManager();
-
-    static int collisionCount = 0;
     boolean isPaused = false;
 
+    /**
+     * Constructor for the Simulation class.
+     *
+     * @param viewport   The viewport for the simulation.
+     * @param controller The controller for the simulation.
+     */
     public Simulation(AnchorPane viewport, MainController controller) {
         simulationView = new SimulationView(viewport, this, controller);
-        initialize(400);
+        initialize(100);
     }
 
+    /**
+     * Initializes the simulation with a given number of bodies.
+     *
+     * @param numOfBodies The number of bodies to initialize the simulation with.
+     */
     public void initialize(int numOfBodies) {
         for (int i = 0; i < numOfBodies; i++) {
             String uniqueID = UUID.randomUUID().toString().replaceAll("-", "");
@@ -36,6 +48,12 @@ public class Simulation {
         planetMap.put(uniqueID, new Planet("sun", new Vector3D(5000, 0, 0), new Vector3D(), 1000, 100000, true));
     }
 
+    /**
+     * Creates a random planet with a given unique ID.
+     *
+     * @param uniqueID The unique ID for the planet.
+     * @return The randomly generated planet.
+     */
     public Planet createRandomPlanet(String uniqueID) {
         Vector3D randPos = Vector3D.generateRandomVector();
         Vector3D randVel = new Vector3D();
@@ -46,40 +64,60 @@ public class Simulation {
         return new Planet(uniqueID, randPos, randVel, getRandomRadius(), Constants.defaultMass, sun);
     }
 
+    /**
+     * Creates a random planet with a given unique ID and position.
+     *
+     * @param uniqueID The unique ID for the planet.
+     * @param pos      The position of the planet.
+     * @return The randomly generated planet.
+     */
     public Planet createRandomPlanet(String uniqueID, Vector3D pos) {
         boolean sun = Math.random() * 4 < 1;
         return new Planet(uniqueID, pos, new Vector3D(), getRandomRadius(), Constants.defaultMass, sun);
     }
 
-
+    /**
+     * Gets a random radius for a planet.
+     *
+     * @return The random radius for the planet.
+     */
     private double getRandomRadius() {
         return 1 + Math.random() * 2;
     }
 
-    public void update(double dt){
+    /**
+     * Updates the simulation with a given time step.
+     *
+     * @param dt The time step for the update.
+     */
+    public void update(double dt) {
         // handle physics and collisions
-        if(!isPaused) {
-            planetMap.forEach((id, p) -> {
-                p.update(dt);
-            });
+        if (!isPaused) {
+            planetMap.forEach((id, p) -> p.update(dt));
 
             constructTree();
             gravity();
 
         }
 
-        simulationView.update(dt);
+        simulationView.update();
     }
 
+    /**
+     * Constructs the octree for the simulation.
+     */
     private void constructTree() {
         double[] boundingSquare = getBoundingSquare();
         root = new TreeNode(boundingSquare[0], boundingSquare[1], boundingSquare[2], boundingSquare[3]);
 
-        planetMap.forEach((id, p) -> {
-            root.insert(p);
-        });
+        planetMap.forEach((id, p) -> root.insert(p));
     }
 
+    /**
+     * Gets the bounding square for the simulation.
+     *
+     * @return The bounding square for the simulation.
+     */
     public double[] getBoundingSquare() {
         // Indices
         double minX = Double.MAX_VALUE;
@@ -101,16 +139,22 @@ public class Simulation {
         }
 
 
-
         return new double[]{minX, minY, minZ, Math.max(maxX - minX, Math.max(maxY - minY, maxZ - minZ))};
     }
 
+    /**
+     * Applies gravity to the planets in the simulation.
+     */
     private void gravity() {
-        planetMap.forEach((id, p) -> {
-            gravitate(p, root);
-        });
+        planetMap.forEach((id, p) -> gravitate(p, root));
     }
 
+    /**
+     * Applies gravity to a given planet.
+     *
+     * @param p  The planet to apply gravity to.
+     * @param tn The tree node to apply gravity from.
+     */
     private void gravitate(Planet p, TreeNode tn) {
         if (tn.leaf) {
             if (tn.planet == null || p == tn.planet) return;
@@ -129,7 +173,15 @@ public class Simulation {
         }
     }
 
-    // Acceleration due to the gravity exerted by a on particle b
+    /**
+     * Calculates the acceleration due to gravity between two planets.
+     *
+     * @param posA  The position of the first planet.
+     * @param posB  The position of the second planet.
+     * @param massA The mass of the first planet.
+     * @param massB The mass of the second planet.
+     * @return The acceleration due to gravity between the two planets.
+     */
     private Vector3D gravityAcc(Vector3D posA, Vector3D posB, double massA, double massB) {
 
         // TODO: collision threshold (no acceleration from a certain distance)
@@ -143,11 +195,21 @@ public class Simulation {
         return direction.scalarProduct(force / massB);
     }
 
+    /**
+     * Saves the simulation to a JSON file.
+     *
+     * @param filePath The file path to save the simulation to.
+     */
     public void saveToJson(String filePath) {
-        planetManager.saveToJson(planetMap, filePath);
+        JsonPlanetManager.saveToJson(planetMap, filePath);
     }
 
+    /**
+     * Loads the simulation from a JSON file.
+     *
+     * @param filePath The file path to load the simulation from.
+     */
     public void loadFromJson(String filePath) {
-        planetMap = planetManager.loadFromJson(filePath);
+        planetMap = JsonPlanetManager.loadFromJson(filePath);
     }
 }

@@ -4,11 +4,17 @@ import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.paint.Color;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.Objects;
-
+/**
+ * Class that represents a utility for generating the average color of an image.
+ */
 public class AverageColourGenerator {
+
+    /**
+     * Constructor for the AverageColourGenerator class.
+     */
+    public AverageColourGenerator() {
+    }
+
     /**
      * Calculates the average color of an image
      *
