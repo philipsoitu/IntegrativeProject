@@ -7,6 +7,7 @@ import javafx.scene.layout.AnchorPane;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -14,11 +15,11 @@ import java.util.UUID;
  */
 public class Simulation {
 
-    static int collisionCount = 0;
     Map<String, Planet> planetMap = new HashMap<>();
     TreeNode root;
     SimulationView simulationView;
     boolean isPaused = false;
+    static int collisionCount = 0;
 
     /**
      * Constructor for the Simulation class.
@@ -28,7 +29,7 @@ public class Simulation {
      */
     public Simulation(AnchorPane viewport, MainController controller) {
         simulationView = new SimulationView(viewport, this, controller);
-        initialize(100);
+        initialize(400);
     }
 
     /**
@@ -94,7 +95,7 @@ public class Simulation {
         // handle physics and collisions
         if (!isPaused) {
             planetMap.forEach((id, p) -> p.update(dt));
-
+            collision();
             constructTree();
             gravity();
 
@@ -184,8 +185,6 @@ public class Simulation {
      */
     private Vector3D gravityAcc(Vector3D posA, Vector3D posB, double massA, double massB) {
 
-        // TODO: collision threshold (no acceleration from a certain distance)
-
         Vector3D distance = Vector3D.difference(posA, posB);
         double dist = distance.magnitude();
 
@@ -194,6 +193,42 @@ public class Simulation {
 
         return direction.scalarProduct(force / massB);
     }
+
+    public void collision() {
+        planetMap.forEach((id1, p1) -> {
+            planetMap.forEach((id2, p2) -> {
+                if (!Objects.equals(p1, p2)) {
+
+                    // collision detection
+                    Vector3D collisionAxis = Vector3D.difference(p1.position, p2.position);
+                    double dist = collisionAxis.magnitude();
+                    double minDist = p1.radius + p2.radius;
+
+                    // collision handle
+                    if (dist < minDist) {
+
+                        Vector3D normal = Vector3D.multiplication(1 / dist, collisionAxis);
+                        double delta = minDist - dist;
+
+                        // Calculate masses
+                        double totalMass = p1.mass + p2.mass;
+                        double p1Ratio = p1.mass / totalMass;
+                        double p2Ratio = p2.mass / totalMass;
+
+                        // Calculate displacement based on mass ratio
+                        Vector3D p1Displacement = Vector3D.multiplication(delta * p2Ratio, normal);
+                        Vector3D p2Displacement = Vector3D.multiplication(delta * p1Ratio, normal);
+
+                        p1.position.add(p1Displacement);
+                        p1.velocity.add(p1Displacement);
+                        p2.position.subtract(p2Displacement);
+                        p2.velocity.subtract(p2Displacement);
+                    }
+                }
+            });
+        });
+    }
+
 
     /**
      * Saves the simulation to a JSON file.
