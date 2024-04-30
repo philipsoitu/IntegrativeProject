@@ -15,11 +15,11 @@ import java.util.UUID;
  */
 public class Simulation {
 
+    static int collisionCount = 0;
     Map<String, Planet> planetMap = new HashMap<>();
     TreeNode root;
     SimulationView simulationView;
     boolean isPaused = false;
-    static int collisionCount = 0;
 
     /**
      * Constructor for the Simulation class.
@@ -29,7 +29,7 @@ public class Simulation {
      */
     public Simulation(AnchorPane viewport, MainController controller) {
         simulationView = new SimulationView(viewport, this, controller);
-        initialize(400);
+        initialize(100);
     }
 
     /**
@@ -194,6 +194,9 @@ public class Simulation {
         return direction.scalarProduct(force / massB);
     }
 
+    /**
+     * Handles collisions between planets in the simulation.
+     */
     public void collision() {
         planetMap.forEach((id1, p1) -> {
             planetMap.forEach((id2, p2) -> {
@@ -206,6 +209,8 @@ public class Simulation {
 
                     // collision handle
                     if (dist < minDist) {
+
+                        collisionCount++;
 
                         Vector3D normal = Vector3D.multiplication(1 / dist, collisionAxis);
                         double delta = minDist - dist;
