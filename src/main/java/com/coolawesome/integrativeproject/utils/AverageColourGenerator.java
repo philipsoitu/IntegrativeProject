@@ -9,6 +9,12 @@ import java.io.FileNotFoundException;
 import java.util.Objects;
 
 public class AverageColourGenerator {
+    /**
+     * Calculates the average color of an image
+     *
+     * @param image The image for which to calculate the average color
+     * @return The average color of the image
+     */
     public static Color getAverageColor(Image image) {
 
         PixelReader pixelReader = image.getPixelReader();

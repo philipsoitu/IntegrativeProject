@@ -32,7 +32,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
-
+/**
+ * UI controller class for the main application window.
+ */
 public class MainController {
     public static double g = 0.001;
     public static double theta;
@@ -100,7 +102,9 @@ public class MainController {
     private final ObservableList<String> simulationListContent = FXCollections.observableArrayList(Constants.TIME_ELAPSED_PREFIX, Constants.PLANET_COUNT_PREFIX, Constants.NUMBER_OF_COLLISIONS_PREFIX);
     public final Image defaultCustomPlanetTexture = new Image(getClass().getResourceAsStream(Constants.defaultCustomPlanetTextureFilePath));
     Color defaultColor;
-
+    /**
+     * Initializes the controller once the root element has been completely loaded
+     */
     @FXML
     public void initialize() {
         previewSetup();
@@ -129,6 +133,9 @@ public class MainController {
         }
     }
 
+    /**
+     * Sets up the preview of the custom planet sphere in the viewport
+     */
     void previewSetup() {
         PerspectiveCamera camera = new PerspectiveCamera(true);
 
@@ -156,6 +163,11 @@ public class MainController {
         previewViewport.getChildren().addAll(previewSphere, camera, ambientLight);
     }
 
+    /**
+     * Sets up the controller and sets initial values
+     *
+     * @param simulation The simulation to set up the controller with
+     */
     void controllerSetup(Simulation simulation) {
         if (simulation != null) {
             this.simulation = simulation;
@@ -177,6 +189,9 @@ public class MainController {
         setInitialValues();
     }
 
+    /**
+     * Sets up the listeners to correct user inputs
+     */
     private void listenerSetup(TextField t1, Slider s1) {
         if (!isNull(s1) && !isNull(t1)) {
 
@@ -211,21 +226,30 @@ public class MainController {
         }
     }
 
-
+    /**
+     * sets the theta value to the theta value from slider
+     */
     private void updateTheta() {
         theta = thetaSLD.getValue();
     }
 
+    /**
+     * Updates the simulation information displayed
+     */
     public void updateSimInfo() {
         simulationListContent.set(1, Constants.PLANET_COUNT_PREFIX + getPlanetCount());
         simulationListContent.set(2, Constants.NUMBER_OF_COLLISIONS_PREFIX + Simulation.collisionCount);
     }
-
+    /**
+     * Sets the initial values for the controls and default planet parameters
+     */
     private void setInitialValues() {
         setInitialControls();
         setDefaultPlanetParameters();
     }
-
+    /**
+     * Sets the default values for all planet parameters for text fields, sliders, and buttons
+     */
     private void setDefaultPlanetParameters() {
         massSLD.setValue(massSLD.getMax() / 2);
         massTXTF.setText(massSLD.getValue() + "");
@@ -234,6 +258,9 @@ public class MainController {
         resetBTN.setDisable(true);
     }
 
+    /**
+     * Sets the initial values for the control part of the UI
+     */
     private void setInitialControls() {
         if (!isNull(gConstSLD) && !isNull(gConstantTXTF)) {
             gConstSLD.setValue(g);
@@ -246,6 +273,9 @@ public class MainController {
         }
     }
 
+    /**
+     * Starts the 'elapsed time' timer
+     */
     private void initializeTime() {
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             secondsElapsed++;
@@ -254,7 +284,9 @@ public class MainController {
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
-
+    /**
+     * Updates the time elapsed and refreshes the timer display
+     */
     private void updateTimer() {
         int hours = secondsElapsed / 3600;
         int minutes = (secondsElapsed % 3600) / 60;
@@ -263,18 +295,30 @@ public class MainController {
         simulationListContent.set(0, Constants.TIME_ELAPSED_PREFIX + String.format("%02d:%02d:%02d", hours, minutes, seconds));
     }
 
+    /**
+     * Retrieves the planet count from the planet map
+     * @return the amount of planets in the planet map
+     */
     private int getPlanetCount() {
         return simulation.planetMap.size();
     }
 
+    /**
+     * Retrieves the Gravitation Constant from the slider
+     */
     private void updateGConst() {
         g = gConstSLD.getValue();
     }
-
+    /**
+     *Validates if an object is null or not
+     * @param obj the object being validated
+     */
     private boolean isNull(Object obj) {
         return obj == null;
     }
-
+    /**
+     * Plays or pauses the simulation
+     */
     private void playPauseSim() {
         simulation.isPaused = !simulation.isPaused;
 
@@ -284,7 +328,11 @@ public class MainController {
             playPauseBTN.setText("Pause");
         }
     }
-
+    /**
+     * Handles button actions
+     *
+     * @param event The ActionEvent triggered by a button.
+     */
     @FXML
     void onBTNUpdate(ActionEvent event) {
         Button btn = (Button) event.getSource();
@@ -306,6 +354,11 @@ public class MainController {
         }
         viewport.requestFocus();
     }
+    /**
+     * Handles text field updates
+     *
+     * @param event The ActionEvent triggered by any text field
+     */
     @FXML
     void onTXTFUpdate(ActionEvent event) {
         TextField source = (TextField) event.getSource();
@@ -324,7 +377,12 @@ public class MainController {
 
         viewport.requestFocus();
     }
-
+    /**
+     * Updates the text fields and the sliders
+     *
+     * @param slider The slider to be updated
+     * @param textField The text field to be updated
+     */
     private void updateTextFieldAndSlider(TextField textField, Slider slider) {
         try {
             if (textField.getText().isEmpty()) {
@@ -351,7 +409,12 @@ public class MainController {
         }
     }
 
-
+    /**
+     * Validates if a string is a valid double
+     *
+     * @param s The string to be validates
+     * @return true if the string is a valid double and false otherwise
+     */
     private boolean isValidDouble(String s) {
         try {
             Double.parseDouble(s);
@@ -360,7 +423,12 @@ public class MainController {
             return false;
         }
     }
-
+    /**
+     * Updates the color of the planet preview sphere based on the selected planet color from
+     * the planet picker
+     *
+     * @param event The ActionEvent triggered by setting the planet color
+     */
     @FXML
     void setPlanetColour(ActionEvent event) {
         if (!isNull(planetColourPicker)) {
@@ -373,7 +441,9 @@ public class MainController {
         }
         viewport.requestFocus();
     }
-
+    /**
+     * Creates a custom planet based on the input parameters
+     */
     private void createCustomPlanet() {
         Planet planet;
 
@@ -394,7 +464,9 @@ public class MainController {
         }
         simulation.planetMap.put(uniqueID, planet);
     }
-
+    /**
+     * Spawns a random planet into the viewport and places into the planet map
+     */
     private void spawnRandomPlanet() {
         String uniqueID = UUID.randomUUID().toString().replaceAll("-", "");
 
@@ -402,12 +474,18 @@ public class MainController {
 
         simulation.planetMap.put(uniqueID, planet);
     }
-
+    /**
+     * Updated the selected planet info
+     *
+     * @param planet the planet that the info is retrieved from
+     */
     public void updateSelectedPlanetInfo(Planet planet) {
         ObservableList<String> planetInfo = FXCollections.observableArrayList("ID: " + planet.name, "Position: " + String.format("%.3f, %.3f, %.3f", planet.position.x, planet.position.y, planet.position.z), "Velocity: " + String.format("%.3f, %.3f, %.3f", planet.velocity.x, planet.velocity.y, planet.velocity.z), "Accel: " + String.format("%.1e, %.1e, %.1e", planet.acceleration.x, planet.acceleration.y, planet.acceleration.z), "Radius: " + String.format("%.3f", planet.radius), "Mass: " + String.format("%.3f", planet.mass), "Color: " + planet.color);
         selectedPlanetInfoList.setItems(planetInfo);
     }
-
+    /**
+     * Views a random planet in the viewport and sets the camera planet ID to that planet
+     */
     private void viewRandPlanet() {
         // Get a random planet from the planetMap
         List<String> keys = new ArrayList<>(simulation.planetMap.keySet());
@@ -420,7 +498,10 @@ public class MainController {
         // Update the current camera planet in the SimulationView
         simulation.simulationView.setCurrentCamPlanetID(randomKey);
     }
-
+    /**
+     * Opens a file chooser to select an image from local storage, and pastes it onto the
+     * preview planet sphere
+     */
     private void chooseCustomTexture() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));
@@ -443,7 +524,9 @@ public class MainController {
         }
         previewSphereMaterial.setDiffuseColor(planetColourPicker.getValue());
     }
-
+    /**
+     * Resets all possible planet inputs and sets all button statuses to their default status
+     */
     private void resetCustomPlanetInputs() {
         customTexture = null;
         previewSphereMaterial.setDiffuseMap(defaultCustomPlanetTexture);
@@ -457,6 +540,10 @@ public class MainController {
         resetBTN.setDisable(true);
     }
 
+    /**
+     * Handles the case where the checkbox for isSun is selected or deselected
+     * @param event the event to be executed by selecting and unselecting the sun checkbox
+     */
     @FXML
     void sunCheckBSelected(ActionEvent event) {
         if (sunCheckB.isSelected()) {
@@ -469,11 +556,18 @@ public class MainController {
         resetBTN.setDisable(false);
         viewport.requestFocus();
     }
-
+    /**
+     * Retrieves the vector of the position in front of the camera
+     * @return the vector position 50 units in front of the vector
+     */
     private Vector3D getPositionInFrontOfCamera() {
         return simulation.simulationView.getPositionInFrontOfCamera(50);
     }
-
+    /**
+     * Saves the planet data to a JSON file
+     *
+     * @param actionEvent The ActionEvent triggered by the save action
+     */
     public void saveJson(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save Planet Data");
@@ -486,7 +580,11 @@ public class MainController {
         }
         viewport.requestFocus();
     }
-
+    /**
+     * Loads planet data from a JSON file
+     *
+     * @param actionEvent The ActionEvent triggered by the load action
+     */
     public void loadJson(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Load Planet Data");
@@ -499,7 +597,11 @@ public class MainController {
         }
         viewport.requestFocus();
     }
-
+    /**
+     * Handles the search action to find a planet by its name
+     *
+     * @param actionEvent The ActionEvent triggered by the search action
+     */
     public void handleSearch(ActionEvent actionEvent) {
         String searchText = SearchBar.getText().trim();
         Planet foundPlanet = null;
@@ -523,7 +625,11 @@ public class MainController {
         viewport.requestFocus();
         SearchBar.clear();
     }
-
+    /**
+     * Handles the renaming of a planet
+     *
+     * @param actionEvent The ActionEvent triggered by the rename action
+     */
     public void handleRename(ActionEvent actionEvent) {
         String searchText = SearchBar.getText().trim();
         if (!simulation.simulationView.getCurrentCamPlanetID().isEmpty()) {
@@ -532,7 +638,11 @@ public class MainController {
         viewport.requestFocus();
         SearchBar.clear();
     }
-
+    /**
+     * Clears the search bar text when clicked, if it displays "Planet not found"
+     *
+     * @param mouseEvent The MouseEvent triggered by clicking on the search bar
+     */
     public void searchClicked(MouseEvent mouseEvent) {
         if (SearchBar.getText().equals("Planet not found")) {
             SearchBar.clear();

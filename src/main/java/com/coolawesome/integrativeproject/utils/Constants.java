@@ -3,7 +3,7 @@ package com.coolawesome.integrativeproject.utils;
 import javafx.scene.image.Image;
 
 public final class Constants {
-
+    //Constants for simulation information
     public static final String TIME_ELAPSED_PREFIX = "Time Elapsed: ";
 
     public static final String PLANET_COUNT_PREFIX = "Planet Count: ";
@@ -18,9 +18,7 @@ public final class Constants {
 
     public static final String defaultCustomPlanetTextureFilePath = "/images/planets/defaultCustomPlanet.jpg";
 
-
-
-    //shouldn't be able to create an instance of this class
+    //Private constructor to stop the instantiation  of this class
     private Constants() {
     }
 }
