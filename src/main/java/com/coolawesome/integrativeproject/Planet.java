@@ -135,8 +135,28 @@ public class Planet {
      * @param color    The color of the planet.
      */
     public Planet(String name, Vector3D position, Vector3D velocity, double radius, double mass, boolean isSun, Color color) {
-        this(name, position, velocity, radius, mass, isSun);
+        this.name = name;
+        this.position = position;
+        this.velocity = velocity;
+        this.acceleration = new Vector3D();
+        this.mass = mass;
+        this.radius = radius;
         this.color = color;
+        this.spinRate = -1.5 + (Math.random() * 3);
+        this.isSun = isSun;
+
+        planetNode = new Sphere(radius);
+        planetNode.setTranslateX(position.x);
+        planetNode.setTranslateY(position.y);
+        planetNode.setTranslateZ(position.z);
+        material = new PhongMaterial(color);
+
+        if (isSun) {
+            initSun();
+        } else {
+            initSphere();
+        }
+
     }
 
     /**
