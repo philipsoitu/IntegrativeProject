@@ -30,7 +30,7 @@ public class Simulation {
      */
     public Simulation(AnchorPane viewport, MainController controller) {
         simulationView = new SimulationView(viewport, this, controller);
-        initialize(100);
+        initialize(0);
     }
 
     /**

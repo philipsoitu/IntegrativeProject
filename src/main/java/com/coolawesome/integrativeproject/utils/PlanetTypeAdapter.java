@@ -2,6 +2,7 @@ package com.coolawesome.integrativeproject.utils;
 
 import com.coolawesome.integrativeproject.Planet;
 import com.google.gson.*;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 import java.lang.reflect.Type;
@@ -59,7 +60,7 @@ public class PlanetTypeAdapter implements JsonSerializer<Planet>, JsonDeserializ
         boolean isSun = jsonObject.get("isSun").getAsBoolean();
         Color color = Color.valueOf(jsonObject.get("color").getAsString());
 
-        return new Planet(id, position, velocity, radius, mass, isSun, color);
+        return new Planet(id, position, velocity, radius, mass, isSun, new Image(Constants.defaultCustomPlanetTextureFilePath), color);
     }
 }
 
