@@ -20,6 +20,7 @@ public class Simulation {
     TreeNode root;
     SimulationView simulationView;
     boolean isPaused = false;
+    JsonPlanetManager planetManager = new JsonPlanetManager();
 
     /**
      * Constructor for the Simulation class.
@@ -241,7 +242,7 @@ public class Simulation {
      * @param filePath The file path to save the simulation to.
      */
     public void saveToJson(String filePath) {
-        JsonPlanetManager.saveToJson(planetMap, filePath);
+        planetManager.saveToJson(planetMap, filePath);
     }
 
     /**
@@ -250,6 +251,6 @@ public class Simulation {
      * @param filePath The file path to load the simulation from.
      */
     public void loadFromJson(String filePath) {
-        planetMap = JsonPlanetManager.loadFromJson(filePath);
+        planetMap = planetManager.loadFromJson(filePath);
     }
 }

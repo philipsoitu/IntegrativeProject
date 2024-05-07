@@ -31,7 +31,7 @@ public class JsonPlanetManager {
      * @param planetMap The map of planets to save.
      * @param filePath  The file path to save the planets to.
      */
-    public static void saveToJson(Map<String, Planet> planetMap, String filePath) {
+    public void saveToJson(Map<String, Planet> planetMap, String filePath) {
         try (FileWriter writer = new FileWriter(filePath)) {
             gson.toJson(planetMap, writer);
         } catch (IOException e) {
@@ -45,7 +45,7 @@ public class JsonPlanetManager {
      * @param filePath The file path to load the planets from.
      * @return The map of planets loaded from the file.
      */
-    public static Map<String, Planet> loadFromJson(String filePath) {
+    public Map<String, Planet> loadFromJson(String filePath) {
         try (FileReader reader = new FileReader(filePath)) {
             Type type = new TypeToken<Map<String, Planet>>() {
             }.getType();
