@@ -1,13 +1,12 @@
-# Cool awesome team :)
+# JavaFX Planet Sim
 
-IDE - IntelliJ IDEA
+This project in a N-body 3D Planet Simulation in written in JavaFX
 
-JAVA - 21
-
-Build System: Maven
-
-Coding Style - IntelliJ
-
-Code Review - Through Jetbrains Space
-
-Notes are done in Jetbrains Space documents
+### features include:
+- Barnes–Hut simulation
+- Json Loading and Saving
+- Highly customizable planets
+- Skybox
+- Dynamic camera controls
+- Simulation customization
+- and more!
